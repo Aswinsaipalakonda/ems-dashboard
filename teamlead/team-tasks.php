@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (!isTeamLead()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($formToken) || (isset($_SESSION['last_form_token']) && $_SESSION['last_form_token'] === $formToken)) {
             // Duplicate submission detected
             $isValidSubmission = false;
-            header("Location: team-tasks.php");
+            header("Location: team-tasks");
             exit;
         }
         $_SESSION['last_form_token'] = $formToken;
@@ -47,6 +47,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $priority = sanitize($_POST['priority'] ?? 'medium');
         $status = sanitize($_POST['status'] ?? 'not_started');
         $deadline = $_POST['deadline'] ?? null;
+        
+        // Handle file upload (optional)
+        $attachmentFile = null;
+        if (!empty($_FILES['task_attachment']['name'])) {
+            $allowedExtensions = ['pdf', 'csv', 'xls', 'xlsx', 'doc', 'docx'];
+            $fileExt = strtolower(pathinfo($_FILES['task_attachment']['name'], PATHINFO_EXTENSION));
+            $fileSize = $_FILES['task_attachment']['size'];
+            $maxSize = 10 * 1024 * 1024; // 10MB max
+            
+            if (!in_array($fileExt, $allowedExtensions)) {
+                $message = 'Invalid file type. Allowed: PDF, CSV, XLS, XLSX, DOC, DOCX';
+                $messageType = 'danger';
+            } elseif ($fileSize > $maxSize) {
+                $message = 'File size too large. Maximum 10MB allowed.';
+                $messageType = 'danger';
+            } else {
+                $attachmentFile = 'task_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $fileExt;
+                $uploadPath = UPLOAD_PATH . 'tasks/' . $attachmentFile;
+                
+                if (!move_uploaded_file($_FILES['task_attachment']['tmp_name'], $uploadPath)) {
+                    $message = 'Failed to upload file. Please try again.';
+                    $messageType = 'danger';
+                    $attachmentFile = null;
+                }
+            }
+        }
         
         // Ensure assigned_to is an array
         if (!is_array($assignedToArray)) {
@@ -63,24 +89,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (empty($title) || empty($assignedToArray)) {
             $message = 'Task title and at least one team member are required!';
             $messageType = 'danger';
-        } else {
+        } elseif (empty($message)) {
             if ($postAction === 'add') {
                 $createdCount = 0;
                 foreach ($assignedToArray as $assignedTo) {
-                    $sql = "INSERT INTO tasks (title, description, assigned_to, assigned_by, priority, status, deadline) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                    executeQuery($sql, "ssiisss", [$title, $description, $assignedTo, $userId, $priority, $status, $deadline]);
+                    $sql = "INSERT INTO tasks (title, description, assigned_to, assigned_by, priority, status, deadline, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    executeQuery($sql, "ssiissss", [$title, $description, $assignedTo, $userId, $priority, $status, $deadline, $attachmentFile]);
                     
+                    $notifyMsg = "Your Team Lead assigned a new task: $title";
+                    if ($attachmentFile) {
+                        $notifyMsg .= ' (with attachment)';
+                    }
                     executeQuery(
                         "INSERT INTO notifications (user_id, user_type, title, message, type) VALUES (?, 'employee', 'New Task from Team Lead', ?, 'info')",
                         "is",
-                        [$assignedTo, "Your Team Lead assigned a new task: $title"]
+                        [$assignedTo, $notifyMsg]
                     );
                     $createdCount++;
                 }
                 
                 $_SESSION['flash_message'] = $createdCount . ' task(s) created successfully!';
                 $_SESSION['flash_type'] = 'success';
-                header("Location: team-tasks.php");
+                header("Location: team-tasks");
                 exit;
             } else {
                 $editId = intval($_POST['id']);
@@ -88,11 +118,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Verify task is for team member
                 $existingTask = fetchOne("SELECT assigned_to FROM tasks WHERE id = ?", "i", [$editId]);
                 if ($existingTask && in_array($existingTask['assigned_to'], $teamMemberIds)) {
-                    $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, status = ?, deadline = ? WHERE id = ?";
-                    executeQuery($sql, "ssisssi", [$title, $description, $assignedTo, $priority, $status, $deadline, $editId]);
+                    if ($attachmentFile) {
+                        $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, status = ?, deadline = ?, attachment = ? WHERE id = ?";
+                        executeQuery($sql, "ssissssi", [$title, $description, $assignedTo, $priority, $status, $deadline, $attachmentFile, $editId]);
+                    } else {
+                        $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, status = ?, deadline = ? WHERE id = ?";
+                        executeQuery($sql, "ssisssi", [$title, $description, $assignedTo, $priority, $status, $deadline, $editId]);
+                    }
                     $_SESSION['flash_message'] = 'Task updated successfully!';
                     $_SESSION['flash_type'] = 'success';
-                    header("Location: team-tasks.php");
+                    header("Location: team-tasks");
                     exit;
                 } else {
                     $message = 'You can only edit tasks assigned to your team members!';
@@ -121,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['flash_message'] = 'Task deleted successfully!';
             }
             $_SESSION['flash_type'] = 'success';
-            header("Location: team-tasks.php");
+            header("Location: team-tasks");
             exit;
         } else {
             $message = 'You can only delete tasks assigned to your team members!';
@@ -182,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     $_SESSION['flash_message'] = "Team member(s) added to task successfully!";
                     $_SESSION['flash_type'] = 'success';
-                    header("Location: team-tasks.php");
+                    header("Location: team-tasks");
                     exit;
                 } else {
                     $message = 'Task group not found!';
@@ -210,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $_SESSION['flash_message'] = 'Task approved and marked as completed!';
                 $_SESSION['flash_type'] = 'success';
-                header("Location: team-tasks.php");
+                header("Location: team-tasks");
                 exit;
             } elseif ($reviewAction === 'request_changes') {
                 executeQuery("UPDATE tasks SET status = 'changes_requested', reviewer_feedback = ? WHERE id = ?", "si", [$reviewerFeedback, $reviewId]);
@@ -224,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $_SESSION['flash_message'] = 'Changes requested. Employee has been notified.';
                 $_SESSION['flash_type'] = 'warning';
-                header("Location: team-tasks.php");
+                header("Location: team-tasks");
                 exit;
             }
         }
@@ -341,12 +376,12 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0"><?php echo $action === 'add' ? 'Assign New Task' : 'Edit Task'; ?></h5>
-                <a href="team-tasks.php" class="btn btn-outline-secondary btn-sm">
+                <a href="team-tasks" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i>Back
                 </a>
             </div>
             <div class="card-body">
-                <form method="POST" id="taskForm" onsubmit="return preventDoubleSubmit(this)">
+                <form method="POST" id="taskForm" enctype="multipart/form-data" onsubmit="return preventDoubleSubmit(this)">
                     <input type="hidden" name="action" value="<?php echo $action; ?>">
                     <input type="hidden" name="form_token" value="<?php echo bin2hex(random_bytes(16)); ?>">
                     <?php if ($action === 'edit'): ?>
@@ -433,13 +468,32 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
                                 <option value="completed" <?php echo (isset($task['status']) && $task['status'] === 'completed') ? 'selected' : ''; ?>>Completed</option>
                             </select>
                         </div>
+                        
+                        <!-- File Attachment (Optional) -->
+                        <div class="col-12 mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-paperclip me-1"></i>Attachment 
+                                <small class="text-muted">(Optional - PDF, CSV, XLS, XLSX, DOC, DOCX - Max 10MB)</small>
+                            </label>
+                            <?php if (isset($task) && !empty($task['attachment'])): ?>
+                            <div class="alert alert-info py-2 mb-2">
+                                <i class="bi bi-file-earmark me-1"></i>Current file: 
+                                <a href="<?php echo APP_URL . '/uploads/tasks/' . htmlspecialchars($task['attachment']); ?>" target="_blank">
+                                    <?php echo htmlspecialchars($task['attachment']); ?>
+                                </a>
+                                <small class="text-muted ms-2">(Upload new file to replace)</small>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" class="form-control" name="task_attachment" 
+                                   accept=".pdf,.csv,.xls,.xlsx,.doc,.docx">
+                        </div>
                     </div>
                     
                     <div class="mt-3">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg me-1"></i><?php echo $action === 'add' ? 'Assign Task' : 'Update Task'; ?>
                         </button>
-                        <a href="team-tasks.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                        <a href="team-tasks" class="btn btn-outline-secondary ms-2">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -615,8 +669,15 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
                                                 </td>
                                                 <td>
                                                     <?php if ($assignee['work_link']): ?>
-                                                    <button type="button" class="btn btn-sm btn-outline-success" 
-                                                            onclick="showWorkModal('<?php echo addslashes($taskGroup['title']); ?>', '<?php echo addslashes($assignee['employee_name']); ?>', '<?php echo addslashes($assignee['emp_id']); ?>', '<?php echo addslashes($assignee['work_link']); ?>', '<?php echo addslashes($assignee['work_link_type'] ?? 'url'); ?>', '<?php echo addslashes($taskGroup['description'] ?? ''); ?>', '<?php echo $taskGroup['deadline'] ? formatDate($taskGroup['deadline']) : 'No deadline'; ?>', '<?php echo ucfirst($taskGroup['priority']); ?>')">
+                                                    <button type="button" class="btn btn-sm btn-outline-success view-work-btn" 
+                                                            data-title="<?php echo htmlspecialchars($taskGroup['title'], ENT_QUOTES); ?>"
+                                                            data-employee="<?php echo htmlspecialchars($assignee['employee_name'], ENT_QUOTES); ?>"
+                                                            data-empid="<?php echo htmlspecialchars($assignee['emp_id'], ENT_QUOTES); ?>"
+                                                            data-link="<?php echo htmlspecialchars($assignee['work_link'], ENT_QUOTES); ?>"
+                                                            data-linktype="<?php echo htmlspecialchars($assignee['work_link_type'] ?? 'url', ENT_QUOTES); ?>"
+                                                            data-description="<?php echo htmlspecialchars($taskGroup['description'] ?? '', ENT_QUOTES); ?>"
+                                                            data-deadline="<?php echo $taskGroup['deadline'] ? formatDate($taskGroup['deadline']) : 'No deadline'; ?>"
+                                                            data-priority="<?php echo ucfirst($taskGroup['priority']); ?>">
                                                         <i class="bi bi-link-45deg"></i> View
                                                     </button>
                                                     <?php else: ?>
@@ -926,6 +987,24 @@ function showWorkModal(title, empName, empId, link, linkType, description, deadl
     
     new bootstrap.Modal(document.getElementById('viewWorkModal')).show();
 }
+
+// Add event listener for view work buttons using data attributes
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.view-work-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            showWorkModal(
+                this.dataset.title,
+                this.dataset.employee,
+                this.dataset.empid,
+                this.dataset.link,
+                this.dataset.linktype,
+                this.dataset.description,
+                this.dataset.deadline,
+                this.dataset.priority
+            );
+        });
+    });
+});
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

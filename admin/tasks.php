@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($postAction === 'add') {
         if (empty($formToken) || (isset($_SESSION['last_form_token']) && $_SESSION['last_form_token'] === $formToken)) {
             $isValidSubmission = false;
-            header("Location: tasks.php");
+            header("Location: tasks");
             exit;
         }
         $_SESSION['last_form_token'] = $formToken;
@@ -45,6 +45,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $deadline = $_POST['deadline'] ?? null;
         $status = sanitize($_POST['status'] ?? 'not_started');
         
+        // Handle file upload (optional)
+        $attachmentFile = null;
+        if (!empty($_FILES['task_attachment']['name'])) {
+            $allowedTypes = [
+                'application/pdf',
+                'text/csv',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            $allowedExtensions = ['pdf', 'csv', 'xls', 'xlsx', 'doc', 'docx'];
+            
+            $fileExt = strtolower(pathinfo($_FILES['task_attachment']['name'], PATHINFO_EXTENSION));
+            $fileType = $_FILES['task_attachment']['type'];
+            $fileSize = $_FILES['task_attachment']['size'];
+            $maxSize = 10 * 1024 * 1024; // 10MB max
+            
+            if (!in_array($fileExt, $allowedExtensions)) {
+                $message = 'Invalid file type. Allowed: PDF, CSV, XLS, XLSX, DOC, DOCX';
+                $messageType = 'danger';
+            } elseif ($fileSize > $maxSize) {
+                $message = 'File size too large. Maximum 10MB allowed.';
+                $messageType = 'danger';
+            } else {
+                // Generate unique filename
+                $attachmentFile = 'task_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $fileExt;
+                $uploadPath = UPLOAD_PATH . 'tasks/' . $attachmentFile;
+                
+                if (!move_uploaded_file($_FILES['task_attachment']['tmp_name'], $uploadPath)) {
+                    $message = 'Failed to upload file. Please try again.';
+                    $messageType = 'danger';
+                    $attachmentFile = null;
+                }
+            }
+        }
+        
         if (!is_array($assignedToArray)) {
             $assignedToArray = [$assignedToArray];
         }
@@ -53,18 +90,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($title) || empty($assignedToArray)) {
             $message = 'Title and at least one Employee are required!';
             $messageType = 'danger';
-        } else {
+        } elseif (empty($message)) {
             if ($postAction === 'add') {
                 $createdCount = 0;
                 foreach ($assignedToArray as $assignedTo) {
-                    $sql = "INSERT INTO tasks (title, description, assigned_to, assigned_by, priority, deadline, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                    executeQuery($sql, "ssiisss", [$title, $description, $assignedTo, $_SESSION['user_id'], $priority, $deadline, $status]);
+                    $sql = "INSERT INTO tasks (title, description, assigned_to, assigned_by, priority, deadline, status, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    executeQuery($sql, "ssiissss", [$title, $description, $assignedTo, $_SESSION['user_id'], $priority, $deadline, $status, $attachmentFile]);
                     
                     $employee = fetchOne("SELECT name, email FROM employees WHERE id = ?", "i", [$assignedTo]);
+                    $notifyMsg = 'You have been assigned a new task: ' . $title;
+                    if ($attachmentFile) {
+                        $notifyMsg .= ' (with attachment)';
+                    }
                     executeQuery(
                         "INSERT INTO notifications (user_id, user_type, title, message, type, link) VALUES (?, 'employee', ?, ?, 'info', ?)",
                         "isss",
-                        [$assignedTo, 'New Task Assigned', 'You have been assigned a new task: ' . $title, '/employee/tasks.php']
+                        [$assignedTo, 'New Task Assigned', $notifyMsg, '/employee/tasks.php']
                     );
                     
                     $createdCount++;
@@ -72,17 +113,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $_SESSION['flash_message'] = $createdCount . ' task(s) created successfully!';
                 $_SESSION['flash_type'] = 'success';
-                header("Location: tasks.php");
+                header("Location: tasks");
                 exit;
             } else {
                 $editId = intval($_POST['id']);
                 $assignedTo = $assignedToArray[0];
-                $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, deadline = ?, status = ? WHERE id = ?";
-                executeQuery($sql, "ssisssi", [$title, $description, $assignedTo, $priority, $deadline, $status, $editId]);
+                
+                // Handle file upload for edit
+                if ($attachmentFile) {
+                    $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, deadline = ?, status = ?, attachment = ? WHERE id = ?";
+                    executeQuery($sql, "ssissssi", [$title, $description, $assignedTo, $priority, $deadline, $status, $attachmentFile, $editId]);
+                } else {
+                    $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, deadline = ?, status = ? WHERE id = ?";
+                    executeQuery($sql, "ssisssi", [$title, $description, $assignedTo, $priority, $deadline, $status, $editId]);
+                }
                 
                 $_SESSION['flash_message'] = 'Task updated successfully!';
                 $_SESSION['flash_type'] = 'success';
-                header("Location: tasks.php");
+                header("Location: tasks");
                 exit;
             }
         }
@@ -139,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['flash_message'] = 'Task group not found!';
                 $_SESSION['flash_type'] = 'danger';
             }
-            header("Location: tasks.php");
+            header("Location: tasks");
             exit;
         }
     } elseif ($postAction === 'delete') {
@@ -168,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         $_SESSION['flash_type'] = 'success';
-        header("Location: tasks.php");
+        header("Location: tasks");
         exit;
     } elseif ($postAction === 'review') {
         $reviewId = intval($_POST['id']);
@@ -200,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['flash_message'] = 'Changes requested. Employee has been notified.';
                 $_SESSION['flash_type'] = 'warning';
             }
-            header("Location: tasks.php");
+            header("Location: tasks");
             exit;
         }
     }
@@ -313,9 +361,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/admin/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -338,12 +386,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     <i class="bi bi-<?php echo $action === 'add' ? 'plus-circle' : 'pencil'; ?> me-2"></i>
                     <?php echo $action === 'add' ? 'Create New Task' : 'Edit Task'; ?>
                 </h5>
-                <a href="<?php echo APP_URL; ?>/admin/tasks.php" class="btn btn-outline-secondary btn-sm">
+                <a href="<?php echo url('admin/tasks'); ?>" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i>Back
                 </a>
             </div>
             <div class="card-body">
-                <form method="POST" id="taskForm" onsubmit="return preventDoubleSubmit(this)">
+                <form method="POST" id="taskForm" enctype="multipart/form-data" onsubmit="return preventDoubleSubmit(this)">
                     <input type="hidden" name="action" value="<?php echo $action; ?>">
                     <input type="hidden" name="form_token" value="<?php echo bin2hex(random_bytes(16)); ?>">
                     <?php if ($task): ?>
@@ -451,13 +499,32 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <option value="completed" <?php echo ($task['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>Completed</option>
                             </select>
                         </div>
+                        
+                        <!-- File Attachment (Optional) -->
+                        <div class="col-12 mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-paperclip me-1"></i>Attachment 
+                                <small class="text-muted">(Optional - PDF, CSV, XLS, XLSX, DOC, DOCX - Max 10MB)</small>
+                            </label>
+                            <?php if ($task && !empty($task['attachment'])): ?>
+                            <div class="alert alert-info py-2 mb-2">
+                                <i class="bi bi-file-earmark me-1"></i>Current file: 
+                                <a href="<?php echo APP_URL . '/uploads/tasks/' . htmlspecialchars($task['attachment']); ?>" target="_blank">
+                                    <?php echo htmlspecialchars($task['attachment']); ?>
+                                </a>
+                                <small class="text-muted ms-2">(Upload new file to replace)</small>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" class="form-control" name="task_attachment" 
+                                   accept=".pdf,.csv,.xls,.xlsx,.doc,.docx">
+                        </div>
                     </div>
                     
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg me-2"></i><?php echo $action === 'add' ? 'Create Task' : 'Update Task'; ?>
                         </button>
-                        <a href="<?php echo APP_URL; ?>/admin/tasks.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                        <a href="<?php echo url('admin/tasks'); ?>" class="btn btn-outline-secondary ms-2">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -563,7 +630,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     <div class="col-md-3 d-flex gap-2">
                         <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Filter</button>
                         <?php if ($statusFilter || $priorityFilter || $employeeFilter): ?>
-                        <a href="tasks.php" class="btn btn-outline-secondary">Clear</a>
+                        <a href="tasks" class="btn btn-outline-secondary">Clear</a>
                         <?php endif; ?>
                     </div>
                 </form>
@@ -682,8 +749,15 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                                 </td>
                                                 <td>
                                                     <?php if ($assignee['work_link']): ?>
-                                                    <button type="button" class="btn btn-sm btn-outline-success" 
-                                                            onclick="showWorkModal('<?php echo addslashes($taskGroup['title']); ?>', '<?php echo addslashes($assignee['employee_name']); ?>', '<?php echo addslashes($assignee['emp_id']); ?>', '<?php echo addslashes($assignee['work_link']); ?>', '<?php echo addslashes($assignee['work_link_type'] ?? 'url'); ?>', '<?php echo addslashes($taskGroup['description'] ?? ''); ?>', '<?php echo $taskGroup['deadline'] ? formatDate($taskGroup['deadline']) : 'No deadline'; ?>', '<?php echo ucfirst($taskGroup['priority']); ?>')">
+                                                    <button type="button" class="btn btn-sm btn-outline-success view-work-btn" 
+                                                            data-title="<?php echo htmlspecialchars($taskGroup['title'], ENT_QUOTES); ?>"
+                                                            data-employee="<?php echo htmlspecialchars($assignee['employee_name'], ENT_QUOTES); ?>"
+                                                            data-empid="<?php echo htmlspecialchars($assignee['emp_id'], ENT_QUOTES); ?>"
+                                                            data-link="<?php echo htmlspecialchars($assignee['work_link'], ENT_QUOTES); ?>"
+                                                            data-linktype="<?php echo htmlspecialchars($assignee['work_link_type'] ?? 'url', ENT_QUOTES); ?>"
+                                                            data-description="<?php echo htmlspecialchars($taskGroup['description'] ?? '', ENT_QUOTES); ?>"
+                                                            data-deadline="<?php echo $taskGroup['deadline'] ? formatDate($taskGroup['deadline']) : 'No deadline'; ?>"
+                                                            data-priority="<?php echo ucfirst($taskGroup['priority']); ?>">
                                                         <i class="bi bi-link-45deg"></i> View
                                                     </button>
                                                     <?php else: ?>
@@ -999,6 +1073,24 @@ function showWorkModal(title, empName, empId, link, linkType, description, deadl
     
     new bootstrap.Modal(document.getElementById('viewWorkModal')).show();
 }
+
+// Add event listener for view work buttons using data attributes
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.view-work-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            showWorkModal(
+                this.dataset.title,
+                this.dataset.employee,
+                this.dataset.empid,
+                this.dataset.link,
+                this.dataset.linktype,
+                this.dataset.description,
+                this.dataset.deadline,
+                this.dataset.priority
+            );
+        });
+    });
+});
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

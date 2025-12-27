@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (isAdmin()) {
-    header("Location: " . APP_URL . "/admin/attendance.php");
+    header("Location: " . url("admin/attendance"));
     exit;
 }
 
@@ -66,9 +66,9 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/employee/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('employee/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>

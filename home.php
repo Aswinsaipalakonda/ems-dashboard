@@ -1414,8 +1414,8 @@
                 <a href="#why-us">Why Us</a>
             </div>
             <div class="nav-buttons">
-                <a href="login.php" class="btn btn-outline-light">Employee Portal</a>
-                <a href="login.php" class="btn btn-primary">
+                <a href="login" class="btn btn-outline-light">Employee Portal</a>
+                <a href="login" class="btn btn-primary">
                     <i class="bi bi-box-arrow-in-right"></i>
                     Login
                 </a>
@@ -1442,7 +1442,7 @@
                     Track attendance, assign tasks, manage teams, and boost productivity effortlessly.
                 </p>
                 <div class="hero-buttons">
-                    <a href="login.php" class="btn btn-primary">
+                    <a href="login" class="btn btn-primary">
                         <i class="bi bi-rocket-takeoff"></i>
                         Get Started
                     </a>
@@ -1720,11 +1720,11 @@
             <h2>Ready to Transform Your HR?</h2>
             <p>Join organizations who trust EMS Dashboard to manage their workforce. Start your journey to smarter HR management today.</p>
             <div class="cta-buttons">
-                <a href="login.php" class="btn btn-primary">
+                <a href="login" class="btn btn-primary">
                     <i class="bi bi-rocket-takeoff"></i>
                     Login Now
                 </a>
-                <a href="login.php" class="btn btn-dark">
+                <a href="login" class="btn btn-dark">
                     <i class="bi bi-person"></i>
                     Employee Portal
                 </a>
@@ -1757,16 +1757,16 @@
                         <li><a href="#features">Features</a></li>
                         <li><a href="#modules">Modules</a></li>
                         <li><a href="#why-us">Why Us</a></li>
-                        <li><a href="login.php">Login</a></li>
+                        <li><a href="login">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h4>Modules</h4>
                     <ul>
-                        <li><a href="login.php">Employees</a></li>
-                        <li><a href="login.php">Attendance</a></li>
-                        <li><a href="login.php">Tasks</a></li>
-                        <li><a href="login.php">Reports</a></li>
+                        <li><a href="login">Employees</a></li>
+                        <li><a href="login">Attendance</a></li>
+                        <li><a href="login">Tasks</a></li>
+                        <li><a href="login">Reports</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -1775,7 +1775,7 @@
                         <li><a href="#">Documentation</a></li>
                         <li><a href="#">Help Center</a></li>
                         <li><a href="#">Contact Us</a></li>
-                        <li><a href="login.php">Employee Portal</a></li>
+                        <li><a href="login">Employee Portal</a></li>
                     </ul>
                 </div>
             </div>

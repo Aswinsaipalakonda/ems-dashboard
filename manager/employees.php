@@ -10,7 +10,7 @@ requireLogin();
 
 // Check if user has management access
 if (!isManager() && !isHR()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -183,7 +183,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0"><?php echo $action === 'add' ? 'Add New Employee' : 'Edit Employee'; ?></h5>
-                <a href="employees.php" class="btn btn-outline-secondary btn-sm">
+                <a href="employees" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i>Back
                 </a>
             </div>
@@ -268,7 +268,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg me-1"></i><?php echo $action === 'add' ? 'Add Employee' : 'Update Employee'; ?>
                         </button>
-                        <a href="employees.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                        <a href="employees" class="btn btn-outline-secondary ms-2">Cancel</a>
                     </div>
                 </form>
             </div>

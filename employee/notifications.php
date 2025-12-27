@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (isAdmin()) {
-    header("Location: " . APP_URL . "/admin/dashboard.php");
+    header("Location: " . url("admin/dashboard"));
     exit;
 }
 
@@ -19,14 +19,14 @@ $userId = $_SESSION['user_id'];
 if (isset($_GET['mark_read'])) {
     $notifId = intval($_GET['mark_read']);
     executeQuery("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?", "ii", [$notifId, $userId]);
-    header("Location: " . APP_URL . "/employee/notifications.php");
+    header("Location: " . url("employee/notifications"));
     exit;
 }
 
 // Mark all as read
 if (isset($_GET['mark_all_read'])) {
     executeQuery("UPDATE notifications SET is_read = 1 WHERE user_id = ? AND user_type = 'employee'", "i", [$userId]);
-    header("Location: " . APP_URL . "/employee/notifications.php");
+    header("Location: " . url("employee/notifications"));
     exit;
 }
 
@@ -60,9 +60,9 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                     <img src="<?php echo getAvatar($_SESSION['avatar'] ?? ''); ?>" alt="Avatar" class="user-avatar">
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/employee/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('employee/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>

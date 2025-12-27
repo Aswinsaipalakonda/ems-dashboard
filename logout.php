@@ -25,6 +25,6 @@ session_unset();
 session_destroy();
 
 // Redirect to login
-header("Location: " . APP_URL . "/login.php?logout=1");
+header("Location: " . url('login') . "?logout=1");
 exit;
 ?>

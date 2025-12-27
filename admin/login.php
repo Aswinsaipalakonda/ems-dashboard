@@ -11,7 +11,7 @@ require_once __DIR__ . '/../config/config.php';
 
 // Redirect if already logged in as admin
 if (isLoggedIn() && isAdmin()) {
-    header("Location: " . APP_URL . "/admin/dashboard.php");
+    header("Location: " . url("admin/dashboard"));
     exit;
 }
 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             logActivity('login', 'Admin logged in successfully');
             
             // Redirect to admin dashboard
-            header("Location: " . APP_URL . "/admin/dashboard.php");
+            header("Location: " . url("admin/dashboard"));
             exit;
         } else {
             $error = 'Invalid email or password.';
@@ -339,7 +339,7 @@ require_once __DIR__ . '/../includes/header.php';
                 </button>
             </form>
             
-            <a href="<?php echo APP_URL; ?>/login.php" class="back-link">
+            <a href="<?php echo url('login'); ?>" class="back-link">
                 <i class="bi bi-arrow-left"></i>
                 Back to Employee Login
             </a>

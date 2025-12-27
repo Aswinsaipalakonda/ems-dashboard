@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (isAdmin()) {
-    header("Location: " . APP_URL . "/admin/tasks.php");
+    header("Location: " . url("admin/tasks"));
     exit;
 }
 
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $_SESSION['flash_message'] = $newStatus === 'submitted' ? 'Task submitted for review!' : 'Task updated successfully!';
             $_SESSION['flash_type'] = 'success';
-            header("Location: tasks.php");
+            header("Location: tasks");
             exit;
         }
     }
@@ -133,9 +133,9 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/employee/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('employee/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -249,8 +249,17 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                         <i class="bi bi-calendar me-1"></i><?php echo formatDate($task['deadline']); ?>
                                     </span>
                                     <?php endif; ?>
+                                    <?php if (!empty($task['attachment'])): ?>
+                                    <a href="<?php echo APP_URL . '/uploads/tasks/' . htmlspecialchars($task['attachment'], ENT_QUOTES); ?>" 
+                                       target="_blank" class="badge bg-primary text-decoration-none" title="Download Attachment">
+                                        <i class="bi bi-file-earmark-arrow-down me-1"></i><?php 
+                                            $ext = strtolower(pathinfo($task['attachment'], PATHINFO_EXTENSION));
+                                            echo strtoupper($ext) . ' File';
+                                        ?>
+                                    </a>
+                                    <?php endif; ?>
                                     <?php if (!empty($task['work_link'])): ?>
-                                    <a href="<?php echo $task['work_link']; ?>" target="_blank" class="badge bg-success text-decoration-none">
+                                    <a href="<?php echo htmlspecialchars($task['work_link'], ENT_QUOTES); ?>" target="_blank" class="badge bg-success text-decoration-none">
                                         <i class="bi bi-<?php 
                                             echo match($task['work_link_type'] ?? 'link') {
                                                 'github' => 'github',

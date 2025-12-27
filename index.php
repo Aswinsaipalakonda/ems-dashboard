@@ -12,16 +12,16 @@ if (isLoggedIn()) {
     $role = $_SESSION['role'] ?? 'employee';
     switch ($role) {
         case 'admin':
-            header("Location: " . APP_URL . "/admin/dashboard.php");
+            header("Location: " . url('admin/dashboard'));
             break;
         case 'manager':
-            header("Location: " . APP_URL . "/manager/dashboard.php");
+            header("Location: " . url('manager/dashboard'));
             break;
         case 'team_lead':
-            header("Location: " . APP_URL . "/teamlead/dashboard.php");
+            header("Location: " . url('teamlead/dashboard'));
             break;
         default:
-            header("Location: " . APP_URL . "/employee/dashboard.php");
+            header("Location: " . url('employee/dashboard'));
     }
     exit;
 }

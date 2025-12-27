@@ -12,15 +12,15 @@ require_once __DIR__ . '/config/config.php';
 // Redirect if already logged in
 if (isLoggedIn()) {
     if (isAdmin()) {
-        header("Location: " . APP_URL . "/admin/dashboard.php");
+        header("Location: " . url('admin/dashboard'));
     } else {
         $roleSlug = $_SESSION['user_role_slug'] ?? 'employee';
         if ($roleSlug === 'manager' || $roleSlug === 'hr') {
-            header("Location: " . APP_URL . "/manager/dashboard.php");
+            header("Location: " . url('manager/dashboard'));
         } elseif ($roleSlug === 'team_lead') {
-            header("Location: " . APP_URL . "/teamlead/dashboard.php");
+            header("Location: " . url('teamlead/dashboard'));
         } else {
-            header("Location: " . APP_URL . "/employee/dashboard.php");
+            header("Location: " . url('employee/dashboard'));
         }
     }
     exit;
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             logActivity('login', 'Admin logged in successfully');
             
-            header("Location: " . APP_URL . "/admin/dashboard.php");
+            header("Location: " . url('admin/dashboard'));
             exit;
         }
         
@@ -120,11 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Redirect based on role
             if ($userRole === 'manager' || $userRole === 'hr') {
-                header("Location: " . APP_URL . "/manager/dashboard.php");
+                header("Location: " . url('manager/dashboard'));
             } elseif ($userRole === 'team_lead') {
-                header("Location: " . APP_URL . "/teamlead/dashboard.php");
+                header("Location: " . url('teamlead/dashboard'));
             } else {
-                header("Location: " . APP_URL . "/employee/dashboard.php");
+                header("Location: " . url('employee/dashboard'));
             }
             exit;
         }
@@ -579,7 +579,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="checkbox" id="remember" name="remember">
                         <label for="remember">Remember me</label>
                     </div>
-                    <a href="<?php echo APP_URL; ?>/forgot-password.php" class="forgot-link">Forgot Password?</a>
+                    <a href="<?php echo url('forgot-password'); ?>" class="forgot-link">Forgot Password?</a>
                 </div>
                 
                 <button type="submit" class="btn-login" id="loginBtn">

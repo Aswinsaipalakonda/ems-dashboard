@@ -11,7 +11,7 @@ require_once __DIR__ . '/config/config.php';
 
 // Redirect if already logged in
 if (isLoggedIn()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             
             // Create reset link
-            $resetLink = APP_URL . "/reset-password.php?token=" . $token;
+            $resetLink = url('reset-password') . "?token=" . $token;
             $tokenExpiry = date('g:i A, M d, Y', strtotime($expiresAt));
             
             // Show success with the link
@@ -263,7 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="forgot-container">
-        <a href="<?php echo APP_URL; ?>/login.php" class="back-link">
+        <a href="<?php echo url('login'); ?>" class="back-link">
             <i class="bi bi-arrow-left"></i>
             Back to Login
         </a>
@@ -339,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         
         <p class="footer-text">
-            Remember your password? <a href="<?php echo APP_URL; ?>/login.php">Sign in</a>
+            Remember your password? <a href="<?php echo url('login'); ?>">Sign in</a>
         </p>
     </div>
     

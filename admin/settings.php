@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
         'working_hours_end' => sanitize($_POST['working_hours_end']),
         'late_threshold' => sanitize($_POST['late_threshold']),
         'auto_approve_attendance' => isset($_POST['auto_approve_attendance']) ? '1' : '0',
+        'auto_checkout_enabled' => isset($_POST['auto_checkout_enabled']) ? '1' : '0',
         'enable_geolocation' => isset($_POST['enable_geolocation']) ? '1' : '0',
         'enable_photo_capture' => isset($_POST['enable_photo_capture']) ? '1' : '0',
     ];
@@ -70,9 +71,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     <img src="<?php echo getAvatar($_SESSION['avatar'] ?? ''); ?>" alt="Avatar" class="user-avatar">
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/admin/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -160,6 +161,15 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                     Auto-approve attendance
                                 </label>
                                 <small class="d-block text-muted">Automatically approve check-ins without admin review</small>
+                            </div>
+                            
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" name="auto_checkout_enabled" id="autoCheckout"
+                                       <?php echo ($settings['auto_checkout_enabled'] ?? '0') == '1' ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="autoCheckout">
+                                    <i class="bi bi-clock-history me-1"></i>Auto-checkout at End Time
+                                </label>
+                                <small class="d-block text-muted">Automatically check out employees at the working hours end time</small>
                             </div>
                         </div>
                     </div>

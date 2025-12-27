@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_domain'])) {
             $_SESSION['flash_type'] = 'danger';
         }
     }
-    header("Location: domains.php");
+    header("Location: domains");
     exit;
 }
 

@@ -246,7 +246,7 @@ function formatTime(time) {
 // Notification polling (check every 30 seconds)
 function startNotificationPolling() {
     setInterval(() => {
-        ajaxRequest(APP_URL + '/api/notifications.php?action=count', 'GET', null, (err, response) => {
+        ajaxRequest(APP_URL + '/api/notifications?action=count', 'GET', null, (err, response) => {
             if (!err && response.count > 0) {
                 const badge = document.querySelector('.notification-badge');
                 if (badge) {
@@ -265,7 +265,7 @@ function checkSessionTimeout() {
     const warningTime = 5 * 60 * 1000; // 5 minutes before timeout
     
     setInterval(() => {
-        ajaxRequest(APP_URL + '/api/session.php?action=check', 'GET', null, (err, response) => {
+        ajaxRequest(APP_URL + '/api/session?action=check', 'GET', null, (err, response) => {
             if (!err && response.remaining < warningTime && !sessionWarningShown) {
                 sessionWarningShown = true;
                 showToast('Your session will expire soon. Please save your work.', 'warning');

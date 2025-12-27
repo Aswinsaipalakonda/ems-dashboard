@@ -172,9 +172,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/admin/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -319,7 +319,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Filter</button>
                     </div>
                     <div class="col-md-2">
-                        <a href="<?php echo APP_URL; ?>/admin/reports.php?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>" class="btn btn-outline-success w-100">
+                        <a href="<?php echo url('admin/reports'); ?>?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>" class="btn btn-outline-success w-100">
                             <i class="bi bi-download me-1"></i>Export
                         </a>
                     </div>
@@ -375,7 +375,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 ?></td>
                                 <td><span class="badge badge-<?php echo $att['status']; ?>"><?php echo ucfirst($att['status']); ?></span></td>
                                 <td>
-                                    <a href="<?php echo APP_URL; ?>/admin/approvals.php?action=view&id=<?php echo $att['id']; ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?php echo url('admin/approvals'); ?>?action=view&id=<?php echo $att['id']; ?>" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>

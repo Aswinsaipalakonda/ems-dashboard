@@ -120,9 +120,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/admin/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -142,7 +142,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-eye me-2"></i>Attendance Details</h5>
-                <a href="<?php echo APP_URL; ?>/admin/approvals.php" class="btn btn-outline-secondary btn-sm">
+                <a href="<?php echo url('admin/approvals'); ?>" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i>Back
                 </a>
             </div>
@@ -282,7 +282,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <?php if ($statusFilter || $dateFilter): ?>
                     <div class="col-md-2">
-                        <a href="<?php echo APP_URL; ?>/admin/approvals.php" class="btn btn-outline-secondary w-100">Clear</a>
+                        <a href="<?php echo url('admin/approvals'); ?>" class="btn btn-outline-secondary w-100">Clear</a>
                     </div>
                     <?php endif; ?>
                 </form>
@@ -332,7 +332,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?php echo APP_URL; ?>/admin/approvals.php?action=view&id=<?php echo $att['id']; ?>" 
+                                    <a href="<?php echo url('admin/approvals'); ?>?action=view&id=<?php echo $att['id']; ?>" 
                                        class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i> View
                                     </a>

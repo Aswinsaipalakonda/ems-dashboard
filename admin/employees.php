@@ -227,9 +227,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/admin/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -253,7 +253,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     <i class="bi bi-<?php echo $action === 'add' ? 'person-plus' : 'pencil'; ?> me-2"></i>
                     <?php echo $action === 'add' ? 'Add New Employee' : 'Edit Employee'; ?>
                 </h5>
-                <a href="<?php echo APP_URL; ?>/admin/employees.php" class="btn btn-outline-secondary btn-sm">
+                <a href="<?php echo url('admin/employees'); ?>" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i>Back
                 </a>
             </div>
@@ -261,7 +261,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 <?php if ($action === 'add' && empty($domains)): ?>
                 <div class="alert alert-warning">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>No domains found!</strong> Please <a href="<?php echo APP_URL; ?>/admin/domains.php">add domains</a> first before creating employees.
+                    <strong>No domains found!</strong> Please <a href="<?php echo url('admin/domains'); ?>">add domains</a> first before creating employees.
                 </div>
                 <?php else: ?>
                 <form method="POST">
@@ -319,7 +319,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <?php endforeach; ?>
                             </select>
                             <small class="text-muted">
-                                <a href="<?php echo APP_URL; ?>/admin/domains.php" target="_blank">Manage Domains</a>
+                                <a href="<?php echo url('admin/domains'); ?>" target="_blank">Manage Domains</a>
                             </small>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -411,7 +411,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg me-2"></i><?php echo $action === 'add' ? 'Add Employee' : 'Update Employee'; ?>
                         </button>
-                        <a href="<?php echo APP_URL; ?>/admin/employees.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                        <a href="<?php echo url('admin/employees'); ?>" class="btn btn-outline-secondary ms-2">Cancel</a>
                     </div>
                 </form>
                 <?php endif; ?>
@@ -463,10 +463,10 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <h5 class="mb-0"><i class="bi bi-people me-2"></i>All Employees (<?php echo count($employees); ?>)</h5>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <a href="<?php echo APP_URL; ?>/admin/domains.php" class="btn btn-outline-primary me-2">
+                        <a href="<?php echo url('admin/domains'); ?>" class="btn btn-outline-primary me-2">
                             <i class="bi bi-grid me-1"></i>Manage Domains
                         </a>
-                        <a href="<?php echo APP_URL; ?>/admin/employees.php?action=add" class="btn btn-primary btn-glow">
+                        <a href="<?php echo url('admin/employees'); ?>?action=add" class="btn btn-primary btn-glow">
                             <i class="bi bi-person-plus me-2"></i>Add Employee
                         </a>
                     </div>
@@ -504,7 +504,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <?php if ($search || $statusFilter || $domainFilter): ?>
                     <div class="col-md-2">
-                        <a href="<?php echo APP_URL; ?>/admin/employees.php" class="btn btn-outline-secondary w-100">Clear</a>
+                        <a href="<?php echo url('admin/employees'); ?>" class="btn btn-outline-secondary w-100">Clear</a>
                     </div>
                     <?php endif; ?>
                 </form>
@@ -577,7 +577,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="<?php echo APP_URL; ?>/admin/employees.php?action=edit&id=<?php echo $emp['id']; ?>" 
+                                        <a href="<?php echo url('admin/employees'); ?>?action=edit&id=<?php echo $emp['id']; ?>" 
                                            class="btn btn-sm btn-outline-primary" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
@@ -604,7 +604,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <?php endif; ?>
                     </p>
                     <?php if (!$search && !$statusFilter && !$domainFilter): ?>
-                    <a href="<?php echo APP_URL; ?>/admin/employees.php?action=add" class="btn btn-primary btn-glow">
+                    <a href="<?php echo url('admin/employees'); ?>?action=add" class="btn btn-primary btn-glow">
                         <i class="bi bi-person-plus me-2"></i>Add Employee
                     </a>
                     <?php endif; ?>

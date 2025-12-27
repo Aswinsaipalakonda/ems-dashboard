@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (!isManager() && !isHR()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                         <button type="submit" class="btn btn-primary me-2">
                             <i class="bi bi-search me-1"></i>Filter
                         </button>
-                        <a href="attendance.php" class="btn btn-outline-secondary">Reset</a>
+                        <a href="attendance" class="btn btn-outline-secondary">Reset</a>
                     </div>
                 </form>
             </div>

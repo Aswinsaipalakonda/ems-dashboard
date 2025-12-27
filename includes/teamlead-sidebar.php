@@ -20,7 +20,7 @@ $teamLeadCheckinRequired = fetchOne(
 <!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <a href="<?php echo APP_URL; ?>/teamlead/dashboard.php" class="sidebar-logo">
+        <a href="<?php echo url('teamlead/dashboard'); ?>" class="sidebar-logo">
             <img src="<?php echo APP_URL; ?>/assets/img/clientura-logo.png" alt="<?php echo APP_NAME; ?>" style="height: 40px; object-fit: contain;">
             <span><?php echo APP_NAME; ?></span>
         </a>
@@ -38,7 +38,7 @@ $teamLeadCheckinRequired = fetchOne(
     
     <ul class="sidebar-menu">
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/dashboard.php" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/dashboard'); ?>" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
                 <i class="bi bi-grid-1x2"></i>
                 <span>Dashboard</span>
             </a>
@@ -47,19 +47,19 @@ $teamLeadCheckinRequired = fetchOne(
         <li class="sidebar-section-title">My Team</li>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/team.php" class="<?php echo $currentPage === 'team.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/team'); ?>" class="<?php echo $currentPage === 'team.php' ? 'active' : ''; ?>">
                 <i class="bi bi-people"></i>
                 <span>Team Members</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/team-attendance.php" class="<?php echo $currentPage === 'team-attendance.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/team-attendance'); ?>" class="<?php echo $currentPage === 'team-attendance.php' ? 'active' : ''; ?>">
                 <i class="bi bi-calendar-check"></i>
                 <span>Team Attendance</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/approvals.php" class="<?php echo $currentPage === 'approvals.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/approvals'); ?>" class="<?php echo $currentPage === 'approvals.php' ? 'active' : ''; ?>">
                 <i class="bi bi-check-circle"></i>
                 <span>Approvals</span>
                 <?php
@@ -80,13 +80,13 @@ $teamLeadCheckinRequired = fetchOne(
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/team-tasks.php" class="<?php echo $currentPage === 'team-tasks.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/team-tasks'); ?>" class="<?php echo $currentPage === 'team-tasks.php' ? 'active' : ''; ?>">
                 <i class="bi bi-list-task"></i>
                 <span>Team Tasks</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/team-reports.php" class="<?php echo $currentPage === 'team-reports.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/team-reports'); ?>" class="<?php echo $currentPage === 'team-reports.php' ? 'active' : ''; ?>">
                 <i class="bi bi-bar-chart-line"></i>
                 <span>Team Reports</span>
             </a>
@@ -96,20 +96,20 @@ $teamLeadCheckinRequired = fetchOne(
         
         <?php if ($teamLeadCheckinRequired): ?>
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/my-attendance.php" class="<?php echo $currentPage === 'my-attendance.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/my-attendance'); ?>" class="<?php echo $currentPage === 'my-attendance.php' ? 'active' : ''; ?>">
                 <i class="bi bi-calendar-check"></i>
                 <span>My Attendance</span>
             </a>
         </li>
         <?php endif; ?>
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/my-tasks.php" class="<?php echo $currentPage === 'my-tasks.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/my-tasks'); ?>" class="<?php echo $currentPage === 'my-tasks.php' ? 'active' : ''; ?>">
                 <i class="bi bi-check2-square"></i>
                 <span>My Tasks</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/teamlead/profile.php" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('teamlead/profile'); ?>" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
                 <i class="bi bi-person-circle"></i>
                 <span>Profile</span>
             </a>
@@ -118,7 +118,7 @@ $teamLeadCheckinRequired = fetchOne(
         <div class="sidebar-divider"></div>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/logout.php" class="text-danger">
+            <a href="<?php echo url('logout'); ?>" class="text-danger">
                 <i class="bi bi-box-arrow-left"></i>
                 <span>Logout</span>
             </a>

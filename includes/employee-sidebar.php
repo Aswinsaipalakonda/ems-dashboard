@@ -20,7 +20,7 @@ $employeeCheckinRequired = fetchOne(
 <!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <a href="<?php echo APP_URL; ?>/employee/dashboard.php" class="sidebar-logo">
+        <a href="<?php echo url('employee/dashboard'); ?>" class="sidebar-logo">
             <img src="<?php echo APP_URL; ?>/assets/img/clientura-logo.png" alt="<?php echo APP_NAME; ?>" style="height: 40px; object-fit: contain;">
             <span><?php echo APP_NAME; ?></span>
         </a>
@@ -28,7 +28,7 @@ $employeeCheckinRequired = fetchOne(
     
     <ul class="sidebar-menu">
         <li>
-            <a href="<?php echo APP_URL; ?>/employee/dashboard.php" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('employee/dashboard'); ?>" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
                 <i class="bi bi-grid-1x2"></i>
                 <span>Dashboard</span>
             </a>
@@ -38,13 +38,13 @@ $employeeCheckinRequired = fetchOne(
         <li class="sidebar-section-title">Attendance</li>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/employee/checkin.php" class="<?php echo $currentPage === 'checkin.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('employee/checkin'); ?>" class="<?php echo $currentPage === 'checkin.php' ? 'active' : ''; ?>">
                 <i class="bi bi-box-arrow-in-right"></i>
                 <span>Check In/Out</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/employee/attendance.php" class="<?php echo $currentPage === 'attendance.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('employee/attendance'); ?>" class="<?php echo $currentPage === 'attendance.php' ? 'active' : ''; ?>">
                 <i class="bi bi-calendar-check"></i>
                 <span>My Attendance</span>
             </a>
@@ -54,7 +54,7 @@ $employeeCheckinRequired = fetchOne(
         <li class="sidebar-section-title">Work</li>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/employee/tasks.php" class="<?php echo $currentPage === 'tasks.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('employee/tasks'); ?>" class="<?php echo $currentPage === 'tasks.php' ? 'active' : ''; ?>">
                 <i class="bi bi-list-task"></i>
                 <span>My Tasks</span>
                 <?php
@@ -73,7 +73,7 @@ $employeeCheckinRequired = fetchOne(
         <li class="sidebar-section-title">Account</li>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/employee/notifications.php" class="<?php echo $currentPage === 'notifications.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('employee/notifications'); ?>" class="<?php echo $currentPage === 'notifications.php' ? 'active' : ''; ?>">
                 <i class="bi bi-bell"></i>
                 <span>Notifications</span>
                 <?php
@@ -89,7 +89,7 @@ $employeeCheckinRequired = fetchOne(
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/employee/profile.php" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('employee/profile'); ?>" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
                 <i class="bi bi-person-circle"></i>
                 <span>Profile</span>
             </a>
@@ -98,7 +98,7 @@ $employeeCheckinRequired = fetchOne(
         <div class="sidebar-divider"></div>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/logout.php" class="text-danger">
+            <a href="<?php echo url('logout'); ?>" class="text-danger">
                 <i class="bi bi-box-arrow-left"></i>
                 <span>Logout</span>
             </a>

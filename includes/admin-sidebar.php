@@ -13,7 +13,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <a href="<?php echo APP_URL; ?>/admin/dashboard.php" class="sidebar-logo">
+        <a href="<?php echo url('admin/dashboard'); ?>" class="sidebar-logo">
             <img src="<?php echo APP_URL; ?>/assets/img/clientura-logo.png" alt="<?php echo APP_NAME; ?>" style="height: 40px; object-fit: contain;">
             <span><?php echo APP_NAME; ?></span>
         </a>
@@ -21,7 +21,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     
     <ul class="sidebar-menu">
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/dashboard.php" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/dashboard'); ?>" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
                 <i class="bi bi-grid-1x2"></i>
                 <span>Dashboard</span>
             </a>
@@ -30,25 +30,25 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <li class="sidebar-section-title">Management</li>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/employees.php" class="<?php echo $currentPage === 'employees.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/employees'); ?>" class="<?php echo $currentPage === 'employees.php' ? 'active' : ''; ?>">
                 <i class="bi bi-people"></i>
                 <span>Employees</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/domains.php" class="<?php echo $currentPage === 'domains.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/domains'); ?>" class="<?php echo $currentPage === 'domains.php' ? 'active' : ''; ?>">
                 <i class="bi bi-grid"></i>
                 <span>Domains</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/attendance.php" class="<?php echo $currentPage === 'attendance.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/attendance'); ?>" class="<?php echo $currentPage === 'attendance.php' ? 'active' : ''; ?>">
                 <i class="bi bi-calendar-check"></i>
                 <span>Attendance</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/approvals.php" class="<?php echo $currentPage === 'approvals.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/approvals'); ?>" class="<?php echo $currentPage === 'approvals.php' ? 'active' : ''; ?>">
                 <i class="bi bi-check-circle"></i>
                 <span>Approvals</span>
                 <?php
@@ -60,7 +60,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/tasks.php" class="<?php echo $currentPage === 'tasks.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/tasks'); ?>" class="<?php echo $currentPage === 'tasks.php' ? 'active' : ''; ?>">
                 <i class="bi bi-list-task"></i>
                 <span>Tasks</span>
             </a>
@@ -69,13 +69,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <li class="sidebar-section-title">Reports</li>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/reports.php" class="<?php echo $currentPage === 'reports.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/reports'); ?>" class="<?php echo $currentPage === 'reports.php' ? 'active' : ''; ?>">
                 <i class="bi bi-bar-chart-line"></i>
                 <span>Reports</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/activity-logs.php" class="<?php echo $currentPage === 'activity-logs.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/activity-logs'); ?>" class="<?php echo $currentPage === 'activity-logs.php' ? 'active' : ''; ?>">
                 <i class="bi bi-clock-history"></i>
                 <span>Activity Logs</span>
             </a>
@@ -84,13 +84,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <li class="sidebar-section-title">Settings</li>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/settings.php" class="<?php echo $currentPage === 'settings.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/settings'); ?>" class="<?php echo $currentPage === 'settings.php' ? 'active' : ''; ?>">
                 <i class="bi bi-gear"></i>
                 <span>Settings</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo APP_URL; ?>/admin/profile.php" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
+            <a href="<?php echo url('admin/profile'); ?>" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
                 <i class="bi bi-person-circle"></i>
                 <span>Profile</span>
             </a>
@@ -99,7 +99,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <div class="sidebar-divider"></div>
         
         <li>
-            <a href="<?php echo APP_URL; ?>/logout.php" class="text-danger">
+            <a href="<?php echo url('logout'); ?>" class="text-danger">
                 <i class="bi bi-box-arrow-left"></i>
                 <span>Logout</span>
             </a>

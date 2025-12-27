@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (!isTeamLead()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -133,7 +133,7 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0">Attendance Details</h5>
-                <a href="approvals.php" class="btn btn-outline-secondary btn-sm">
+                <a href="approvals" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i>Back
                 </a>
             </div>
@@ -286,7 +286,7 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary">Filter</button>
-                        <a href="approvals.php" class="btn btn-outline-secondary">Reset</a>
+                        <a href="approvals" class="btn btn-outline-secondary">Reset</a>
                     </div>
                 </form>
             </div>

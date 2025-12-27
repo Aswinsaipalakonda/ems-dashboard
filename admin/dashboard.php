@@ -8,6 +8,9 @@ $pageTitle = 'Admin Dashboard';
 require_once __DIR__ . '/../config/config.php';
 requireAdmin();
 
+// Process auto-checkout if applicable
+checkAutoCheckout();
+
 // Get statistics
 $totalEmployees = fetchOne("SELECT COUNT(*) as count FROM employees WHERE status = 'active'")['count'] ?? 0;
 $pendingApprovals = fetchOne("SELECT COUNT(*) as count FROM attendance WHERE status = 'pending'")['count'] ?? 0;
@@ -627,7 +630,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <h6 class="mb-0">Notifications</h6>
                     </div>
                     <?php if ($pendingApprovals > 0): ?>
-                    <a href="<?php echo APP_URL; ?>/admin/approvals.php" class="notification-item unread">
+                    <a href="<?php echo url('admin/approvals'); ?>" class="notification-item unread">
                         <div class="notification-icon bg-warning text-white">
                             <i class="bi bi-clock"></i>
                         </div>
@@ -654,10 +657,10 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/admin/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/admin/settings.php"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/settings'); ?>"><i class="bi bi-gear me-2"></i>Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -734,7 +737,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <span class="header-icon orange"><i class="bi bi-clock-history"></i></span>
                         Pending Approvals
                     </h5>
-                    <a href="<?php echo APP_URL; ?>/admin/approvals.php" class="btn-view-all">View All</a>
+                    <a href="<?php echo url('admin/approvals'); ?>" class="btn-view-all">View All</a>
                 </div>
                 <?php if (count($recentPending) > 0): ?>
                 <div class="table-responsive">
@@ -773,7 +776,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <a href="<?php echo APP_URL; ?>/admin/approvals.php?action=view&id=<?php echo $pending['id']; ?>" class="action-btn">
+                                    <a href="<?php echo url('admin/approvals'); ?>?action=view&id=<?php echo $pending['id']; ?>" class="action-btn">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
@@ -802,7 +805,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </h5>
                 </div>
                 <div class="quick-actions-grid">
-                    <a href="<?php echo APP_URL; ?>/admin/employees.php?action=add" class="quick-action-btn primary">
+                    <a href="<?php echo url('admin/employees'); ?>?action=add" class="quick-action-btn primary">
                         <div class="action-icon">
                             <i class="bi bi-person-plus"></i>
                         </div>
@@ -812,7 +815,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </a>
                     
-                    <a href="<?php echo APP_URL; ?>/admin/tasks.php?action=add" class="quick-action-btn success">
+                    <a href="<?php echo url('admin/tasks'); ?>?action=add" class="quick-action-btn success">
                         <div class="action-icon">
                             <i class="bi bi-plus-circle"></i>
                         </div>
@@ -822,7 +825,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </a>
                     
-                    <a href="<?php echo APP_URL; ?>/admin/approvals.php" class="quick-action-btn warning">
+                    <a href="<?php echo url('admin/approvals'); ?>" class="quick-action-btn warning">
                         <div class="action-icon">
                             <i class="bi bi-clipboard-check"></i>
                         </div>
@@ -832,7 +835,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </a>
                     
-                    <a href="<?php echo APP_URL; ?>/admin/reports.php" class="quick-action-btn info">
+                    <a href="<?php echo url('admin/reports'); ?>" class="quick-action-btn info">
                         <div class="action-icon">
                             <i class="bi bi-graph-up-arrow"></i>
                         </div>
@@ -854,7 +857,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <span class="header-icon blue"><i class="bi bi-people"></i></span>
                         Recent Employees
                     </h5>
-                    <a href="<?php echo APP_URL; ?>/admin/employees.php" class="btn-view-all">View All</a>
+                    <a href="<?php echo url('admin/employees'); ?>" class="btn-view-all">View All</a>
                 </div>
                 <?php if (count($recentEmployees) > 0): ?>
                 <div class="table-responsive">

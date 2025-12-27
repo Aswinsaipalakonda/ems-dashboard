@@ -8,8 +8,11 @@ $pageTitle = 'Check In/Out';
 require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
+// Process auto-checkout if applicable
+checkAutoCheckout();
+
 if (isAdmin()) {
-    header("Location: " . APP_URL . "/admin/dashboard.php");
+    header("Location: " . url("admin/dashboard"));
     exit;
 }
 
@@ -184,9 +187,9 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/employee/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('employee/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -242,7 +245,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                             </span>
                         </div>
                         
-                        <a href="<?php echo APP_URL; ?>/employee/dashboard.php" class="btn btn-primary mt-4">
+                        <a href="<?php echo url('employee/dashboard'); ?>" class="btn btn-primary mt-4">
                             <i class="bi bi-house me-2"></i>Back to Dashboard
                         </a>
                     </div>
@@ -250,11 +253,23 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                 
                 <?php elseif ($showCheckout): ?>
                 <!-- Check Out Card -->
+                <?php 
+                $autoCheckoutEnabled = getSetting('auto_checkout_enabled', '0') === '1';
+                $workingHoursEnd = getSetting('working_hours_end', '18:00');
+                ?>
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="bi bi-box-arrow-right me-2"></i>Check Out</h5>
                     </div>
                     <div class="card-body">
+                        <?php if ($autoCheckoutEnabled): ?>
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-clock-history me-2"></i>
+                            <strong>Auto-checkout enabled:</strong> You will be automatically checked out at 
+                            <strong><?php echo date('h:i A', strtotime($workingHoursEnd)); ?></strong> if you don't check out manually.
+                        </div>
+                        <?php endif; ?>
+                        
                         <div class="text-center mb-4">
                             <p class="text-muted mb-2">You checked in at <strong><?php echo formatTime($todayAttendance['check_in_time']); ?></strong></p>
                             <div class="checkin-card mx-auto" style="max-width: 280px; padding: 15px 20px;">

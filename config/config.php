@@ -63,6 +63,9 @@ if (!file_exists(UPLOAD_PATH . 'avatars')) {
 if (!file_exists(UPLOAD_PATH . 'checkin')) {
     mkdir(UPLOAD_PATH . 'checkin', 0755, true);
 }
+if (!file_exists(UPLOAD_PATH . 'tasks')) {
+    mkdir(UPLOAD_PATH . 'tasks', 0755, true);
+}
 
 // Session timeout (2 hours in seconds)
 define('SESSION_TIMEOUT', 7200);
@@ -72,6 +75,28 @@ date_default_timezone_set('Asia/Kolkata');
 
 // Include database
 require_once __DIR__ . '/database.php';
+
+/**
+ * Generate clean URL (without .php extension)
+ * @param string $path The path with or without .php extension
+ * @return string Clean URL without .php extension
+ */
+function url($path) {
+    // Remove .php extension if present
+    $cleanPath = preg_replace('/\.php$/', '', $path);
+    return APP_URL . '/' . ltrim($cleanPath, '/');
+}
+
+/**
+ * Redirect to a clean URL
+ * @param string $path The path to redirect to
+ * @param bool $permanent Whether to use 301 (permanent) or 302 (temporary) redirect
+ */
+function redirect($path, $permanent = false) {
+    $cleanUrl = url($path);
+    header("Location: " . $cleanUrl, true, $permanent ? 301 : 302);
+    exit;
+}
 
 /**
  * Get asset URL (CSS, JS, images)
@@ -95,7 +120,7 @@ function checkSessionTimeout() {
         if (time() - $_SESSION['last_activity'] > SESSION_TIMEOUT) {
             session_unset();
             session_destroy();
-            header("Location: " . APP_URL . "/login.php?timeout=1");
+            header("Location: " . url('login') . "?timeout=1");
             exit;
         }
     }
@@ -216,7 +241,7 @@ function getUserRoleName() {
  */
 function requireLogin() {
     if (!isLoggedIn()) {
-        header("Location: " . APP_URL . "/login.php");
+        header("Location: " . url('login'));
         exit;
     }
     checkSessionTimeout();
@@ -228,7 +253,7 @@ function requireLogin() {
 function requireAdmin() {
     requireLogin();
     if (!isAdmin()) {
-        header("Location: " . APP_URL . "/employee/dashboard.php");
+        header("Location: " . url('employee/dashboard'));
         exit;
     }
 }
@@ -366,8 +391,17 @@ function calculateTimeDiff($start, $end) {
  * Get user avatar or default
  */
 function getAvatar($avatar) {
-    if ($avatar && file_exists(UPLOAD_PATH . 'avatars/' . $avatar)) {
-        return APP_URL . '/uploads/avatars/' . $avatar;
+    if ($avatar) {
+        // Normalize the avatar path (remove any directory traversal, normalize slashes)
+        $avatar = basename($avatar);
+        $avatarPath = UPLOAD_PATH . 'avatars/' . $avatar;
+        
+        // Check if file exists
+        if (file_exists($avatarPath) && is_file($avatarPath)) {
+            // Add cache-busting parameter to force browser refresh
+            $mtime = filemtime($avatarPath);
+            return APP_URL . '/uploads/avatars/' . rawurlencode($avatar) . '?v=' . $mtime;
+        }
     }
     return APP_URL . '/assets/img/default-avatar.svg';
 }
@@ -401,5 +435,118 @@ function logActivity($action, $description = '') {
     
     $sql = "INSERT INTO activity_logs (user_id, user_type, action, description, ip_address, created_at) VALUES (?, ?, ?, ?, ?, NOW())";
     executeQuery($sql, "issss", [$userId, $userType, $action, $description, $ip]);
+}
+
+/**
+ * Get system setting
+ */
+function getSetting($key, $default = null) {
+    $setting = fetchOne("SELECT setting_value FROM settings WHERE setting_key = ?", "s", [$key]);
+    return $setting ? $setting['setting_value'] : $default;
+}
+
+/**
+ * Process automatic checkout for employees
+ * This function checks all employees who have checked in today but not checked out
+ * and automatically checks them out at the configured end time
+ */
+function processAutoCheckout() {
+    // Check if auto-checkout is enabled
+    $autoCheckoutEnabled = getSetting('auto_checkout_enabled', '0');
+    if ($autoCheckoutEnabled !== '1') {
+        return ['processed' => 0, 'message' => 'Auto-checkout is disabled'];
+    }
+    
+    // Get working hours end time
+    $workingHoursEnd = getSetting('working_hours_end', '18:00');
+    
+    // Get current time
+    $currentTime = date('H:i');
+    $currentDate = date('Y-m-d');
+    
+    // Only process if current time is past or equal to end time
+    if ($currentTime < $workingHoursEnd) {
+        return ['processed' => 0, 'message' => 'Not yet end time'];
+    }
+    
+    // Find all attendance records for today where:
+    // - Employee has checked in
+    // - Employee has NOT checked out
+    // - auto_checkout has not been done (check_out_time is NULL)
+    $pendingCheckouts = fetchAll(
+        "SELECT a.*, e.name as employee_name 
+         FROM attendance a 
+         JOIN employees e ON a.employee_id = e.id 
+         WHERE a.date = ? 
+         AND a.check_in_time IS NOT NULL 
+         AND a.check_out_time IS NULL",
+        "s",
+        [$currentDate]
+    );
+    
+    $processedCount = 0;
+    $autoCheckoutTime = $currentDate . ' ' . $workingHoursEnd . ':00';
+    
+    foreach ($pendingCheckouts as $attendance) {
+        // Calculate total hours
+        $checkInTime = strtotime($attendance['check_in_time']);
+        $checkOutTime = strtotime($autoCheckoutTime);
+        $totalSeconds = $checkOutTime - $checkInTime;
+        
+        // Ensure positive total hours (in case check-in was after end time)
+        if ($totalSeconds < 0) {
+            $totalSeconds = 0;
+        }
+        
+        $totalHours = round($totalSeconds / 3600, 2);
+        
+        // Update the attendance record with auto-checkout
+        $sql = "UPDATE attendance SET 
+                check_out_time = ?, 
+                total_hours = ?,
+                admin_remarks = CONCAT(IFNULL(admin_remarks, ''), ' [Auto-checkout at ', ?, ']')
+                WHERE id = ?";
+        executeQuery($sql, "sdsi", [$autoCheckoutTime, $totalHours, $workingHoursEnd, $attendance['id']]);
+        
+        // Create notification for the employee
+        executeQuery(
+            "INSERT INTO notifications (user_id, user_type, title, message, type) VALUES (?, 'employee', ?, ?, 'info')",
+            "iss",
+            [
+                $attendance['employee_id'], 
+                'Automatic Check-out', 
+                'You have been automatically checked out at ' . date('h:i A', strtotime($autoCheckoutTime)) . '. Total hours: ' . number_format($totalHours, 2)
+            ]
+        );
+        
+        $processedCount++;
+    }
+    
+    return [
+        'processed' => $processedCount, 
+        'message' => $processedCount > 0 ? "Auto-checkout completed for $processedCount employee(s)" : 'No pending checkouts'
+    ];
+}
+
+/**
+ * Check and process auto-checkout (called on page loads)
+ * This is throttled to run at most once per minute to avoid performance issues
+ */
+function checkAutoCheckout() {
+    // Use a simple file-based throttle to avoid running too frequently
+    $throttleFile = sys_get_temp_dir() . '/ems_auto_checkout_' . date('Y-m-d') . '.lock';
+    $lastRun = file_exists($throttleFile) ? (int)file_get_contents($throttleFile) : 0;
+    $currentMinute = (int)date('Hi'); // HHMM format
+    
+    // Only run if we haven't run this minute
+    if ($lastRun >= $currentMinute) {
+        return null;
+    }
+    
+    // Update throttle file
+    file_put_contents($throttleFile, $currentMinute);
+    
+    // Process auto-checkout
+    return processAutoCheckout();
 }
 ?>

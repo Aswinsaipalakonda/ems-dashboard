@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (!isManager() && !isHR()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($formToken) || (isset($_SESSION['last_form_token']) && $_SESSION['last_form_token'] === $formToken)) {
             // Duplicate submission detected
             $isValidSubmission = false;
-            header("Location: tasks.php");
+            header("Location: tasks");
             exit;
         }
         $_SESSION['last_form_token'] = $formToken;
@@ -43,8 +43,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $status = sanitize($_POST['status'] ?? 'not_started');
         $deadline = $_POST['deadline'] ?? null;
         
+        // Handle file upload (optional)
+        $attachmentFile = null;
+        if (!empty($_FILES['task_attachment']['name'])) {
+            $allowedTypes = [
+                'application/pdf',
+                'text/csv',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            $allowedExtensions = ['pdf', 'csv', 'xls', 'xlsx', 'doc', 'docx'];
+            
+            $fileExt = strtolower(pathinfo($_FILES['task_attachment']['name'], PATHINFO_EXTENSION));
+            $fileSize = $_FILES['task_attachment']['size'];
+            $maxSize = 10 * 1024 * 1024; // 10MB max
+            
+            if (!in_array($fileExt, $allowedExtensions)) {
+                $message = 'Invalid file type. Allowed: PDF, CSV, XLS, XLSX, DOC, DOCX';
+                $messageType = 'danger';
+            } elseif ($fileSize > $maxSize) {
+                $message = 'File size too large. Maximum 10MB allowed.';
+                $messageType = 'danger';
+            } else {
+                $attachmentFile = 'task_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $fileExt;
+                $uploadPath = UPLOAD_PATH . 'tasks/' . $attachmentFile;
+                
+                if (!move_uploaded_file($_FILES['task_attachment']['tmp_name'], $uploadPath)) {
+                    $message = 'Failed to upload file. Please try again.';
+                    $messageType = 'danger';
+                    $attachmentFile = null;
+                }
+            }
+        }
+        
         // Handle multi-select for add action
-        if ($postAction === 'add') {
+        if ($postAction === 'add' && empty($message)) {
             $assignedToArray = $_POST['assigned_to'] ?? [];
             if (empty($title) || empty($assignedToArray)) {
                 $message = 'Title and Assigned To are required!';
@@ -54,14 +89,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 foreach ($assignedToArray as $assignedTo) {
                     $assignedTo = intval($assignedTo);
                     if ($assignedTo > 0) {
-                        $sql = "INSERT INTO tasks (title, description, assigned_to, assigned_by, priority, status, deadline) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                        executeQuery($sql, "ssiisss", [$title, $description, $assignedTo, $_SESSION['user_id'], $priority, $status, $deadline]);
+                        $sql = "INSERT INTO tasks (title, description, assigned_to, assigned_by, priority, status, deadline, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                        executeQuery($sql, "ssiissss", [$title, $description, $assignedTo, $_SESSION['user_id'], $priority, $status, $deadline, $attachmentFile]);
                         
                         // Notify employee
+                        $notifyMsg = "You have been assigned a new task: $title";
+                        if ($attachmentFile) {
+                            $notifyMsg .= ' (with attachment)';
+                        }
                         executeQuery(
                             "INSERT INTO notifications (user_id, user_type, title, message, type) VALUES (?, 'employee', 'New Task Assigned', ?, 'info')",
                             "is",
-                            [$assignedTo, "You have been assigned a new task: $title"]
+                            [$assignedTo, $notifyMsg]
                         );
                         $successCount++;
                     }
@@ -69,10 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $_SESSION['flash_message'] = "Task assigned to $successCount employee(s) successfully!";
                 $_SESSION['flash_type'] = 'success';
-                header("Location: tasks.php");
+                header("Location: tasks");
                 exit;
             }
-        } else {
+        } elseif ($postAction === 'edit' && empty($message)) {
             // Edit single task
             $assignedTo = intval($_POST['assigned_to'] ?? 0);
             if (empty($title) || $assignedTo == 0) {
@@ -80,12 +119,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $messageType = 'danger';
             } else {
                 $editId = intval($_POST['id']);
-                $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, status = ?, deadline = ? WHERE id = ?";
-                executeQuery($sql, "ssisssi", [$title, $description, $assignedTo, $priority, $status, $deadline, $editId]);
+                if ($attachmentFile) {
+                    $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, status = ?, deadline = ?, attachment = ? WHERE id = ?";
+                    executeQuery($sql, "ssissssi", [$title, $description, $assignedTo, $priority, $status, $deadline, $attachmentFile, $editId]);
+                } else {
+                    $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, status = ?, deadline = ? WHERE id = ?";
+                    executeQuery($sql, "ssisssi", [$title, $description, $assignedTo, $priority, $status, $deadline, $editId]);
+                }
                 
                 $_SESSION['flash_message'] = 'Task updated successfully!';
                 $_SESSION['flash_type'] = 'success';
-                header("Location: tasks.php");
+                header("Location: tasks");
                 exit;
             }
         }
@@ -142,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['flash_message'] = 'Task group not found!';
                 $_SESSION['flash_type'] = 'danger';
             }
-            header("Location: tasks.php");
+            header("Location: tasks");
             exit;
         }
     } elseif ($postAction === 'delete') {
@@ -171,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         $_SESSION['flash_type'] = 'success';
-        header("Location: tasks.php");
+        header("Location: tasks");
         exit;
     } elseif ($postAction === 'review') {
         // Handle task review (approve or request changes)
@@ -193,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $_SESSION['flash_message'] = 'Task approved and marked as completed!';
                 $_SESSION['flash_type'] = 'success';
-                header("Location: tasks.php");
+                header("Location: tasks");
                 exit;
             } elseif ($reviewAction === 'request_changes') {
                 executeQuery("UPDATE tasks SET status = 'changes_requested', reviewer_feedback = ? WHERE id = ?", "si", [$reviewerFeedback, $reviewId]);
@@ -207,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $_SESSION['flash_message'] = 'Changes requested. Employee has been notified.';
                 $_SESSION['flash_type'] = 'warning';
-                header("Location: tasks.php");
+                header("Location: tasks");
                 exit;
             }
         }
@@ -327,12 +371,12 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0"><?php echo $action === 'add' ? 'Create New Task' : 'Edit Task'; ?></h5>
-                <a href="tasks.php" class="btn btn-outline-secondary btn-sm">
+                <a href="tasks" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i>Back
                 </a>
             </div>
             <div class="card-body">
-                <form method="POST" id="taskForm" onsubmit="return preventDoubleSubmit(this)">
+                <form method="POST" id="taskForm" enctype="multipart/form-data" onsubmit="return preventDoubleSubmit(this)">
                     <input type="hidden" name="action" value="<?php echo $action; ?>">
                     <input type="hidden" name="form_token" value="<?php echo bin2hex(random_bytes(16)); ?>">
                     <?php if ($action === 'edit'): ?>
@@ -422,13 +466,32 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                                 <option value="completed" <?php echo (isset($task['status']) && $task['status'] === 'completed') ? 'selected' : ''; ?>>Completed</option>
                             </select>
                         </div>
+                        
+                        <!-- File Attachment (Optional) -->
+                        <div class="col-12 mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-paperclip me-1"></i>Attachment 
+                                <small class="text-muted">(Optional - PDF, CSV, XLS, XLSX, DOC, DOCX - Max 10MB)</small>
+                            </label>
+                            <?php if (isset($task) && !empty($task['attachment'])): ?>
+                            <div class="alert alert-info py-2 mb-2">
+                                <i class="bi bi-file-earmark me-1"></i>Current file: 
+                                <a href="<?php echo APP_URL . '/uploads/tasks/' . htmlspecialchars($task['attachment']); ?>" target="_blank">
+                                    <?php echo htmlspecialchars($task['attachment']); ?>
+                                </a>
+                                <small class="text-muted ms-2">(Upload new file to replace)</small>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" class="form-control" name="task_attachment" 
+                                   accept=".pdf,.csv,.xls,.xlsx,.doc,.docx">
+                        </div>
                     </div>
                     
                     <div class="mt-3">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg me-1"></i><?php echo $action === 'add' ? 'Create Task' : 'Update Task'; ?>
                         </button>
-                        <a href="tasks.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                        <a href="tasks" class="btn btn-outline-secondary ms-2">Cancel</a>
                     </div>
                 </form>
             </div>

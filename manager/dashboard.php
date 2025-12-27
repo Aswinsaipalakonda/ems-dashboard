@@ -8,14 +8,17 @@ $pageTitle = 'Manager Dashboard';
 require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
+// Process auto-checkout if applicable
+checkAutoCheckout();
+
 // Check if user has management access
 if (!isManager() && !isHR()) {
     if (isAdmin()) {
-        header("Location: " . APP_URL . "/admin/dashboard.php");
+        header("Location: " . url("admin/dashboard"));
     } elseif (isTeamLead()) {
-        header("Location: " . APP_URL . "/teamlead/dashboard.php");
+        header("Location: " . url("teamlead/dashboard"));
     } else {
-        header("Location: " . APP_URL . "/employee/dashboard.php");
+        header("Location: " . url("employee/dashboard"));
     }
     exit;
 }
@@ -93,7 +96,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><h6 class="dropdown-header">Notifications</h6></li>
                     <?php if ($pendingApprovals > 0): ?>
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/manager/approvals.php">
+                    <li><a class="dropdown-item" href="<?php echo url('manager/approvals'); ?>">
                         <i class="bi bi-clock-history me-2"></i><?php echo $pendingApprovals; ?> pending approvals
                     </a></li>
                     <?php else: ?>
@@ -107,11 +110,11 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                     <span class="d-none d-md-inline ms-2"><?php echo $_SESSION['user_name']; ?></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/manager/profile.php">
+                    <li><a class="dropdown-item" href="<?php echo url('manager/profile'); ?>">
                         <i class="bi bi-person me-2"></i>Profile
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php">
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>">
                         <i class="bi bi-box-arrow-right me-2"></i>Logout
                     </a></li>
                 </ul>
@@ -160,7 +163,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                         <?php endif; ?>
                     </div>
                 </div>
-                <a href="<?php echo APP_URL; ?>/manager/checkin.php" class="btn btn-gradient btn-sm">
+                <a href="<?php echo url('manager/checkin'); ?>" class="btn btn-gradient btn-sm">
                     <i class="bi bi-camera-video me-1"></i>
                     <?php echo !$myAttendance ? 'Check In' : (!$myAttendance['check_out_time'] ? 'Check Out' : 'View'); ?>
                 </a>
@@ -230,7 +233,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                 <div class="card h-100">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Pending Approvals</h5>
-                        <a href="<?php echo APP_URL; ?>/manager/approvals.php" class="btn btn-sm btn-outline-primary">View All</a>
+                        <a href="<?php echo url('manager/approvals'); ?>" class="btn btn-sm btn-outline-primary">View All</a>
                     </div>
                     <div class="card-body p-0">
                         <?php if (count($pendingList) > 0): ?>
@@ -245,7 +248,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                                             <?php echo formatDate($pending['date']); ?> at <?php echo formatTime($pending['check_in_time']); ?>
                                         </small>
                                     </div>
-                                    <a href="<?php echo APP_URL; ?>/manager/approvals.php?action=view&id=<?php echo $pending['id']; ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?php echo url('manager/approvals'); ?>?action=view&id=<?php echo $pending['id']; ?>" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </div>
@@ -281,7 +284,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                 <div class="card">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="mb-0"><i class="bi bi-people me-2"></i>Recent Employees</h5>
-                        <a href="<?php echo APP_URL; ?>/manager/employees.php" class="btn btn-sm btn-outline-primary">View All</a>
+                        <a href="<?php echo url('manager/employees'); ?>" class="btn btn-sm btn-outline-primary">View All</a>
                     </div>
                     <div class="card-body p-0">
                         <?php if (count($recentEmployees) > 0): ?>

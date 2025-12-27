@@ -8,7 +8,7 @@ require_once __DIR__ . '/config/config.php';
 
 // Redirect if already logged in
 if (isLoggedIn()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -326,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
             <span><?php echo $success; ?></span>
         </div>
         
-        <a href="<?php echo APP_URL; ?>/login.php" class="btn-submit">
+        <a href="<?php echo url('login'); ?>" class="btn-submit">
             <i class="bi bi-box-arrow-in-right"></i>
             Sign In Now
         </a>
@@ -343,13 +343,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
             <span><?php echo $error; ?></span>
         </div>
         
-        <a href="<?php echo APP_URL; ?>/forgot-password.php" class="btn-submit">
+        <a href="<?php echo url('forgot-password'); ?>" class="btn-submit">
             <i class="bi bi-arrow-repeat"></i>
             Request New Link
         </a>
         
         <p class="footer-text">
-            Remember your password? <a href="<?php echo APP_URL; ?>/login.php">Sign in</a>
+            Remember your password? <a href="<?php echo url('login'); ?>">Sign in</a>
         </p>
         
         <?php elseif ($validToken): ?>
@@ -402,7 +402,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
         </form>
         
         <p class="footer-text">
-            Remember your password? <a href="<?php echo APP_URL; ?>/login.php">Sign in</a>
+            Remember your password? <a href="<?php echo url('login'); ?>">Sign in</a>
         </p>
         <?php endif; ?>
     </div>

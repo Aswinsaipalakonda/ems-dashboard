@@ -16,7 +16,11 @@ php_value memory_limit 256M
 # Enable URL rewriting
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
+    
+    # Dynamically set RewriteBase based on the installation path
+    # This handles both root and subdirectory installations
+    RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
+    RewriteRule ^(.*) - [E=BASE:%1]
     
     # Redirect to HTTPS (uncomment in production if you have SSL)
     # RewriteCond %{HTTPS} off
@@ -24,6 +28,16 @@ php_value memory_limit 256M
     
     # Prevent directory browsing
     Options -Indexes
+    
+    # Remove .php extension from URLs (redirect .php to clean URL)
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+    RewriteRule ^ %{ENV:BASE}%1 [R=301,L]
+    
+    # Internally rewrite clean URLs to .php files
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME}.php -f
+    RewriteRule ^(.*)$ $1.php [L]
 </IfModule>
 
 # Deny access to sensitive files

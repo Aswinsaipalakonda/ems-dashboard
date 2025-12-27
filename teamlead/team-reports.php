@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
 if (!isTeamLead()) {
-    header("Location: " . APP_URL . "/employee/dashboard.php");
+    header("Location: " . url("employee/dashboard"));
     exit;
 }
 
@@ -137,7 +137,7 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary me-2">Generate</button>
-                        <a href="team-reports.php" class="btn btn-outline-secondary">Reset</a>
+                        <a href="team-reports" class="btn btn-outline-secondary">Reset</a>
                     </div>
                 </form>
             </div>

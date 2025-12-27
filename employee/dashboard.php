@@ -8,9 +8,12 @@ $pageTitle = 'Dashboard';
 require_once __DIR__ . '/../config/config.php';
 requireLogin();
 
+// Process auto-checkout if applicable
+checkAutoCheckout();
+
 // Redirect admin to admin dashboard
 if (isAdmin()) {
-    header("Location: " . APP_URL . "/admin/dashboard.php");
+    header("Location: " . url("admin/dashboard"));
     exit;
 }
 
@@ -121,7 +124,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                         </div>
                         <?php endforeach; ?>
                         <div class="p-2 text-center border-top">
-                            <a href="<?php echo APP_URL; ?>/employee/notifications.php" class="text-primary">View All Notifications</a>
+                            <a href="<?php echo url('employee/notifications'); ?>" class="text-primary">View All Notifications</a>
                         </div>
                     <?php else: ?>
                     <div class="p-4 text-center text-muted">
@@ -141,9 +144,9 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo APP_URL; ?>/employee/profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('employee/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo APP_URL; ?>/logout.php"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -198,11 +201,11 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                     <div class="date-display"></div>
                     
                     <?php if (!$todayAttendance || !$todayAttendance['check_in_time']): ?>
-                        <a href="<?php echo APP_URL; ?>/employee/checkin.php" class="btn btn-checkin">
+                        <a href="<?php echo url('employee/checkin'); ?>" class="btn btn-checkin">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Check In
                         </a>
                     <?php elseif (!$todayAttendance['check_out_time']): ?>
-                        <a href="<?php echo APP_URL; ?>/employee/checkin.php?action=checkout" class="btn btn-checkout">
+                        <a href="<?php echo url('employee/checkin'); ?>?action=checkout" class="btn btn-checkout">
                             <i class="bi bi-box-arrow-right me-2"></i>Check Out
                         </a>
                     <?php else: ?>
@@ -318,7 +321,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>My Tasks</h5>
-                        <a href="<?php echo APP_URL; ?>/employee/tasks.php" class="btn btn-sm btn-outline-primary">View All</a>
+                        <a href="<?php echo url('employee/tasks'); ?>" class="btn btn-sm btn-outline-primary">View All</a>
                     </div>
                     <div class="card-body p-0">
                         <?php if (is_array($pendingTasks) && count($pendingTasks) > 0): ?>
@@ -359,7 +362,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Recent Attendance</h5>
-                        <a href="<?php echo APP_URL; ?>/employee/attendance.php" class="btn btn-sm btn-outline-primary">View All</a>
+                        <a href="<?php echo url('employee/attendance'); ?>" class="btn btn-sm btn-outline-primary">View All</a>
                     </div>
                     <div class="card-body p-0">
                         <?php if (is_array($recentAttendance) && count($recentAttendance) > 0): ?>
@@ -405,7 +408,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Recent Notifications</h5>
-                        <a href="<?php echo APP_URL; ?>/employee/notifications.php" class="btn btn-sm btn-outline-primary">View All</a>
+                        <a href="<?php echo url('employee/notifications'); ?>" class="btn btn-sm btn-outline-primary">View All</a>
                     </div>
                     <div class="card-body p-0">
                         <?php if (is_array($notifications) && count($notifications) > 0): ?>
