@@ -234,8 +234,8 @@ ems-dashboard/
 6. **Access the application**
    - Open `http://localhost/ems-dashboard`
    - Default credentials:
-     - Email: `admin@example.com`
-     - Password: `admin123` (Change immediately!)
+     - Email: `admin@ems.com`
+     - Password: `password` (Change immediately!)
 
 ## 📊 Database Schema
 
