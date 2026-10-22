@@ -189,7 +189,7 @@ ON DUPLICATE KEY UPDATE `code` = `code`;
 
 INSERT INTO `settings` (`setting_key`, `setting_value`) VALUES
 ('company_name', 'Clientura EMS'),
-('company_email', 'contact@clientura.com'),
+('company_email', 'contact@clientura.in'),
 ('company_phone', '+91 9876543210'),
 ('company_address', 'Hyderabad, India'),
 ('working_hours_start', '09:00'),

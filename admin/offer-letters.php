@@ -1,6 +1,6 @@
 <?php
 /**
- * Offer Letters Management
+ * Offer Letters Management - SaaS Document Hub
  * View, search, and issue dynamic offer letters matching template.pdf & offer.pdf
  */
 require_once __DIR__ . '/../config/config.php';
@@ -56,114 +56,207 @@ $offerLetters = fetchAll($sql, $types, $params);
 $totalOffers = fetchOne("SELECT COUNT(*) as c FROM offer_letters")['c'] ?? 0;
 $internOffers = fetchOne("SELECT COUNT(*) as c FROM offer_letters WHERE employment_type = 'internship'")['c'] ?? 0;
 $fulltimeOffers = fetchOne("SELECT COUNT(*) as c FROM offer_letters WHERE employment_type = 'fulltime'")['c'] ?? 0;
+$activeOffers = fetchOne("SELECT COUNT(*) as c FROM offer_letters WHERE status != 'revoked'")['c'] ?? 0;
+$issuanceRate = $totalOffers > 0 ? round(($activeOffers / $totalOffers) * 100) : 100;
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/admin-sidebar.php';
 ?>
 
+<!-- Main Content -->
 <div class="main-content">
-    <div class="content-wrapper">
-        <!-- Header -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-            <div>
-                <h1 class="h3 font-weight-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Offer Letters</h1>
-                <p class="text-muted mb-0">Generate and issue official, branded candidate and internship offer letters on Clientura letterhead.</p>
-            </div>
-            <div>
-                <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-primary">
-                    <?php echo pika_icon('plus'); ?> Generate New Offer Letter
-                </a>
+    <header class="main-header">
+        <div class="header-left">
+            <button class="sidebar-toggle"><i class="bi bi-list"></i></button>
+            <h1 class="page-title">Candidate Offer Letters</h1>
+        </div>
+        <div class="header-right">
+            <div class="dropdown">
+                <div class="user-dropdown" data-bs-toggle="dropdown">
+                    <img src="<?php echo getAvatar($_SESSION['avatar'] ?? ''); ?>" alt="Avatar" class="user-avatar">
+                    <div class="user-info">
+                        <div class="user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><?php echo pika_icon('profile', 'me-2', 16); ?>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/settings'); ?>"><?php echo pika_icon('settings', 'me-2', 16); ?>Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><?php echo pika_icon('logout', 'me-2 text-danger', 16); ?>Logout</a></li>
+                </ul>
             </div>
         </div>
-
+    </header>
+    
+    <div class="content-wrapper">
         <?php if (!empty($successMsg)): ?>
-            <div class="alert alert-success alert-dismissible fade show rounded-pill px-4" role="alert">
-                <i class="bi bi-check-circle me-2"></i> <?php echo htmlspecialchars($successMsg); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <?php echo pika_icon('check-circle', 'flex-shrink-0', 20); ?>
+                <div><?php echo htmlspecialchars($successMsg); ?></div>
             </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
         <?php endif; ?>
 
-        <!-- Stats Overview Cards -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-icon primary">
-                        <?php echo pika_icon('offer-letter'); ?>
-                    </div>
-                    <div class="stats-info">
-                        <h3><?php echo number_format($totalOffers); ?></h3>
-                        <p>Total Offer Letters Issued</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-icon accent">
-                        <?php echo pika_icon('certificate'); ?>
-                    </div>
-                    <div class="stats-info">
-                        <h3><?php echo number_format($internOffers); ?></h3>
-                        <p>Internship Positions</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-icon success">
-                        <?php echo pika_icon('users'); ?>
-                    </div>
-                    <div class="stats-info">
-                        <h3><?php echo number_format($fulltimeOffers); ?></h3>
-                        <p>Full-Time Positions</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filter & Search Bar -->
-        <div class="card mb-4 border-0 shadow-sm">
-            <div class="card-body p-3">
-                <form method="GET" class="row g-3 align-items-center">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0" style="border-radius: 9999px 0 0 9999px;">
-                                <i class="bi bi-search text-muted"></i>
+        <!-- Hero Hub -->
+        <div class="saas-hero">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="saas-hero-content">
+                        <h2 class="saas-hero-title">Candidate Offer Letters</h2>
+                        <p class="saas-hero-subtitle">
+                            Generate and manage corporate internship and full-time employment agreements with dynamic letterhead formatting matching the official Clientura standards.
+                        </p>
+                        <div class="saas-hero-pills">
+                            <span class="saas-pill live-pulse">
+                                <span class="pulse-dot"></span>
+                                <?php echo $totalOffers; ?> Letters Issued
                             </span>
-                            <input type="text" name="search" class="form-control border-start-0" placeholder="Search by candidate name, offer ID, or role..." value="<?php echo htmlspecialchars($search); ?>" style="border-radius: 0 9999px 9999px 0;">
+                            <span class="saas-pill">
+                                <?php echo pika_icon('briefcase', '', 14); ?>
+                                <?php echo $internOffers; ?> Internships
+                            </span>
+                            <span class="saas-pill">
+                                <?php echo pika_icon('award', '', 14); ?>
+                                <?php echo $fulltimeOffers; ?> Full-Time
+                            </span>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <select name="type" class="form-select" style="border-radius: 9999px;">
-                            <option value="">All Employment Types</option>
-                            <option value="internship" <?php echo $typeFilter === 'internship' ? 'selected' : ''; ?>>Internship</option>
-                            <option value="fulltime" <?php echo $typeFilter === 'fulltime' ? 'selected' : ''; ?>>Full-Time</option>
-                            <option value="parttime" <?php echo $typeFilter === 'parttime' ? 'selected' : ''; ?>>Part-Time</option>
-                        </select>
+                </div>
+                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                    <div class="saas-hero-actions">
+                        <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-primary btn-glow">
+                            <?php echo pika_icon('plus', 'me-1', 16); ?> Issue New Offer Letter
+                        </a>
                     </div>
-                    <div class="col-md-2 d-flex gap-2">
-                        <button type="submit" class="btn btn-navy w-100">Filter</button>
-                        <?php if (!empty($search) || !empty($typeFilter)): ?>
-                            <a href="<?php echo url('admin/offer-letters'); ?>" class="btn btn-light" title="Reset Filters"><i class="bi bi-x-lg"></i></a>
-                        <?php endif; ?>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
 
-        <!-- Offer Letters Table -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                <span class="font-weight-bold text-dark">Issued Offer Letters Log</span>
-                <span class="text-muted small"><?php echo count($offerLetters); ?> records found</span>
+        <!-- 4 Dynamic Metric Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge navy">
+                            <?php echo pika_icon('offer-letter', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill active">Cumulative</span>
+                    </div>
+                    <div class="metric-value"><?php echo $totalOffers; ?></div>
+                    <div class="metric-label">Total Offers Generated</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
+                    </div>
+                </div>
             </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge amber">
+                            <?php echo pika_icon('briefcase', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill warning">Interns</span>
+                    </div>
+                    <div class="metric-value"><?php echo $internOffers; ?></div>
+                    <div class="metric-label">Internship Agreements</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar amber" style="width: <?php echo $totalOffers > 0 ? round(($internOffers / $totalOffers) * 100) : 100; ?>%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge emerald">
+                            <?php echo pika_icon('users', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill active">Full-Time</span>
+                    </div>
+                    <div class="metric-value"><?php echo $fulltimeOffers; ?></div>
+                    <div class="metric-label">Full-Time Roles</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar emerald" style="width: <?php echo $totalOffers > 0 ? round(($fulltimeOffers / $totalOffers) * 100) : 100; ?>%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge sky">
+                            <?php echo pika_icon('check-circle', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill sky"><?php echo $issuanceRate; ?>%</span>
+                    </div>
+                    <div class="metric-value"><?php echo $activeOffers; ?></div>
+                    <div class="metric-label">Active / Valid Offers</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar sky" style="width: <?php echo $issuanceRate; ?>%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter SaaS Toolbar -->
+        <div class="saas-toolbar">
+            <form method="GET" class="row g-3 align-items-center">
+                <div class="col-lg-6 col-md-5">
+                    <div class="saas-input-group">
+                        <span class="saas-input-icon"><?php echo pika_icon('search', '', 16); ?></span>
+                        <input type="text" name="search" class="saas-input" placeholder="Search by candidate name, offer ID, or position..." value="<?php echo htmlspecialchars($search); ?>">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <select name="type" class="form-select saas-select">
+                        <option value="">All Employment Positions</option>
+                        <option value="internship" <?php echo $typeFilter === 'internship' ? 'selected' : ''; ?>>Internship</option>
+                        <option value="fulltime" <?php echo $typeFilter === 'fulltime' ? 'selected' : ''; ?>>Full-Time</option>
+                        <option value="parttime" <?php echo $typeFilter === 'parttime' ? 'selected' : ''; ?>>Part-Time</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <?php echo pika_icon('filter', '', 15); ?> Apply
+                    </button>
+                    <?php if (!empty($search) || !empty($typeFilter)): ?>
+                    <a href="<?php echo url('admin/offer-letters'); ?>" class="btn btn-outline-secondary" title="Reset Filters">
+                        <?php echo pika_icon('refresh', '', 15); ?>
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+
+        <!-- Offer Letters Table Card -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="saas-card-title">
+                        <?php echo pika_icon('offer-letter', 'text-primary', 20); ?>
+                        Issued Offer Letters Log
+                    </h5>
+                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill small">
+                        <?php echo count($offerLetters); ?> Documents Found
+                    </span>
+                </div>
+                <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-sm btn-primary">
+                    <?php echo pika_icon('plus', 'me-1', 14); ?> Issue Offer
+                </a>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                <table class="saas-table">
+                    <thead>
                         <tr>
                             <th>Offer ID</th>
-                            <th>Candidate Name</th>
+                            <th>Candidate</th>
                             <th>Designation Role</th>
-                            <th>Type & Duration</th>
+                            <th>Category</th>
                             <th>Tenure Period</th>
                             <th>Location</th>
                             <th>Status</th>
@@ -172,80 +265,71 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </thead>
                     <tbody>
                         <?php if (empty($offerLetters)): ?>
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <?php echo pika_icon('offer-letter', 'opacity-25 d-block mx-auto mb-3', 48); ?>
+                                <h6 class="fw-bold text-dark">No Offer Letters Generated Yet</h6>
+                                <p class="text-muted small mb-3">Deploy your first official candidate offer letter with Clientura letterhead.</p>
+                                <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-primary btn-sm">
+                                    <?php echo pika_icon('plus', 'me-1', 14); ?> Generate First Offer
+                                </a>
+                            </td>
+                        </tr>
+                        <?php else: ?>
+                            <?php foreach ($offerLetters as $offer): ?>
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
-                                    <i class="bi bi-envelope-open fs-1 d-block text-muted opacity-50 mb-2"></i>
-                                    No offer letters generated yet.
-                                    <div class="mt-2">
-                                        <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-primary btn-sm">Generate First Offer Letter</a>
+                                <td>
+                                    <span class="saas-id-badge"><?php echo htmlspecialchars($offer['offer_id']); ?></span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark"><?php echo htmlspecialchars($offer['candidate_name']); ?></div>
+                                    <small class="text-muted"><?php echo htmlspecialchars($offer['candidate_email']); ?></small>
+                                </td>
+                                <td>
+                                    <span class="saas-tag primary">
+                                        <?php echo htmlspecialchars($offer['designation']); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-1 small"><?php echo ucfirst($offer['employment_type']); ?></span>
+                                    <small class="d-block text-muted mt-1"><?php echo htmlspecialchars($offer['duration_text']); ?></small>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark small"><?php echo date('d M Y', strtotime($offer['start_date'])); ?></div>
+                                    <small class="text-muted">to <?php echo date('d M Y', strtotime($offer['end_date'])); ?></small>
+                                </td>
+                                <td>
+                                    <span class="saas-tag sky"><?php echo htmlspecialchars($offer['location']); ?></span>
+                                </td>
+                                <td>
+                                    <span class="saas-tag <?php 
+                                        echo match($offer['status']) {
+                                            'issued' => 'emerald',
+                                            'accepted' => 'sky',
+                                            default => 'rose'
+                                        };
+                                    ?>">
+                                        <?php echo ucfirst($offer['status']); ?>
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <a href="<?php echo url($offer['file_path']); ?>" target="_blank" class="saas-action-btn" title="View Document">
+                                            <?php echo pika_icon('eye', '', 15); ?>
+                                        </a>
+                                        <a href="<?php echo url($offer['file_path']); ?>" download class="saas-action-btn success" title="Download Document">
+                                            <?php echo pika_icon('download', '', 15); ?>
+                                        </a>
+                                        <?php if ($offer['status'] !== 'revoked'): ?>
+                                        <a href="<?php echo url('admin/offer-letters?action=revoke&id=' . $offer['id']); ?>" 
+                                           class="saas-action-btn delete" title="Revoke Offer"
+                                           onclick="return confirm('Revoke official offer letter for <?php echo addslashes($offer['candidate_name']); ?>?');">
+                                            <?php echo pika_icon('x', '', 15); ?>
+                                        </a>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($offerLetters as $offer): ?>
-                                <tr>
-                                    <td>
-                                        <span class="badge bg-light text-primary border font-monospace">
-                                            <?php echo htmlspecialchars($offer['offer_id']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="font-weight-bold text-dark"><?php echo htmlspecialchars($offer['candidate_name']); ?></div>
-                                        <small class="text-muted"><?php echo htmlspecialchars($offer['candidate_email']); ?></small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary">
-                                            <?php echo htmlspecialchars($offer['designation']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border"><?php echo ucfirst($offer['employment_type']); ?></span>
-                                        <small class="d-block text-muted mt-1"><?php echo htmlspecialchars($offer['duration_text']); ?></small>
-                                    </td>
-                                    <td>
-                                        <small class="text-dark font-weight-500 d-block"><?php echo date('d M Y', strtotime($offer['start_date'])); ?></small>
-                                        <small class="text-muted">to <?php echo date('d M Y', strtotime($offer['end_date'])); ?></small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary-subtle text-secondary"><?php echo htmlspecialchars($offer['location']); ?></span>
-                                    </td>
-                                    <td>
-                                        <?php if ($offer['status'] === 'issued'): ?>
-                                            <span class="badge bg-success-subtle text-success">Issued</span>
-                                        <?php elseif ($offer['status'] === 'accepted'): ?>
-                                            <span class="badge bg-primary-subtle text-primary">Accepted</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-danger-subtle text-danger">Revoked</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="text-end">
-                                        <div class="dropdown">
-                                            <button class="btn btn-light btn-sm rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px; padding: 0 !important;">
-                                                <i class="bi bi-three-dots-vertical"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius: 14px;">
-                                                <li>
-                                                    <a class="dropdown-item" href="<?php echo url($offer['file_path']); ?>" target="_blank" download>
-                                                        <i class="bi bi-download me-2 text-primary"></i> Download Offer PDF
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="<?php echo url($offer['file_path']); ?>" target="_blank">
-                                                        <i class="bi bi-eye me-2 text-info"></i> View Document
-                                                    </a>
-                                                </li>
-                                                <?php if ($offer['status'] !== 'revoked'): ?>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li>
-                                                        <a class="dropdown-item text-danger" href="<?php echo url('admin/offer-letters?action=revoke&id=' . $offer['id']); ?>" onclick="return confirm('Are you sure you want to revoke this offer letter?');">
-                                                            <i class="bi bi-x-circle me-2"></i> Revoke Offer
-                                                        </a>
-                                                    </li>
-                                                <?php endif; ?>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>

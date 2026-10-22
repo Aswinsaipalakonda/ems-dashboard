@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin Task Management - Grouped View
+ * Admin Task Management - SaaS Project Operations
  * Employee Management System
  */
 
@@ -45,23 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $deadline = $_POST['deadline'] ?? null;
         $status = sanitize($_POST['status'] ?? 'not_started');
         
-        // Handle file upload (optional)
+        // Handle file attachment
         $attachmentFile = null;
         if (!empty($_FILES['task_attachment']['name'])) {
-            $allowedTypes = [
-                'application/pdf',
-                'text/csv',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-            ];
             $allowedExtensions = ['pdf', 'csv', 'xls', 'xlsx', 'doc', 'docx'];
-            
             $fileExt = strtolower(pathinfo($_FILES['task_attachment']['name'], PATHINFO_EXTENSION));
-            $fileType = $_FILES['task_attachment']['type'];
             $fileSize = $_FILES['task_attachment']['size'];
-            $maxSize = 10 * 1024 * 1024; // 10MB max
+            $maxSize = 10 * 1024 * 1024; // 10MB
             
             if (!in_array($fileExt, $allowedExtensions)) {
                 $message = 'Invalid file type. Allowed: PDF, CSV, XLS, XLSX, DOC, DOCX';
@@ -70,12 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'File size too large. Maximum 10MB allowed.';
                 $messageType = 'danger';
             } else {
-                // Generate unique filename
                 $attachmentFile = 'task_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $fileExt;
                 $uploadPath = UPLOAD_PATH . 'tasks/' . $attachmentFile;
                 
                 if (!move_uploaded_file($_FILES['task_attachment']['tmp_name'], $uploadPath)) {
-                    $message = 'Failed to upload file. Please try again.';
+                    $message = 'Failed to upload attachment.';
                     $messageType = 'danger';
                     $attachmentFile = null;
                 }
@@ -88,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $assignedToArray = array_filter(array_map('intval', $assignedToArray));
         
         if (empty($title) || empty($assignedToArray)) {
-            $message = 'Title and at least one Employee are required!';
+            $message = 'Task Title and at least one Assigned Employee are required!';
             $messageType = 'danger';
         } elseif (empty($message)) {
             if ($postAction === 'add') {
@@ -98,20 +87,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     executeQuery($sql, "ssiissss", [$title, $description, $assignedTo, $_SESSION['user_id'], $priority, $deadline, $status, $attachmentFile]);
                     
                     $employee = fetchOne("SELECT name, email FROM employees WHERE id = ?", "i", [$assignedTo]);
-                    $notifyMsg = 'You have been assigned a new task: ' . $title;
-                    if ($attachmentFile) {
-                        $notifyMsg .= ' (with attachment)';
-                    }
                     executeQuery(
-                        "INSERT INTO notifications (user_id, user_type, title, message, type, link) VALUES (?, 'employee', ?, ?, 'info', ?)",
-                        "isss",
-                        [$assignedTo, 'New Task Assigned', $notifyMsg, '/employee/tasks.php']
+                        "INSERT INTO notifications (user_id, user_type, title, message, type) VALUES (?, 'employee', 'New Task Assigned 📋', ?, 'info')",
+                        "is",
+                        [$assignedTo, "You have been assigned to task: '$title'"]
                     );
-                    
                     $createdCount++;
                 }
                 
-                $_SESSION['flash_message'] = $createdCount . ' task(s) created successfully!';
+                $_SESSION['flash_message'] = "Task deployed to $createdCount team member(s) successfully!";
                 $_SESSION['flash_type'] = 'success';
                 header("Location: tasks");
                 exit;
@@ -119,7 +103,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $editId = intval($_POST['id']);
                 $assignedTo = $assignedToArray[0];
                 
-                // Handle file upload for edit
                 if ($attachmentFile) {
                     $sql = "UPDATE tasks SET title = ?, description = ?, assigned_to = ?, priority = ?, deadline = ?, status = ?, attachment = ? WHERE id = ?";
                     executeQuery($sql, "ssissssi", [$title, $description, $assignedTo, $priority, $deadline, $status, $attachmentFile, $editId]);
@@ -134,88 +117,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         }
-    } elseif ($postAction === 'add_employee_to_task') {
-        // Add additional employee to existing task group
-        $taskGroupKey = $_POST['task_group_key'] ?? '';
-        $newAssignees = $_POST['new_assigned_to'] ?? [];
-        
-        if (empty($taskGroupKey) || empty($newAssignees)) {
-            $message = 'Please select at least one employee to add!';
-            $messageType = 'danger';
-        } else {
-            // Get all tasks and find the matching task group by key
-            $allTasks = fetchAll("SELECT * FROM tasks ORDER BY created_at DESC");
-            $foundTask = null;
-            foreach ($allTasks as $t) {
-                $taskKey = md5($t['title'] . '|' . $t['description'] . '|' . $t['deadline'] . '|' . $t['priority'] . '|' . $t['assigned_by']);
-                if ($taskKey === $taskGroupKey) {
-                    $foundTask = $t;
-                    break;
-                }
-            }
-            
-            if ($foundTask) {
-                $successCount = 0;
-                foreach ($newAssignees as $assignedTo) {
-                    $assignedTo = intval($assignedTo);
-                    if ($assignedTo > 0) {
-                        // Check if already assigned
-                        $existing = fetchOne(
-                            "SELECT id FROM tasks WHERE title = ? AND description = ? AND deadline = ? AND priority = ? AND assigned_to = ? AND assigned_by = ?",
-                            "ssssii",
-                            [$foundTask['title'], $foundTask['description'], $foundTask['deadline'], $foundTask['priority'], $assignedTo, $foundTask['assigned_by']]
-                        );
-                        
-                        if (!$existing) {
-                            $sql = "INSERT INTO tasks (title, description, assigned_to, assigned_by, priority, status, deadline) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                            executeQuery($sql, "ssiisss", [$foundTask['title'], $foundTask['description'], $assignedTo, $_SESSION['user_id'], $foundTask['priority'], $foundTask['status'], $foundTask['deadline']]);
-                            
-                            // Notify employee
-                            executeQuery(
-                                "INSERT INTO notifications (user_id, user_type, title, message, type) VALUES (?, 'employee', 'New Task Assigned', ?, 'info')",
-                                "is",
-                                [$assignedTo, "You have been assigned a new task: {$foundTask['title']}"]
-                            );
-                            $successCount++;
-                        }
-                    }
-                }
-                
-                $_SESSION['flash_message'] = "Employee(s) added to task successfully!";
-                $_SESSION['flash_type'] = 'success';
-            } else {
-                $_SESSION['flash_message'] = 'Task group not found!';
-                $_SESSION['flash_type'] = 'danger';
-            }
-            header("Location: tasks");
-            exit;
-        }
     } elseif ($postAction === 'delete') {
-        // Check if we're deleting a single task assignment or entire task
         $taskId = intval($_POST['id']);
         $singleTask = fetchOne("SELECT * FROM tasks WHERE id = ?", "i", [$taskId]);
-        
         if ($singleTask) {
-            // Count how many employees are assigned to this task's parent group
-            $countResult = fetchOne(
-                "SELECT COUNT(*) as total FROM tasks WHERE title = ? AND description = ? AND deadline = ? AND priority = ? AND assigned_by = ?",
-                "ssssi",
-                [$singleTask['title'], $singleTask['description'], $singleTask['deadline'], $singleTask['priority'], $singleTask['assigned_by']]
-            );
-            
-            $totalAssignees = $countResult['total'] ?? 0;
-            
-            if ($totalAssignees > 1) {
-                // Multiple employees assigned - remove only this one
-                executeQuery("DELETE FROM tasks WHERE id = ?", "i", [$taskId]);
-                $_SESSION['flash_message'] = 'Employee removed from task successfully!';
-            } else {
-                // Only one employee assigned - delete the entire task
-                executeQuery("DELETE FROM tasks WHERE id = ?", "i", [$taskId]);
-                $_SESSION['flash_message'] = 'Task deleted successfully!';
-            }
+            executeQuery("DELETE FROM tasks WHERE id = ?", "i", [$taskId]);
+            $_SESSION['flash_message'] = 'Task removed successfully!';
+            $_SESSION['flash_type'] = 'success';
         }
-        $_SESSION['flash_type'] = 'success';
         header("Location: tasks");
         exit;
     } elseif ($postAction === 'review') {
@@ -227,25 +136,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($existingTask) {
             if ($reviewAction === 'approve') {
                 executeQuery("UPDATE tasks SET status = 'completed', completed_at = NOW(), reviewer_feedback = NULL WHERE id = ?", "i", [$reviewId]);
-                
                 executeQuery(
                     "INSERT INTO notifications (user_id, user_type, title, message, type) VALUES (?, 'employee', 'Task Approved! ✅', ?, 'success')",
                     "is",
-                    [$existingTask['assigned_to'], "Your task '{$existingTask['title']}' has been approved and marked as completed!"]
+                    [$existingTask['assigned_to'], "Your submission for task '{$existingTask['title']}' has been officially approved!"]
                 );
-                
                 $_SESSION['flash_message'] = 'Task approved and marked as completed!';
                 $_SESSION['flash_type'] = 'success';
             } elseif ($reviewAction === 'request_changes') {
                 executeQuery("UPDATE tasks SET status = 'changes_requested', reviewer_feedback = ? WHERE id = ?", "si", [$reviewerFeedback, $reviewId]);
-                
                 executeQuery(
                     "INSERT INTO notifications (user_id, user_type, title, message, type) VALUES (?, 'employee', 'Changes Requested ⚠️', ?, 'warning')",
                     "is",
-                    [$existingTask['assigned_to'], "Changes requested for task '{$existingTask['title']}': $reviewerFeedback"]
+                    [$existingTask['assigned_to'], "Changes requested on task '{$existingTask['title']}': $reviewerFeedback"]
                 );
-                
-                $_SESSION['flash_message'] = 'Changes requested. Employee has been notified.';
+                $_SESSION['flash_message'] = 'Feedback sent to employee. Status marked as Changes Requested.';
                 $_SESSION['flash_type'] = 'warning';
             }
             header("Location: tasks");
@@ -260,7 +165,7 @@ if ($action === 'edit' && $id) {
     $task = fetchOne("SELECT * FROM tasks WHERE id = ?", "i", [$id]);
 }
 
-// Get all employees for assignment
+// Active Employees
 $employees = fetchAll(
     "SELECT e.id, e.name, e.employee_id, d.name as domain_name 
      FROM employees e 
@@ -269,7 +174,7 @@ $employees = fetchAll(
      ORDER BY d.name, e.name"
 );
 
-// Get all tasks with filters
+// Filters
 $statusFilter = $_GET['status'] ?? '';
 $priorityFilter = $_GET['priority'] ?? '';
 $employeeFilter = $_GET['employee'] ?? '';
@@ -306,7 +211,7 @@ $tasks = fetchAll(
     $params
 );
 
-// Check for overdue tasks
+// Auto-flag overdue tasks
 foreach ($tasks as $t) {
     if ($t['deadline'] && $t['status'] !== 'completed' && strtotime($t['deadline']) < time()) {
         executeQuery("UPDATE tasks SET status = 'overdue' WHERE id = ? AND status NOT IN ('completed', 'overdue')", "i", [$t['id']]);
@@ -325,6 +230,7 @@ foreach ($tasks as $t) {
             'deadline' => $t['deadline'],
             'assigned_by' => $t['assigned_by'],
             'created_at' => $t['created_at'],
+            'attachment' => $t['attachment'] ?? null,
             'assignees' => []
         ];
     }
@@ -341,29 +247,37 @@ foreach ($tasks as $t) {
     ];
 }
 
+// Global Task Statistics
+$activeTasksCount = fetchOne("SELECT COUNT(*) as count FROM tasks WHERE status IN ('not_started', 'in_progress')")['count'] ?? 0;
+$submittedCountGlobal = fetchOne("SELECT COUNT(*) as count FROM tasks WHERE status = 'submitted'")['count'] ?? 0;
+$completedCountGlobal = fetchOne("SELECT COUNT(*) as count FROM tasks WHERE status = 'completed'")['count'] ?? 0;
+$overdueCountGlobal = fetchOne("SELECT COUNT(*) as count FROM tasks WHERE status = 'overdue'")['count'] ?? 0;
+
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/admin-sidebar.php';
 ?>
 
+<!-- Main Content -->
 <div class="main-content">
     <header class="main-header">
         <div class="header-left">
             <button class="sidebar-toggle"><i class="bi bi-list"></i></button>
-            <h1 class="page-title">Task Management</h1>
+            <h1 class="page-title">Task Operations</h1>
         </div>
         <div class="header-right">
             <div class="dropdown">
                 <div class="user-dropdown" data-bs-toggle="dropdown">
                     <img src="<?php echo getAvatar($_SESSION['avatar'] ?? ''); ?>" alt="Avatar" class="user-avatar">
                     <div class="user-info">
-                        <div class="user-name"><?php echo $_SESSION['user_name']; ?></div>
+                        <div class="user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></div>
                         <div class="user-role">Administrator</div>
                     </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><?php echo pika_icon('profile', 'me-2', 16); ?>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/settings'); ?>"><?php echo pika_icon('settings', 'me-2', 16); ?>Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><?php echo pika_icon('logout', 'me-2 text-danger', 16); ?>Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -371,385 +285,309 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
     
     <div class="content-wrapper">
         <?php if ($message): ?>
-        <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
-            <i class="bi bi-<?php echo $messageType === 'success' ? 'check-circle' : ($messageType === 'warning' ? 'exclamation-triangle' : 'x-circle'); ?> me-2"></i>
-            <?php echo $message; ?>
+        <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <?php echo pika_icon($messageType === 'success' ? 'check-circle' : 'x', 'flex-shrink-0', 20); ?>
+                <div><?php echo $message; ?></div>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         <?php endif; ?>
-        
-        <?php if ($action === 'add' || $action === 'edit'): ?>
-        <!-- Add/Edit Form -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="bi bi-<?php echo $action === 'add' ? 'plus-circle' : 'pencil'; ?> me-2"></i>
-                    <?php echo $action === 'add' ? 'Create New Task' : 'Edit Task'; ?>
-                </h5>
-                <a href="<?php echo url('admin/tasks'); ?>" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i>Back
-                </a>
-            </div>
-            <div class="card-body">
-                <form method="POST" id="taskForm" enctype="multipart/form-data" onsubmit="return preventDoubleSubmit(this)">
-                    <input type="hidden" name="action" value="<?php echo $action; ?>">
-                    <input type="hidden" name="form_token" value="<?php echo bin2hex(random_bytes(16)); ?>">
-                    <?php if ($task): ?>
-                    <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
-                    <?php endif; ?>
-                    
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <label class="form-label">Task Title <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="title" required 
-                                   value="<?php echo $task['title'] ?? ''; ?>" placeholder="Enter task title">
-                        </div>
-                        <div class="col-12 mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" name="description" rows="3" placeholder="Enter task description"><?php echo $task['description'] ?? ''; ?></textarea>
-                        </div>
-                        
-                        <!-- Employee Selection with Checkboxes -->
-                        <div class="col-12 mb-3">
-                            <label class="form-label">
-                                Assign To <span class="text-danger">*</span>
-                                <?php if ($action === 'add'): ?>
-                                <small class="text-muted ms-2">Select one or more employees</small>
-                                <?php endif; ?>
-                            </label>
-                            
-                            <?php if ($action === 'add'): ?>
-                            <div class="d-flex gap-2 mb-3 flex-wrap">
-                                <input type="text" class="form-control" id="employeeSearch" placeholder="Search employees..." style="max-width: 300px;">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllEmployees(true)">
-                                    <i class="bi bi-check-all me-1"></i>Select All
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllEmployees(false)">
-                                    <i class="bi bi-x-lg me-1"></i>Clear All
-                                </button>
-                                <span class="badge bg-primary align-self-center" id="selectedCount">0 selected</span>
-                            </div>
-                            
-                            <div class="employee-checkbox-grid">
-                                <?php 
-                                $groupedEmployees = [];
-                                foreach ($employees as $emp) {
-                                    $domain = $emp['domain_name'] ?? 'Other';
-                                    $groupedEmployees[$domain][] = $emp;
-                                }
-                                foreach ($groupedEmployees as $domain => $domainEmployees): ?>
-                                <div class="employee-domain-group mb-3">
-                                    <h6 class="text-muted border-bottom pb-2 mb-2">
-                                        <i class="bi bi-folder me-1"></i><?php echo $domain; ?>
-                                        <button type="button" class="btn btn-link btn-sm p-0 ms-2" onclick="toggleDomain('<?php echo md5($domain); ?>')">
-                                            <small>Toggle All</small>
-                                        </button>
-                                    </h6>
-                                    <div class="row g-2" id="domain-<?php echo md5($domain); ?>">
-                                        <?php foreach ($domainEmployees as $emp): ?>
-                                        <div class="col-12 col-sm-6 col-lg-4 employee-item" data-name="<?php echo strtolower($emp['name']); ?>">
-                                            <label class="employee-checkbox-card">
-                                                <input type="checkbox" name="assigned_to[]" value="<?php echo $emp['id']; ?>" 
-                                                       class="employee-checkbox domain-<?php echo md5($domain); ?>" onchange="updateSelectedCount()">
-                                                <div class="card-body d-flex align-items-center gap-2 p-2">
-                                                    <i class="bi bi-person-circle fs-5 text-muted"></i>
-                                                    <div class="flex-grow-1 min-w-0">
-                                                        <div class="fw-medium text-truncate"><?php echo $emp['name']; ?></div>
-                                                        <small class="text-muted"><?php echo $emp['employee_id']; ?></small>
-                                                    </div>
-                                                    <i class="bi bi-check-circle-fill text-success check-icon"></i>
-                                                </div>
-                                            </label>
-                                        </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                            <?php else: ?>
-                            <select class="form-select" name="assigned_to[]" required>
-                                <option value="">Select Employee</option>
-                                <?php foreach ($employees as $emp): ?>
-                                <option value="<?php echo $emp['id']; ?>" <?php echo ($task['assigned_to'] ?? '') == $emp['id'] ? 'selected' : ''; ?>>
-                                    <?php echo $emp['name']; ?> (<?php echo $emp['employee_id']; ?><?php echo $emp['domain_name'] ? ' - '.$emp['domain_name'] : ''; ?>)
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Priority</label>
-                            <select class="form-select" name="priority">
-                                <option value="low" <?php echo ($task['priority'] ?? '') === 'low' ? 'selected' : ''; ?>>Low</option>
-                                <option value="medium" <?php echo ($task['priority'] ?? 'medium') === 'medium' ? 'selected' : ''; ?>>Medium</option>
-                                <option value="high" <?php echo ($task['priority'] ?? '') === 'high' ? 'selected' : ''; ?>>High</option>
-                                <option value="urgent" <?php echo ($task['priority'] ?? '') === 'urgent' ? 'selected' : ''; ?>>Urgent</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Deadline</label>
-                            <input type="date" class="form-control" name="deadline" value="<?php echo $task['deadline'] ?? ''; ?>">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" name="status">
-                                <option value="not_started" <?php echo ($task['status'] ?? 'not_started') === 'not_started' ? 'selected' : ''; ?>>Not Started</option>
-                                <option value="in_progress" <?php echo ($task['status'] ?? '') === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
-                                <option value="completed" <?php echo ($task['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>Completed</option>
-                            </select>
-                        </div>
-                        
-                        <!-- File Attachment (Optional) -->
-                        <div class="col-12 mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-paperclip me-1"></i>Attachment 
-                                <small class="text-muted">(Optional - PDF, CSV, XLS, XLSX, DOC, DOCX - Max 10MB)</small>
-                            </label>
-                            <?php if ($task && !empty($task['attachment'])): ?>
-                            <div class="alert alert-info py-2 mb-2">
-                                <i class="bi bi-file-earmark me-1"></i>Current file: 
-                                <a href="<?php echo APP_URL . '/uploads/tasks/' . htmlspecialchars($task['attachment']); ?>" target="_blank">
-                                    <?php echo htmlspecialchars($task['attachment']); ?>
-                                </a>
-                                <small class="text-muted ms-2">(Upload new file to replace)</small>
-                            </div>
-                            <?php endif; ?>
-                            <input type="file" class="form-control" name="task_attachment" 
-                                   accept=".pdf,.csv,.xls,.xlsx,.doc,.docx">
+
+        <?php if ($action !== 'add' && $action !== 'edit'): ?>
+        <!-- Hero Hub -->
+        <div class="saas-hero">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="saas-hero-content">
+                        <h2 class="saas-hero-title">Task & Project Operations Hub</h2>
+                        <p class="saas-hero-subtitle">
+                            Delegate assignments, review employee deliverables, inspect GitHub repositories or live URLs, and track milestone velocity.
+                        </p>
+                        <div class="saas-hero-pills">
+                            <span class="saas-pill live-pulse">
+                                <span class="pulse-dot"></span>
+                                <?php echo $activeTasksCount; ?> Active Assignments
+                            </span>
+                            <span class="saas-pill">
+                                <?php echo pika_icon('eye', '', 14); ?>
+                                <?php echo $submittedCountGlobal; ?> Deliverables To Review
+                            </span>
+                            <span class="saas-pill">
+                                <?php echo pika_icon('check-circle', '', 14); ?>
+                                <?php echo $completedCountGlobal; ?> Completed
+                            </span>
                         </div>
                     </div>
-                    
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg me-2"></i><?php echo $action === 'add' ? 'Create Task' : 'Update Task'; ?>
-                        </button>
-                        <a href="<?php echo url('admin/tasks'); ?>" class="btn btn-outline-secondary ms-2">Cancel</a>
+                </div>
+                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                    <div class="saas-hero-actions">
+                        <a href="?action=add" class="btn btn-primary btn-glow">
+                            <?php echo pika_icon('plus', 'me-1', 16); ?> Create New Task
+                        </a>
                     </div>
-                </form>
-            </div>
-        </div>
-        
-        <style>
-        .employee-checkbox-grid { max-height: 400px; overflow-y: auto; }
-        .employee-checkbox-card {
-            display: block;
-            cursor: pointer;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            transition: all 0.2s;
-            background: #fff;
-        }
-        .employee-checkbox-card:hover {
-            border-color: #0d6efd;
-            background: #f8f9ff;
-        }
-        .employee-checkbox-card input { display: none; }
-        .employee-checkbox-card .check-icon { display: none; }
-        .employee-checkbox-card input:checked + .card-body {
-            background: #e8f4ff;
-            border-radius: 6px;
-        }
-        .employee-checkbox-card input:checked + .card-body .check-icon { display: block; }
-        </style>
-        
-        <script>
-        function preventDoubleSubmit(form) {
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn.disabled) return false;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
-            return true;
-        }
-        
-        document.getElementById('employeeSearch')?.addEventListener('input', function(e) {
-            const search = e.target.value.toLowerCase();
-            document.querySelectorAll('.employee-item').forEach(item => {
-                item.style.display = item.dataset.name.includes(search) ? '' : 'none';
-            });
-        });
-        
-        function toggleAllEmployees(select) {
-            document.querySelectorAll('.employee-checkbox').forEach(cb => {
-                if (cb.closest('.employee-item').style.display !== 'none') {
-                    cb.checked = select;
-                }
-            });
-            updateSelectedCount();
-        }
-        
-        function toggleDomain(domainHash) {
-            const checkboxes = document.querySelectorAll('.domain-' + domainHash);
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-            checkboxes.forEach(cb => cb.checked = !allChecked);
-            updateSelectedCount();
-        }
-        
-        function updateSelectedCount() {
-            const count = document.querySelectorAll('.employee-checkbox:checked').length;
-            const badge = document.getElementById('selectedCount');
-            if (badge) badge.textContent = count + ' selected';
-        }
-        </script>
-        
-        <?php else: ?>
-        <!-- Filters -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-3">
-                        <select class="form-select" name="status">
-                            <option value="">All Status</option>
-                            <option value="not_started" <?php echo $statusFilter === 'not_started' ? 'selected' : ''; ?>>Not Started</option>
-                            <option value="in_progress" <?php echo $statusFilter === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
-                            <option value="submitted" <?php echo $statusFilter === 'submitted' ? 'selected' : ''; ?>>Submitted (Needs Review)</option>
-                            <option value="changes_requested" <?php echo $statusFilter === 'changes_requested' ? 'selected' : ''; ?>>Changes Requested</option>
-                            <option value="completed" <?php echo $statusFilter === 'completed' ? 'selected' : ''; ?>>Completed</option>
-                            <option value="overdue" <?php echo $statusFilter === 'overdue' ? 'selected' : ''; ?>>Overdue</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select" name="priority">
-                            <option value="">All Priority</option>
-                            <option value="low" <?php echo $priorityFilter === 'low' ? 'selected' : ''; ?>>Low</option>
-                            <option value="medium" <?php echo $priorityFilter === 'medium' ? 'selected' : ''; ?>>Medium</option>
-                            <option value="high" <?php echo $priorityFilter === 'high' ? 'selected' : ''; ?>>High</option>
-                            <option value="urgent" <?php echo $priorityFilter === 'urgent' ? 'selected' : ''; ?>>Urgent</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select" name="employee">
-                            <option value="">All Employees</option>
-                            <?php foreach ($employees as $emp): ?>
-                            <option value="<?php echo $emp['id']; ?>" <?php echo $employeeFilter == $emp['id'] ? 'selected' : ''; ?>>
-                                <?php echo $emp['name']; ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3 d-flex gap-2">
-                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Filter</button>
-                        <?php if ($statusFilter || $priorityFilter || $employeeFilter): ?>
-                        <a href="tasks" class="btn btn-outline-secondary">Clear</a>
-                        <?php endif; ?>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
 
-        <!-- Tasks List - Grouped View -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>All Tasks (<?php echo count($tasks); ?>)</h5>
-                <a href="?action=add" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-2"></i>New Task
+        <!-- 4 Dynamic Metric Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge navy">
+                            <?php echo pika_icon('tasks', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill active">In Flight</span>
+                    </div>
+                    <div class="metric-value"><?php echo $activeTasksCount; ?></div>
+                    <div class="metric-label">Active / In Progress</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar navy" style="width: 80%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge amber">
+                            <?php echo pika_icon('eye', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill warning">Needs Audit</span>
+                    </div>
+                    <div class="metric-value"><?php echo $submittedCountGlobal; ?></div>
+                    <div class="metric-label">Submitted Deliverables</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar amber" style="width: <?php echo min(100, $submittedCountGlobal * 20); ?>%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge emerald">
+                            <?php echo pika_icon('check-circle', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill active">Finished</span>
+                    </div>
+                    <div class="metric-value"><?php echo $completedCountGlobal; ?></div>
+                    <div class="metric-label">Completed Deliverables</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar emerald" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge rose">
+                            <?php echo pika_icon('clock', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill danger">Overdue</span>
+                    </div>
+                    <div class="metric-value"><?php echo $overdueCountGlobal; ?></div>
+                    <div class="metric-label">Missed Deadlines</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar rose" style="width: <?php echo min(100, $overdueCountGlobal * 25); ?>%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter SaaS Toolbar -->
+        <div class="saas-toolbar">
+            <form method="GET" class="row g-3 align-items-center">
+                <div class="col-lg-3 col-md-4">
+                    <select class="form-select saas-select" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="not_started" <?php echo $statusFilter === 'not_started' ? 'selected' : ''; ?>>Not Started</option>
+                        <option value="in_progress" <?php echo $statusFilter === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                        <option value="submitted" <?php echo $statusFilter === 'submitted' ? 'selected' : ''; ?>>Submitted (Needs Review)</option>
+                        <option value="changes_requested" <?php echo $statusFilter === 'changes_requested' ? 'selected' : ''; ?>>Changes Requested</option>
+                        <option value="completed" <?php echo $statusFilter === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                        <option value="overdue" <?php echo $statusFilter === 'overdue' ? 'selected' : ''; ?>>Overdue</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <select class="form-select saas-select" name="priority">
+                        <option value="">All Priorities</option>
+                        <option value="low" <?php echo $priorityFilter === 'low' ? 'selected' : ''; ?>>Low</option>
+                        <option value="medium" <?php echo $priorityFilter === 'medium' ? 'selected' : ''; ?>>Medium</option>
+                        <option value="high" <?php echo $priorityFilter === 'high' ? 'selected' : ''; ?>>High</option>
+                        <option value="urgent" <?php echo $priorityFilter === 'urgent' ? 'selected' : ''; ?>>Urgent</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <select class="form-select saas-select" name="employee">
+                        <option value="">All Assignees</option>
+                        <?php foreach ($employees as $emp): ?>
+                        <option value="<?php echo $emp['id']; ?>" <?php echo $employeeFilter == $emp['id'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($emp['name']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <?php echo pika_icon('filter', '', 15); ?> Apply
+                    </button>
+                    <?php if ($statusFilter || $priorityFilter || $employeeFilter): ?>
+                    <a href="tasks" class="btn btn-outline-secondary" title="Reset Filters">
+                        <?php echo pika_icon('refresh', '', 15); ?>
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+
+        <!-- Grouped Tasks Accordion -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="saas-card-title">
+                        <?php echo pika_icon('tasks', 'text-primary', 20); ?>
+                        Project Task Workstreams
+                    </h5>
+                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill small">
+                        <?php echo count($groupedTasks); ?> Workstreams (<?php echo count($tasks); ?> Assignees)
+                    </span>
+                </div>
+                <a href="?action=add" class="btn btn-sm btn-primary">
+                    <?php echo pika_icon('plus', 'me-1', 14); ?> New Task
                 </a>
             </div>
-            <div class="card-body p-0">
+
+            <div class="p-3">
                 <?php if (count($groupedTasks) > 0): ?>
                 <div class="accordion accordion-flush" id="tasksAccordion">
-                    <?php $taskIndex = 0; foreach ($groupedTasks as $taskKey => $taskGroup): $taskIndex++; ?>
-                    <?php 
+                    <?php $taskIndex = 0; foreach ($groupedTasks as $taskKey => $taskGroup): $taskIndex++; 
                         $totalAssignees = count($taskGroup['assignees']);
                         $completedCount = count(array_filter($taskGroup['assignees'], fn($a) => $a['status'] === 'completed'));
                         $submittedCount = count(array_filter($taskGroup['assignees'], fn($a) => $a['status'] === 'submitted'));
                         $changesCount = count(array_filter($taskGroup['assignees'], fn($a) => $a['status'] === 'changes_requested'));
                         $overdueCount = count(array_filter($taskGroup['assignees'], fn($a) => $a['status'] === 'overdue'));
-                        
                         $overallProgress = round(($completedCount / $totalAssignees) * 100);
-                        $needsReview = $submittedCount > 0;
                     ?>
-                    <div class="accordion-item">
+                    <div class="accordion-item mb-3 rounded-4 border overflow-hidden shadow-sm">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            <button class="accordion-button collapsed p-3 bg-white" type="button" data-bs-toggle="collapse" 
                                     data-bs-target="#task<?php echo $taskIndex; ?>">
-                                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 w-100 me-3">
+                                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100 me-3">
                                     <div class="flex-grow-1">
-                                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                                            <strong><?php echo htmlspecialchars($taskGroup['title']); ?></strong>
-                                            <?php if ($needsReview): ?>
-                                            <span class="badge bg-info"><i class="bi bi-exclamation-circle me-1"></i><?php echo $submittedCount; ?> Needs Review</span>
-                                            <?php endif; ?>
-                                            <?php if ($changesCount > 0): ?>
-                                            <span class="badge bg-warning text-dark"><?php echo $changesCount; ?> Changes Requested</span>
+                                        <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                            <span class="fw-bold text-dark fs-6"><?php echo htmlspecialchars($taskGroup['title']); ?></span>
+                                            <span class="saas-tag <?php 
+                                                echo match($taskGroup['priority']) {
+                                                    'urgent' => 'rose',
+                                                    'high' => 'amber',
+                                                    'medium' => 'sky',
+                                                    default => 'primary'
+                                                };
+                                            ?>">
+                                                <?php echo ucfirst($taskGroup['priority']); ?> Priority
+                                            </span>
+                                            <?php if ($submittedCount > 0): ?>
+                                            <span class="saas-tag amber">
+                                                <?php echo pika_icon('eye', '', 12); ?> <?php echo $submittedCount; ?> Ready For Review
+                                            </span>
                                             <?php endif; ?>
                                             <?php if ($overdueCount > 0): ?>
-                                            <span class="badge bg-danger"><?php echo $overdueCount; ?> Overdue</span>
+                                            <span class="saas-tag rose"><?php echo $overdueCount; ?> Overdue</span>
                                             <?php endif; ?>
                                         </div>
-                                        <small class="text-muted d-block mt-1">
-                                            <i class="bi bi-people me-1"></i><?php echo $totalAssignees; ?> assignee(s) • 
-                                            <span class="badge priority-<?php echo $taskGroup['priority']; ?> badge-sm">
-                                                <?php echo ucfirst($taskGroup['priority']); ?>
-                                            </span>
+                                        <div class="d-flex align-items-center gap-3 text-muted small flex-wrap">
+                                            <span><?php echo pika_icon('users', 'me-1', 14); ?><?php echo $totalAssignees; ?> Assigned</span>
                                             <?php if ($taskGroup['deadline']): ?>
-                                            • <i class="bi bi-calendar me-1"></i><?php echo formatDate($taskGroup['deadline']); ?>
+                                            <span><?php echo pika_icon('clock', 'me-1', 14); ?>Due: <?php echo formatDate($taskGroup['deadline']); ?></span>
                                             <?php endif; ?>
-                                        </small>
+                                            <?php if (!empty($taskGroup['attachment'])): ?>
+                                            <span class="text-primary"><?php echo pika_icon('file-text', 'me-1', 14); ?>Attachment Included</span>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="progress" style="width: 100px; height: 8px;">
-                                            <div class="progress-bar bg-success" style="width: <?php echo $overallProgress; ?>%"></div>
+                                        <div class="progress rounded-pill" style="width: 110px; height: 8px;">
+                                            <div class="progress-bar <?php echo $overallProgress === 100 ? 'bg-success' : 'bg-primary'; ?>" 
+                                                 style="width: <?php echo $overallProgress; ?>%"></div>
                                         </div>
-                                        <span class="badge bg-<?php echo $overallProgress == 100 ? 'success' : 'secondary'; ?>">
-                                            <?php echo $completedCount; ?>/<?php echo $totalAssignees; ?>
+                                        <span class="badge bg-light text-dark border rounded-pill px-2 py-1 small">
+                                            <?php echo $completedCount; ?>/<?php echo $totalAssignees; ?> Done (<?php echo $overallProgress; ?>%)
                                         </span>
                                     </div>
                                 </div>
                             </button>
                         </h2>
                         <div id="task<?php echo $taskIndex; ?>" class="accordion-collapse collapse" data-bs-parent="#tasksAccordion">
-                            <div class="accordion-body bg-light">
+                            <div class="accordion-body bg-light p-4">
                                 <?php if ($taskGroup['description']): ?>
-                                <div class="mb-3 p-3 bg-white rounded">
-                                    <small class="text-muted d-block mb-1">Description:</small>
-                                    <p class="mb-0"><?php echo nl2br(htmlspecialchars($taskGroup['description'])); ?></p>
+                                <div class="p-3 bg-white rounded-4 border mb-3">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Briefing & Scope:</span>
+                                    <p class="mb-0 text-dark small"><?php echo nl2br(htmlspecialchars($taskGroup['description'])); ?></p>
                                 </div>
                                 <?php endif; ?>
-                                
-                                <h6 class="mb-3"><i class="bi bi-people me-2"></i>Assigned Employees & Progress</h6>
-                                
-                                <div class="table-responsive">
-                                    <table class="table table-hover bg-white mb-0">
-                                        <thead class="table-light">
+
+                                <?php if (!empty($taskGroup['attachment'])): ?>
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <span class="small text-muted">Briefing Document:</span>
+                                    <a href="<?php echo APP_URL . '/uploads/tasks/' . htmlspecialchars($taskGroup['attachment']); ?>" 
+                                       target="_blank" class="saas-tag sky text-decoration-none">
+                                        <?php echo pika_icon('download', '', 12); ?> <?php echo htmlspecialchars($taskGroup['attachment']); ?>
+                                    </a>
+                                </div>
+                                <?php endif; ?>
+
+                                <!-- Assignees Table -->
+                                <div class="rounded-4 overflow-hidden border bg-white shadow-sm mb-3">
+                                    <table class="saas-table mb-0">
+                                        <thead>
                                             <tr>
-                                                <th>Employee</th>
-                                                <th>Status</th>
-                                                <th>Work Link</th>
-                                                <th>Last Updated</th>
+                                                <th>Assignee</th>
+                                                <th>Current Progress</th>
+                                                <th>Deliverable Link</th>
+                                                <th>Last Active</th>
                                                 <th class="text-end">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($taskGroup['assignees'] as $assignee): ?>
-                                            <tr class="<?php echo $assignee['status'] === 'submitted' ? 'table-info' : ($assignee['status'] === 'overdue' ? 'table-danger' : ''); ?>">
+                                            <?php foreach ($taskGroup['assignees'] as $assignee): 
+                                                $initials = strtoupper(substr($assignee['employee_name'], 0, 1));
+                                            ?>
+                                            <tr>
                                                 <td>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <img src="<?php echo getAvatar($assignee['avatar']); ?>" class="avatar avatar-sm" alt="">
+                                                    <div class="saas-user-cell">
+                                                        <?php if (!empty($assignee['avatar'])): ?>
+                                                        <img src="<?php echo getAvatar($assignee['avatar']); ?>" class="saas-avatar" style="width: 36px; height: 36px;" alt="">
+                                                        <?php else: ?>
+                                                        <div class="saas-avatar-initials" style="width: 36px; height: 36px; font-size: 12px;"><?php echo $initials; ?></div>
+                                                        <?php endif; ?>
                                                         <div>
-                                                            <strong><?php echo htmlspecialchars($assignee['employee_name']); ?></strong>
-                                                            <small class="d-block text-muted"><?php echo $assignee['emp_id']; ?></small>
+                                                            <div class="fw-bold text-dark small"><?php echo htmlspecialchars($assignee['employee_name']); ?></div>
+                                                            <span class="saas-id-badge" style="font-size: 0.7rem; padding: 1px 7px;">
+                                                                <?php echo htmlspecialchars($assignee['emp_id']); ?>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span class="badge status-<?php echo $assignee['status']; ?>">
-                                                        <?php 
-                                                        $statusLabels = [
-                                                            'not_started' => 'Not Started',
-                                                            'in_progress' => 'In Progress',
-                                                            'submitted' => 'Submitted',
-                                                            'completed' => 'Completed',
-                                                            'changes_requested' => 'Changes Needed',
-                                                            'overdue' => 'Overdue'
-                                                        ];
-                                                        echo $statusLabels[$assignee['status']] ?? ucfirst($assignee['status']);
-                                                        ?>
+                                                    <span class="saas-tag <?php 
+                                                        echo match($assignee['status']) {
+                                                            'completed' => 'emerald',
+                                                            'submitted' => 'amber',
+                                                            'changes_requested' => 'rose',
+                                                            'in_progress' => 'sky',
+                                                            'overdue' => 'rose',
+                                                            default => 'primary'
+                                                        };
+                                                    ?>">
+                                                        <?php echo ucfirst(str_replace('_', ' ', $assignee['status'])); ?>
                                                     </span>
                                                 </td>
                                                 <td>
                                                     <?php if ($assignee['work_link']): ?>
-                                                    <button type="button" class="btn btn-sm btn-outline-success view-work-btn" 
+                                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 view-work-btn" 
                                                             data-title="<?php echo htmlspecialchars($taskGroup['title'], ENT_QUOTES); ?>"
                                                             data-employee="<?php echo htmlspecialchars($assignee['employee_name'], ENT_QUOTES); ?>"
                                                             data-empid="<?php echo htmlspecialchars($assignee['emp_id'], ENT_QUOTES); ?>"
@@ -758,111 +596,39 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                                             data-description="<?php echo htmlspecialchars($taskGroup['description'] ?? '', ENT_QUOTES); ?>"
                                                             data-deadline="<?php echo $taskGroup['deadline'] ? formatDate($taskGroup['deadline']) : 'No deadline'; ?>"
                                                             data-priority="<?php echo ucfirst($taskGroup['priority']); ?>">
-                                                        <i class="bi bi-link-45deg"></i> View
+                                                        <?php echo pika_icon('eye', 'me-1', 13); ?> Review Deliverable
                                                     </button>
                                                     <?php else: ?>
-                                                    <span class="text-muted">-</span>
+                                                    <span class="text-muted small">No submission yet</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>
                                                     <small class="text-muted"><?php echo date('d M Y, h:i A', strtotime($assignee['updated_at'])); ?></small>
                                                 </td>
                                                 <td class="text-end">
-                                                    <?php if ($assignee['status'] === 'submitted'): ?>
-                                                    <button class="btn btn-success btn-sm" onclick="reviewTask(<?php echo $assignee['id']; ?>, 'approve', '<?php echo addslashes($taskGroup['title']); ?>')" title="Approve">
-                                                        <i class="bi bi-check-lg"></i>
-                                                    </button>
-                                                    <button class="btn btn-warning btn-sm" onclick="showFeedbackModal(<?php echo $assignee['id']; ?>, '<?php echo addslashes($taskGroup['title']); ?>')" title="Request Changes">
-                                                        <i class="bi bi-chat-left-text"></i>
-                                                    </button>
-                                                    <?php else: ?>
-                                                    <a href="?action=edit&id=<?php echo $assignee['id']; ?>" class="btn btn-sm btn-outline-primary" title="Edit">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
-                                                            onclick="deleteTask(<?php echo $assignee['id']; ?>, '<?php echo addslashes($taskGroup['title']); ?>')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                    <?php endif; ?>
+                                                    <div class="d-inline-flex gap-1">
+                                                        <?php if ($assignee['status'] === 'submitted'): ?>
+                                                        <button class="saas-action-btn success" onclick="reviewTask(<?php echo $assignee['id']; ?>, 'approve', '<?php echo addslashes($taskGroup['title']); ?>')" title="Approve Work">
+                                                            <?php echo pika_icon('check', '', 15); ?>
+                                                        </button>
+                                                        <button class="saas-action-btn amber" onclick="showFeedbackModal(<?php echo $assignee['id']; ?>, '<?php echo addslashes($taskGroup['title']); ?>')" title="Request Revision">
+                                                            <?php echo pika_icon('edit', '', 15); ?>
+                                                        </button>
+                                                        <?php else: ?>
+                                                        <a href="?action=edit&id=<?php echo $assignee['id']; ?>" class="saas-action-btn" title="Edit Task">
+                                                            <?php echo pika_icon('edit', '', 15); ?>
+                                                        </a>
+                                                        <button type="button" class="saas-action-btn delete" title="Delete Task"
+                                                                onclick="deleteTask(<?php echo $assignee['id']; ?>, '<?php echo addslashes($taskGroup['title']); ?>')">
+                                                            <?php echo pika_icon('trash', '', 15); ?>
+                                                        </button>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
-                                </div>
-                                
-                                <!-- Add Employee to Task Section -->
-                                <div class="mt-4 pt-3 border-top">
-                                    <h6 class="mb-3"><i class="bi bi-person-plus me-2"></i>Add Employee to Task</h6>
-                                    <form method="POST" id="addEmpForm_<?php echo $taskIndex; ?>" class="row g-3">
-                                        <input type="hidden" name="action" value="add_employee_to_task">
-                                        <input type="hidden" name="task_group_key" value="<?php echo $taskKey; ?>">
-                                        
-                                        <div class="col-12">
-                                            <div class="d-flex gap-2 mb-2 flex-wrap">
-                                                <input type="text" class="form-control" id="empSearch_<?php echo $taskIndex; ?>" placeholder="Search employees..." style="max-width: 250px;">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllNewEmps(true, <?php echo $taskIndex; ?>)">
-                                                    <i class="bi bi-check-all me-1"></i>Select All
-                                                </button>
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllNewEmps(false, <?php echo $taskIndex; ?>)">
-                                                    <i class="bi bi-x-lg me-1"></i>Clear
-                                                </button>
-                                                <span class="badge bg-primary align-self-center" id="empCountAdd_<?php echo $taskIndex; ?>">0 selected</span>
-                                            </div>
-                                            
-                                            <div class="emp-checkbox-grid" style="max-height: 300px; overflow-y: auto;">
-                                                <div class="row g-2">
-                                                    <?php 
-                                                    $existingIds = array_map(fn($a) => $a['employee_id'], $taskGroup['assignees']);
-                                                    foreach ($employees as $emp):
-                                                        if (!in_array($emp['id'], $existingIds)):
-                                                    ?>
-                                                    <div class="col-12 col-sm-6 col-lg-4 emp-item-add-<?php echo $taskIndex; ?>" data-name="<?php echo strtolower($emp['name']); ?>">
-                                                        <label class="emp-checkbox-card">
-                                                            <input type="checkbox" name="new_assigned_to[]" value="<?php echo $emp['id']; ?>" 
-                                                                   class="emp-checkbox-add-<?php echo $taskIndex; ?>" onchange="updateEmpCountAdd(<?php echo $taskIndex; ?>)">
-                                                            <div class="card-body d-flex align-items-center gap-2 p-2">
-                                                                <i class="bi bi-person-circle fs-5 text-muted"></i>
-                                                                <div class="flex-grow-1 min-w-0">
-                                                                    <div class="fw-medium text-truncate"><?php echo $emp['name']; ?></div>
-                                                                    <small class="text-muted"><?php echo $emp['employee_id']; ?></small>
-                                                                </div>
-                                                                <i class="bi bi-check-circle-fill text-success check-icon"></i>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    <?php endif; endforeach; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-12">
-                                            <button type="submit" class="btn btn-primary w-100">
-                                                <i class="bi bi-plus-lg me-1"></i>Add Selected Employee(s)
-                                            </button>
-                                        </div>
-                                    </form>
-                                    
-                                    <script>
-                                    document.getElementById('empSearch_<?php echo $taskIndex; ?>')?.addEventListener('input', function(e) {
-                                        const search = e.target.value.toLowerCase();
-                                        document.querySelectorAll('.emp-item-add-<?php echo $taskIndex; ?>').forEach(item => {
-                                            item.style.display = item.dataset.name.includes(search) ? '' : 'none';
-                                        });
-                                    });
-                                    
-                                    function toggleAllNewEmps(select, taskIndex) {
-                                        document.querySelectorAll('.emp-checkbox-add-' + taskIndex).forEach(cb => {
-                                            if (cb.closest('.emp-item-add-' + taskIndex)?.style.display !== 'none') cb.checked = select;
-                                        });
-                                        updateEmpCountAdd(taskIndex);
-                                    }
-                                    
-                                    function updateEmpCountAdd(taskIndex) {
-                                        const count = document.querySelectorAll('.emp-checkbox-add-' + taskIndex + ':checked').length;
-                                        document.getElementById('empCountAdd_' + taskIndex).textContent = count + ' selected';
-                                    }
-                                    </script>
                                 </div>
                             </div>
                         </div>
@@ -870,16 +636,172 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     <?php endforeach; ?>
                 </div>
                 <?php else: ?>
-                <div class="text-center py-5 text-muted">
-                    <i class="bi bi-list-task fs-1"></i>
-                    <p class="mt-2">No tasks found</p>
-                    <a href="?action=add" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>Create First Task
+                <div class="text-center py-5">
+                    <?php echo pika_icon('tasks', 'opacity-25 d-block mx-auto mb-3', 48); ?>
+                    <h5 class="fw-bold text-dark">No Tasks Match Query</h5>
+                    <p class="text-muted small">Adjust your filter options or create a new assignment.</p>
+                    <a href="?action=add" class="btn btn-primary btn-sm">
+                        <?php echo pika_icon('plus', 'me-1', 14); ?> Add Task
                     </a>
                 </div>
                 <?php endif; ?>
             </div>
         </div>
+
+        <?php else: ?>
+        <!-- Add / Edit Task Form Workspace -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title">
+                    <?php echo pika_icon($action === 'add' ? 'plus' : 'edit', 'text-primary', 20); ?>
+                    <?php echo $action === 'add' ? 'Deploy New Task Assignment' : 'Modify Task Details'; ?>
+                </h5>
+                <a href="tasks" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Tasks
+                </a>
+            </div>
+            <div class="saas-card-body p-4">
+                <form method="POST" id="taskForm" enctype="multipart/form-data" onsubmit="return preventDoubleSubmit(this)">
+                    <input type="hidden" name="action" value="<?php echo $action; ?>">
+                    <input type="hidden" name="form_token" value="<?php echo bin2hex(random_bytes(16)); ?>">
+                    <?php if ($task): ?>
+                    <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
+                    <?php endif; ?>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-dark small">Task Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-pill px-3 py-2" name="title" required 
+                                   value="<?php echo htmlspecialchars($task['title'] ?? ''); ?>" placeholder="e.g. Implement Clientura Cloud Certificate Verification Portal">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-dark small">Briefing & Specifications</label>
+                            <textarea class="form-control rounded-4 p-3" name="description" rows="3" placeholder="Describe the task scope, key deliverables, and documentation requirements..."><?php echo htmlspecialchars($task['description'] ?? ''); ?></textarea>
+                        </div>
+
+                        <!-- Assignees Selector -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-dark small">
+                                Assign To <span class="text-danger">*</span>
+                                <?php if ($action === 'add'): ?>
+                                <small class="text-muted fw-normal ms-2">(Select one or multiple employees)</small>
+                                <?php endif; ?>
+                            </label>
+
+                            <?php if ($action === 'add'): ?>
+                            <div class="d-flex gap-2 mb-3 flex-wrap">
+                                <input type="text" class="form-control rounded-pill px-3 py-2" id="employeeSearch" placeholder="Search team members..." style="max-width: 280px;">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllEmployees(true)">
+                                    <?php echo pika_icon('check', 'me-1', 14); ?> Select All
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllEmployees(false)">
+                                    <?php echo pika_icon('x', 'me-1', 14); ?> Clear
+                                </button>
+                                <span class="badge bg-primary align-self-center px-3 py-2 rounded-pill" id="selectedCount">0 selected</span>
+                            </div>
+
+                            <div class="p-3 bg-light rounded-4 border" style="max-height: 340px; overflow-y: auto;">
+                                <div class="row g-2">
+                                    <?php foreach ($employees as $emp): ?>
+                                    <div class="col-12 col-sm-6 col-lg-4 employee-item" data-name="<?php echo strtolower($emp['name']); ?>">
+                                        <label class="d-flex align-items-center gap-2 p-2 bg-white rounded-3 border cursor-pointer hover-shadow" style="cursor: pointer;">
+                                            <input type="checkbox" name="assigned_to[]" value="<?php echo $emp['id']; ?>" 
+                                                   class="form-check-input employee-checkbox m-0" onchange="updateSelectedCount()">
+                                            <div class="min-w-0 flex-grow-1">
+                                                <div class="fw-semibold text-dark small text-truncate"><?php echo htmlspecialchars($emp['name']); ?></div>
+                                                <small class="text-muted d-block"><?php echo htmlspecialchars($emp['employee_id']); ?> • <?php echo htmlspecialchars($emp['domain_name'] ?? 'Gen'); ?></small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php else: ?>
+                            <select class="form-select rounded-pill px-3 py-2" name="assigned_to[]" required>
+                                <option value="">Select Employee</option>
+                                <?php foreach ($employees as $emp): ?>
+                                <option value="<?php echo $emp['id']; ?>" <?php echo ($task['assigned_to'] ?? '') == $emp['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($emp['name']); ?> (<?php echo htmlspecialchars($emp['employee_id']); ?>)
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Priority Level</label>
+                            <select class="form-select rounded-pill px-3 py-2" name="priority">
+                                <option value="low" <?php echo ($task['priority'] ?? '') === 'low' ? 'selected' : ''; ?>>Low</option>
+                                <option value="medium" <?php echo ($task['priority'] ?? 'medium') === 'medium' ? 'selected' : ''; ?>>Medium</option>
+                                <option value="high" <?php echo ($task['priority'] ?? '') === 'high' ? 'selected' : ''; ?>>High</option>
+                                <option value="urgent" <?php echo ($task['priority'] ?? '') === 'urgent' ? 'selected' : ''; ?>>Urgent</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Milestone Deadline</label>
+                            <input type="date" class="form-control rounded-pill px-3 py-2" name="deadline" value="<?php echo htmlspecialchars($task['deadline'] ?? ''); ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark small">Task State</label>
+                            <select class="form-select rounded-pill px-3 py-2" name="status">
+                                <option value="not_started" <?php echo ($task['status'] ?? 'not_started') === 'not_started' ? 'selected' : ''; ?>>Not Started</option>
+                                <option value="in_progress" <?php echo ($task['status'] ?? '') === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                                <option value="completed" <?php echo ($task['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-dark small">Reference Attachment</label>
+                            <?php if ($task && !empty($task['attachment'])): ?>
+                            <div class="small mb-2">
+                                Current file: <a href="<?php echo APP_URL . '/uploads/tasks/' . htmlspecialchars($task['attachment']); ?>" target="_blank" class="fw-bold"><?php echo htmlspecialchars($task['attachment']); ?></a>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" class="form-control rounded-pill px-3 py-2" name="task_attachment" accept=".pdf,.csv,.xls,.xlsx,.doc,.docx">
+                            <small class="text-muted">PDF, CSV, XLS, DOCX (Max 10MB)</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4 pt-2">
+                        <button type="submit" class="btn btn-primary btn-glow px-4">
+                            <?php echo pika_icon('check', 'me-1', 16); ?>
+                            <?php echo $action === 'add' ? 'Deploy Task' : 'Save Changes'; ?>
+                        </button>
+                        <a href="tasks" class="btn btn-outline-secondary px-3">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+        function preventDoubleSubmit(form) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn.disabled) return false;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Deploying...';
+            return true;
+        }
+
+        document.getElementById('employeeSearch')?.addEventListener('input', function(e) {
+            const search = e.target.value.toLowerCase();
+            document.querySelectorAll('.employee-item').forEach(item => {
+                item.style.display = item.dataset.name.includes(search) ? '' : 'none';
+            });
+        });
+
+        function toggleAllEmployees(select) {
+            document.querySelectorAll('.employee-checkbox').forEach(cb => {
+                if (cb.closest('.employee-item').style.display !== 'none') cb.checked = select;
+            });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.employee-checkbox:checked').length;
+            const badge = document.getElementById('selectedCount');
+            if (badge) badge.textContent = count + ' selected';
+        }
+        </script>
         <?php endif; ?>
     </div>
 </div>
@@ -887,102 +809,87 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
 <!-- View Work Modal -->
 <div class="modal fade" id="viewWorkModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="bi bi-briefcase me-2"></i>Task Work Submission</h5>
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-navy text-white border-0 px-4 py-3" style="background: #0A1138;">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2">
+                    <?php echo pika_icon('briefcase', 'text-white', 20); ?> Deliverable Inspection
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label text-muted small mb-1">Task Title</label>
-                    <h5 id="workTaskTitle" class="mb-0"></h5>
+            <div class="modal-body p-4">
+                <h5 id="workTaskTitle" class="fw-bold text-dark mb-1"></h5>
+                <p class="text-muted small mb-3">Submitted by <strong id="workEmployeeName" class="text-dark"></strong> (<span id="workEmployeeId"></span>)</p>
+
+                <div class="p-3 bg-light rounded-4 border mb-3">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Work Description:</span>
+                    <p id="workDescription" class="mb-0 text-dark small"></p>
                 </div>
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <label class="form-label text-muted small mb-1">Assigned To</label>
-                        <div><i class="bi bi-person me-1"></i><span id="workEmployeeName"></span></div>
-                        <small class="text-muted" id="workEmployeeId"></small>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label text-muted small mb-1">Deadline</label>
-                        <div><i class="bi bi-calendar me-1"></i><span id="workDeadline"></span></div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small mb-1">Priority</label>
-                    <div><span id="workPriority" class="badge"></span></div>
-                </div>
-                <div class="mb-3" id="workDescriptionSection">
-                    <label class="form-label text-muted small mb-1">Description</label>
-                    <p id="workDescription" class="mb-0 text-muted"></p>
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <label class="form-label text-muted small mb-1">Work Link Type</label>
-                    <div><span id="workLinkType" class="badge bg-secondary"></span></div>
-                </div>
-                <div class="mb-0">
-                    <label class="form-label text-muted small mb-1">Submitted Work</label>
-                    <div class="d-grid">
-                        <a id="workLink" href="#" target="_blank" class="btn btn-outline-success">
-                            <i class="bi bi-box-arrow-up-right me-2"></i>Open Work Link
-                        </a>
-                    </div>
+
+                <div class="d-grid mt-4">
+                    <a id="workLink" href="#" target="_blank" class="btn btn-primary btn-glow">
+                        <i class="bi bi-box-arrow-up-right me-2"></i> Open Submitted Work Link
+                    </a>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer bg-light border-0 px-4 py-3">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Feedback Modal -->
+<!-- Request Changes Feedback Modal -->
 <div class="modal fade" id="feedbackModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title"><i class="bi bi-chat-left-text me-2"></i>Request Changes</h5>
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-warning text-dark border-0 px-4 py-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <?php echo pika_icon('edit', 'text-dark', 20); ?> Request Revision
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="review">
-                    <input type="hidden" name="review_action" value="request_changes">
-                    <input type="hidden" name="id" id="feedbackTaskId">
-                    <p class="text-muted">Requesting changes for: <strong id="feedbackTaskTitle"></strong></p>
+                <input type="hidden" name="action" value="review">
+                <input type="hidden" name="review_action" value="request_changes">
+                <input type="hidden" name="id" id="feedbackTaskId">
+                <div class="modal-body p-4">
+                    <p class="mb-2">Requesting changes for: <strong id="feedbackTaskTitle" class="text-dark"></strong></p>
                     <div class="mb-3">
-                        <label class="form-label">Feedback for Employee <span class="text-danger">*</span></label>
-                        <textarea class="form-control" name="reviewer_feedback" rows="4" required 
-                                  placeholder="Explain what changes are needed..."></textarea>
+                        <label class="form-label fw-bold small text-dark">Revision Feedback <span class="text-danger">*</span></label>
+                        <textarea class="form-control rounded-3 p-3" name="reviewer_feedback" rows="3" required 
+                                  placeholder="Specify requirements or changes required before final sign-off..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer bg-light border-0 px-4 py-3">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning"><i class="bi bi-send me-1"></i>Send Feedback</button>
+                    <button type="submit" class="btn btn-warning px-4">
+                        <?php echo pika_icon('check', 'me-1', 14); ?> Send Revision Request
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-danger text-white border-0 px-4 py-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <?php echo pika_icon('trash', 'text-white', 20); ?> Remove Task
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete task: <strong id="deleteTaskName"></strong>?</p>
+            <div class="modal-body p-4">
+                <p class="mb-0">Are you sure you want to delete <strong id="deleteTaskName" class="text-dark"></strong>?</p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer bg-light border-0 px-4 py-3">
                 <form method="POST" id="deleteForm">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="id" id="deleteTaskId">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger px-4">Delete</button>
                 </form>
             </div>
         </div>
@@ -996,32 +903,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
     <input type="hidden" name="id" id="approveTaskId">
 </form>
 
-<style>
-.status-submitted { background: #0dcaf0; color: #000; }
-.status-changes_requested { background: #fd7e14; color: #fff; }
-.status-not_started { background: #6c757d; color: #fff; }
-.status-in_progress { background: #0d6efd; color: #fff; }
-.status-completed { background: #198754; color: #fff; }
-.status-overdue { background: #dc3545; color: #fff; }
-
-.priority-low { background: #6c757d; color: #fff; }
-.priority-medium { background: #0dcaf0; color: #000; }
-.priority-high { background: #ffc107; color: #000; }
-.priority-urgent { background: #dc3545; color: #fff; }
-
-.accordion-button:not(.collapsed) { background-color: #f8f9fa; color: #212529; }
-.accordion-button:focus { box-shadow: none; border-color: rgba(0,0,0,.125); }
-.accordion-item {
-    border-left: 4px solid #0d6efd;
-    margin-bottom: 0.5rem;
-    border-radius: 0.5rem !important;
-    overflow: hidden;
-}
-.accordion-item:has(.table-info) { border-left-color: #0dcaf0; }
-.accordion-item:has(.table-danger) { border-left-color: #dc3545; }
-.badge-sm { font-size: 0.7rem; padding: 0.2em 0.5em; }
-</style>
-
 <script>
 function deleteTask(id, title) {
     document.getElementById('deleteTaskId').value = id;
@@ -1031,7 +912,7 @@ function deleteTask(id, title) {
 
 function reviewTask(taskId, action, title) {
     if (action === 'approve') {
-        if (confirm('Approve task: ' + title + '?')) {
+        if (confirm('Approve task deliverable for: ' + title + '?')) {
             document.getElementById('approveTaskId').value = taskId;
             document.getElementById('approveForm').submit();
         }
@@ -1044,37 +925,15 @@ function showFeedbackModal(taskId, title) {
     new bootstrap.Modal(document.getElementById('feedbackModal')).show();
 }
 
-function showWorkModal(title, empName, empId, link, linkType, description, deadline, priority) {
+function showWorkModal(title, empName, empId, link, linkType, description) {
     document.getElementById('workTaskTitle').textContent = title;
     document.getElementById('workEmployeeName').textContent = empName;
     document.getElementById('workEmployeeId').textContent = empId;
-    document.getElementById('workDeadline').textContent = deadline;
     document.getElementById('workLink').href = link;
-    
-    const linkTypeLabels = { 'url': 'Website URL', 'github': 'GitHub Repository', 'drive': 'Google Drive', 'dropbox': 'Dropbox', 'other': 'Other Link' };
-    document.getElementById('workLinkType').textContent = linkTypeLabels[linkType] || linkType;
-    
-    const priorityEl = document.getElementById('workPriority');
-    priorityEl.textContent = priority;
-    priorityEl.className = 'badge';
-    if (priority.toLowerCase() === 'urgent') priorityEl.classList.add('bg-danger');
-    else if (priority.toLowerCase() === 'high') priorityEl.classList.add('bg-warning', 'text-dark');
-    else if (priority.toLowerCase() === 'medium') priorityEl.classList.add('bg-info');
-    else priorityEl.classList.add('bg-secondary');
-    
-    const descSection = document.getElementById('workDescriptionSection');
-    const descEl = document.getElementById('workDescription');
-    if (description && description.trim()) {
-        descEl.textContent = description;
-        descSection.style.display = 'block';
-    } else {
-        descSection.style.display = 'none';
-    }
-    
+    document.getElementById('workDescription').textContent = description || 'No extra description notes provided.';
     new bootstrap.Modal(document.getElementById('viewWorkModal')).show();
 }
 
-// Add event listener for view work buttons using data attributes
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.view-work-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -1084,9 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.dataset.empid,
                 this.dataset.link,
                 this.dataset.linktype,
-                this.dataset.description,
-                this.dataset.deadline,
-                this.dataset.priority
+                this.dataset.description
             );
         });
     });

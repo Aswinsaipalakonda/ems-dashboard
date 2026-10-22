@@ -21,7 +21,7 @@
     --text-primary: #0F172A;
     --text-secondary: #475569;
     --text-muted: #94A3B8;
-    --sidebar-width: 250px;
+    --sidebar-width: 276px;
     --header-height: 65px;
     --border-radius-pill: 9999px;
     --border-radius-card: 20px;
@@ -141,7 +141,7 @@ a.btn,
     height: 100vh;
     background: #090E24 !important;
     border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
-    padding: 16px 10px !important;
+    padding: 18px 14px !important;
     z-index: 1000;
     transition: all 0.3s ease;
     overflow-y: auto;
@@ -2000,4 +2000,495 @@ a.btn,
     outline: none;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
+
+/* ==========================================================================
+   Clientura SaaS Design System - Enterprise Standard
+   ========================================================================== */
+
+.content-wrapper {
+    padding: 28px 32px;
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 16px 14px;
+    }
+}
+
+/* SaaS Hero Hub */
+.saas-hero {
+    background: linear-gradient(135deg, #0A1138 0%, #121E52 55%, #1A2B75 100%);
+    border-radius: 24px;
+    padding: 32px 36px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 28px;
+    box-shadow: 0 16px 40px rgba(10, 17, 56, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.saas-hero::before {
+    content: '';
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(255, 165, 0, 0.22) 0%, transparent 68%);
+    border-radius: 50%;
+    top: -120px;
+    right: -60px;
+    pointer-events: none;
+}
+
+.saas-hero::after {
+    content: '';
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    bottom: -100px;
+    left: 20%;
+    pointer-events: none;
+}
+
+.saas-hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.saas-hero-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.4px;
+    margin-bottom: 6px;
+    color: #FFFFFF;
+}
+
+.saas-hero-subtitle {
+    font-size: 0.96rem;
+    color: rgba(255, 255, 255, 0.82);
+    margin-bottom: 20px;
+    max-width: 650px;
+}
+
+.saas-hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.saas-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 7px 16px;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #FFFFFF;
+    backdrop-filter: blur(10px);
+}
+
+.saas-pill i, .saas-pill svg {
+    color: #FFA500;
+}
+
+.saas-pill.live-pulse {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #A7F3D0;
+}
+
+.saas-pill.live-pulse .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+    animation: pulseGlow 1.8s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.saas-hero-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* Metric Cards Grid */
+.metric-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid rgba(10, 17, 56, 0.06);
+    box-shadow: 0 4px 20px -2px rgba(10, 17, 56, 0.04);
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none !important;
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px -6px rgba(10, 17, 56, 0.12);
+    border-color: rgba(255, 165, 0, 0.35);
+}
+
+.metric-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.metric-icon-badge {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease;
+}
+
+.metric-card:hover .metric-icon-badge {
+    transform: scale(1.08);
+}
+
+.metric-icon-badge.navy { background: rgba(10, 17, 56, 0.07); color: #0A1138; }
+.metric-icon-badge.emerald { background: rgba(16, 185, 129, 0.12); color: #10B981; }
+.metric-icon-badge.amber { background: rgba(255, 165, 0, 0.14); color: #FFA500; }
+.metric-icon-badge.sky { background: rgba(14, 165, 233, 0.12); color: #0284C7; }
+.metric-icon-badge.rose { background: rgba(239, 68, 68, 0.12); color: #EF4444; }
+.metric-icon-badge.purple { background: rgba(168, 85, 247, 0.12); color: #A855F7; }
+
+.metric-trend-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.metric-trend-pill.active, .metric-trend-pill.success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.metric-trend-pill.warning, .metric-trend-pill.amber {
+    background: rgba(255, 165, 0, 0.14);
+    color: #D97706;
+}
+
+.metric-trend-pill.sky, .metric-trend-pill.info {
+    background: rgba(14, 165, 233, 0.12);
+    color: #0284C7;
+}
+
+.metric-trend-pill.danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #DC2626;
+}
+
+.metric-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0A1138;
+    line-height: 1.1;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+
+.metric-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #64748B;
+    margin-bottom: 14px;
+}
+
+.metric-progress {
+    height: 6px;
+    border-radius: 9999px;
+    background: #F1F5F9;
+    overflow: hidden;
+    margin-top: auto;
+}
+
+.metric-progress-bar {
+    height: 100%;
+    border-radius: 9999px;
+}
+
+.metric-progress-bar.navy { background: #0A1138; }
+.metric-progress-bar.emerald { background: #10B981; }
+.metric-progress-bar.amber { background: #FFA500; }
+.metric-progress-bar.sky { background: #0284C7; }
+.metric-progress-bar.rose { background: #EF4444; }
+
+/* Elevated SaaS Container Cards */
+.saas-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1px solid rgba(10, 17, 56, 0.06);
+    box-shadow: 0 4px 20px -2px rgba(10, 17, 56, 0.04);
+    overflow: hidden;
+    transition: box-shadow 0.25s ease;
+    margin-bottom: 24px;
+}
+
+.saas-card:hover {
+    box-shadow: 0 10px 30px -4px rgba(10, 17, 56, 0.08);
+}
+
+.saas-card-header {
+    padding: 20px 26px;
+    border-bottom: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFFFFF;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.saas-card-title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    color: #0A1138;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.saas-card-body {
+    padding: 24px 26px;
+}
+
+/* Modern SaaS Table */
+.saas-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.saas-table thead th {
+    background: #F8FAFC;
+    color: #64748B;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #E2E8F0;
+    white-space: nowrap;
+}
+
+.saas-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.saas-table tbody tr:hover {
+    background: #F8FAFC;
+}
+
+.saas-table tbody td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 0.92rem;
+    color: #1E293B;
+}
+
+.saas-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* User Identity Cell */
+.saas-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.saas-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(10, 17, 56, 0.08);
+}
+
+.saas-avatar-initials {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0A1138 0%, #1E2968 100%);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+.saas-user-name {
+    font-weight: 700;
+    color: #0A1138;
+    line-height: 1.25;
+    margin-bottom: 2px;
+}
+
+.saas-user-sub {
+    font-size: 0.8rem;
+    color: #64748B;
+}
+
+/* Badges & Tags */
+.saas-id-badge {
+    background: #0A1138;
+    color: #FFFFFF;
+    font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    letter-spacing: 0.4px;
+    display: inline-block;
+}
+
+.saas-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.saas-tag.primary { background: rgba(10, 17, 56, 0.08); color: #0A1138; }
+.saas-tag.emerald { background: rgba(16, 185, 129, 0.12); color: #059669; }
+.saas-tag.amber { background: rgba(255, 165, 0, 0.14); color: #D97706; }
+.saas-tag.rose { background: rgba(239, 68, 68, 0.12); color: #DC2626; }
+.saas-tag.sky { background: rgba(14, 165, 233, 0.12); color: #0284C7; }
+
+/* Filter Toolbar */
+.saas-toolbar {
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 16px 20px;
+    border: 1px solid rgba(10, 17, 56, 0.06);
+    box-shadow: 0 4px 20px -2px rgba(10, 17, 56, 0.04);
+    margin-bottom: 24px;
+}
+
+.saas-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.saas-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #94A3B8;
+    pointer-events: none;
+}
+
+.saas-input {
+    border-radius: 9999px !important;
+    border: 1.5px solid #E2E8F0 !important;
+    padding: 10px 18px 10px 42px !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    background: #FFFFFF !important;
+    width: 100%;
+}
+
+.saas-input:focus {
+    border-color: #0A1138 !important;
+    box-shadow: 0 0 0 3px rgba(10, 17, 56, 0.08) !important;
+    outline: none !important;
+}
+
+.saas-select {
+    border-radius: 9999px !important;
+    border: 1.5px solid #E2E8F0 !important;
+    padding: 10px 20px !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    background-color: #FFFFFF !important;
+}
+
+.saas-select:focus {
+    border-color: #0A1138 !important;
+    box-shadow: 0 0 0 3px rgba(10, 17, 56, 0.08) !important;
+    outline: none !important;
+}
+
+/* Button Group / Action Icons */
+.saas-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #475569;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+
+.saas-action-btn:hover {
+    background: #0A1138;
+    color: #FFFFFF;
+    border-color: #0A1138;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(10, 17, 56, 0.15);
+}
+
+.saas-action-btn.delete:hover {
+    background: #EF4444;
+    color: #FFFFFF;
+    border-color: #EF4444;
+}
+
+.saas-action-btn.success:hover {
+    background: #10B981;
+    color: #FFFFFF;
+    border-color: #10B981;
+}
+
+.saas-action-btn.amber:hover {
+    background: #FFA500;
+    color: #FFFFFF;
+    border-color: #FFA500;
+}
+
 

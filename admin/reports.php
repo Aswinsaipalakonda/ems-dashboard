@@ -1,10 +1,10 @@
 <?php
 /**
- * Admin Reports
+ * Admin Reports - SaaS Executive Analytics Center
  * Employee Management System
  */
 
-$pageTitle = 'Reports';
+$pageTitle = 'Reports & Analytics';
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/pdf-generator.php';
 requireAdmin();
@@ -111,9 +111,9 @@ if ($export === 'csv') {
     exit;
 }
 
-// Get report data
+// Attendance summary
 $attendanceSummary = fetchAll(
-    "SELECT e.name, e.employee_id,
+    "SELECT e.name, e.employee_id, e.avatar,
         COUNT(a.id) as total_days,
         SUM(CASE WHEN a.status = 'approved' THEN 1 ELSE 0 END) as approved,
         SEC_TO_TIME(SUM(TIME_TO_SEC(a.total_hours))) as total_hours
@@ -126,8 +126,9 @@ $attendanceSummary = fetchAll(
     [$month, $year]
 );
 
+// Task summary
 $taskSummary = fetchAll(
-    "SELECT e.name, e.employee_id,
+    "SELECT e.name, e.employee_id, e.avatar,
         COUNT(t.id) as total_tasks,
         SUM(CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END) as completed,
         SUM(CASE WHEN t.status = 'overdue' THEN 1 ELSE 0 END) as overdue
@@ -138,6 +139,13 @@ $taskSummary = fetchAll(
      ORDER BY e.name"
 );
 
+// Global Stats for Analytics
+$staffCount = fetchOne("SELECT COUNT(*) as count FROM employees WHERE status = 'active'")['count'] ?? 0;
+$totalHoursLogged = fetchOne("SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(total_hours))) as total FROM attendance WHERE MONTH(date) = ? AND YEAR(date) = ? AND status = 'approved'", "ii", [$month, $year])['total'] ?? '00:00:00';
+$totalTasksIssued = fetchOne("SELECT COUNT(*) as count FROM tasks")['count'] ?? 0;
+$totalTasksDone = fetchOne("SELECT COUNT(*) as count FROM tasks WHERE status = 'completed'")['count'] ?? 0;
+$taskSuccessRate = $totalTasksIssued > 0 ? round(($totalTasksDone / $totalTasksIssued) * 100) : 100;
+
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/admin-sidebar.php';
 ?>
@@ -147,223 +155,406 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
     <header class="main-header">
         <div class="header-left">
             <button class="sidebar-toggle"><i class="bi bi-list"></i></button>
-            <h1 class="page-title">Reports</h1>
+            <h1 class="page-title">Executive Reports & Analytics</h1>
         </div>
         <div class="header-right">
             <div class="dropdown">
                 <div class="user-dropdown" data-bs-toggle="dropdown">
                     <img src="<?php echo getAvatar($_SESSION['avatar'] ?? ''); ?>" alt="Avatar" class="user-avatar">
+                    <div class="user-info">
+                        <div class="user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></div>
+                        <div class="user-role">Administrator</div>
+                    </div>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/profile'); ?>"><?php echo pika_icon('profile', 'me-2', 16); ?>Profile</a></li>
+                    <li><a class="dropdown-item" href="<?php echo url('admin/settings'); ?>"><?php echo pika_icon('settings', 'me-2', 16); ?>Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><?php echo pika_icon('logout', 'me-2 text-danger', 16); ?>Logout</a></li>
                 </ul>
             </div>
         </div>
     </header>
     
     <div class="content-wrapper">
-        <!-- Report Type Tabs -->
-        <div class="report-tabs-container mb-4">
-            <a href="?type=attendance" class="report-tab <?php echo $reportType === 'attendance' ? 'active' : ''; ?>">
-                <i class="bi bi-calendar-check"></i>
-                <span>Attendance</span>
-            </a>
-            <a href="?type=tasks" class="report-tab <?php echo $reportType === 'tasks' ? 'active' : ''; ?>">
-                <i class="bi bi-list-task"></i>
-                <span>Tasks</span>
-            </a>
-            <a href="?type=employees" class="report-tab <?php echo $reportType === 'employees' ? 'active' : ''; ?>">
-                <i class="bi bi-people"></i>
-                <span>Employees</span>
-            </a>
-        </div>
-        
-        <?php if ($reportType === 'attendance'): ?>
-        <!-- Attendance Report -->
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Monthly Attendance Summary</h5>
+        <!-- Hero Hub -->
+        <div class="saas-hero">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="saas-hero-content">
+                        <h2 class="saas-hero-title">Executive Intelligence & Auditing</h2>
+                        <p class="saas-hero-subtitle">
+                            Extract aggregated attendance records, task completion velocities, and organizational workforce rosters in presentation-ready PDF or CSV format.
+                        </p>
+                        <div class="saas-hero-pills">
+                            <span class="saas-pill live-pulse">
+                                <span class="pulse-dot"></span>
+                                Live Analytics Active
+                            </span>
+                            <span class="saas-pill">
+                                <?php echo pika_icon('calendar', '', 14); ?>
+                                Period: <?php echo date('F Y', mktime(0, 0, 0, $month, 1, $year)); ?>
+                            </span>
+                            <span class="saas-pill">
+                                <?php echo pika_icon('trending-up', '', 14); ?>
+                                <?php echo $taskSuccessRate; ?>% Task Velocity
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="filter-container">
-                    <form class="d-flex gap-3 align-items-center flex-wrap" method="GET">
-                        <input type="hidden" name="type" value="attendance">
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="text-muted small">Month:</label>
-                            <select class="form-select form-select-sm" name="month" style="width: 140px;">
-                                <?php for ($i = 1; $i <= 12; $i++): ?>
-                                <option value="<?php echo $i; ?>" <?php echo $month == $i ? 'selected' : ''; ?>>
-                                    <?php echo date('F', mktime(0, 0, 0, $i, 1)); ?>
-                                </option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="text-muted small">Year:</label>
-                            <select class="form-select form-select-sm" name="year" style="width: 100px;">
-                                <?php for ($i = date('Y'); $i >= date('Y') - 5; $i--): ?>
-                                <option value="<?php echo $i; ?>" <?php echo $year == $i ? 'selected' : ''; ?>><?php echo $i; ?></option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-primary px-3">
-                            <i class="bi bi-filter me-1"></i> Filter
-                        </button>
-                    </form>
-                    
-                    <div class="d-flex gap-2 ms-auto">
-                        <a href="?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=csv" class="btn btn-sm btn-outline-success">
-                            <i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV
+                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                    <div class="saas-hero-actions">
+                        <a href="?type=<?php echo $reportType; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=csv" class="btn btn-outline-light">
+                            <?php echo pika_icon('download', 'me-1', 16); ?> Export CSV
                         </a>
-                        <a href="?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=pdf" class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+                        <a href="?type=<?php echo $reportType; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=pdf" class="btn btn-primary btn-glow">
+                            <?php echo pika_icon('file-text', 'me-1', 16); ?> Download PDF Report
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Days Present</th>
-                                <th>Approved</th>
-                                <th>Total Hours</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($attendanceSummary as $row): ?>
-                            <tr>
-                                <td>
-                                    <div class="fw-semibold"><?php echo $row['name']; ?></div>
-                                    <small class="text-muted"><?php echo $row['employee_id']; ?></small>
-                                </td>
-                                <td><?php echo $row['total_days'] ?? 0; ?></td>
-                                <td><span class="badge bg-success"><?php echo $row['approved'] ?? 0; ?></span></td>
-                                <td><?php echo $row['total_hours'] ? substr($row['total_hours'], 0, 8) : '00:00:00'; ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+        </div>
+
+        <!-- 4 Dynamic Metric Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge navy">
+                            <?php echo pika_icon('users', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill active">Workforce</span>
+                    </div>
+                    <div class="metric-value"><?php echo $staffCount; ?></div>
+                    <div class="metric-label">Active Team Members</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge emerald">
+                            <?php echo pika_icon('clock', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill active">Hours</span>
+                    </div>
+                    <div class="metric-value"><?php echo substr($totalHoursLogged, 0, 5); ?>h</div>
+                    <div class="metric-label">Approved Hours Logged</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar emerald" style="width: 85%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge sky">
+                            <?php echo pika_icon('tasks', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill sky">Deliverables</span>
+                    </div>
+                    <div class="metric-value"><?php echo $totalTasksDone; ?>/<?php echo $totalTasksIssued; ?></div>
+                    <div class="metric-label">Completed Tasks</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar sky" style="width: <?php echo $taskSuccessRate; ?>%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <div class="metric-icon-badge amber">
+                            <?php echo pika_icon('trending-up', '', 24); ?>
+                        </div>
+                        <span class="metric-trend-pill warning"><?php echo $taskSuccessRate; ?>%</span>
+                    </div>
+                    <div class="metric-value"><?php echo $taskSuccessRate; ?>%</div>
+                    <div class="metric-label">Execution Velocity</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-bar amber" style="width: <?php echo $taskSuccessRate; ?>%;"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <?php elseif ($reportType === 'tasks'): ?>
-        <!-- Task Report -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>Task Performance Summary</h5>
-                <div class="d-flex gap-2">
-                    <a href="?type=tasks&export=csv" class="btn btn-sm btn-success">
-                        <i class="bi bi-download me-1"></i>CSV
+
+        <!-- SaaS Navigation Pills for Report Modes -->
+        <div class="saas-toolbar mb-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex gap-2 p-1 bg-light rounded-pill border">
+                    <a href="?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>" 
+                       class="btn btn-sm <?php echo $reportType === 'attendance' ? 'btn-primary' : 'btn-light border-0'; ?>">
+                        <?php echo pika_icon('calendar', 'me-1', 14); ?> Attendance Audit
                     </a>
-                    <a href="?type=tasks&export=pdf" class="btn btn-sm btn-danger">
-                        <i class="bi bi-file-pdf me-1"></i>PDF
+                    <a href="?type=tasks" 
+                       class="btn btn-sm <?php echo $reportType === 'tasks' ? 'btn-primary' : 'btn-light border-0'; ?>">
+                        <?php echo pika_icon('tasks', 'me-1', 14); ?> Task Velocity
+                    </a>
+                    <a href="?type=employees" 
+                       class="btn btn-sm <?php echo $reportType === 'employees' ? 'btn-primary' : 'btn-light border-0'; ?>">
+                        <?php echo pika_icon('users', 'me-1', 14); ?> Workforce Roster
+                    </a>
+                </div>
+
+                <?php if ($reportType === 'attendance'): ?>
+                <form class="d-flex gap-2 align-items-center" method="GET">
+                    <input type="hidden" name="type" value="attendance">
+                    <select class="form-select saas-select py-1" name="month" style="width: 140px;">
+                        <?php for ($i = 1; $i <= 12; $i++): ?>
+                        <option value="<?php echo $i; ?>" <?php echo $month == $i ? 'selected' : ''; ?>>
+                            <?php echo date('F', mktime(0, 0, 0, $i, 1)); ?>
+                        </option>
+                        <?php endfor; ?>
+                    </select>
+                    <select class="form-select saas-select py-1" name="year" style="width: 110px;">
+                        <?php for ($i = date('Y'); $i >= date('Y') - 5; $i--): ?>
+                        <option value="<?php echo $i; ?>" <?php echo $year == $i ? 'selected' : ''; ?>><?php echo $i; ?></option>
+                        <?php endfor; ?>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <?php echo pika_icon('filter', '', 14); ?> Filter
+                    </button>
+                </form>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <?php if ($reportType === 'attendance'): ?>
+        <!-- Attendance Report Table -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title">
+                    <?php echo pika_icon('calendar', 'text-primary', 20); ?>
+                    Monthly Attendance Audit (<?php echo date('F Y', mktime(0, 0, 0, $month, 1, $year)); ?>)
+                </h5>
+                <div class="d-flex gap-2">
+                    <a href="?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=csv" class="btn btn-sm btn-outline-success">
+                        <?php echo pika_icon('download', 'me-1', 13); ?> CSV
+                    </a>
+                    <a href="?type=attendance&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=pdf" class="btn btn-sm btn-outline-danger">
+                        <?php echo pika_icon('file-text', 'me-1', 13); ?> PDF
                     </a>
                 </div>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Total Tasks</th>
-                                <th>Completed</th>
-                                <th>Overdue</th>
-                                <th>Completion Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($taskSummary as $row): ?>
-                            <?php $rate = $row['total_tasks'] > 0 ? round(($row['completed'] / $row['total_tasks']) * 100) : 0; ?>
-                            <tr>
-                                <td>
-                                    <div class="fw-semibold"><?php echo $row['name']; ?></div>
-                                    <small class="text-muted"><?php echo $row['employee_id']; ?></small>
-                                </td>
-                                <td><?php echo $row['total_tasks'] ?? 0; ?></td>
-                                <td><span class="badge bg-success"><?php echo $row['completed'] ?? 0; ?></span></td>
-                                <td><span class="badge bg-danger"><?php echo $row['overdue'] ?? 0; ?></span></td>
-                                <td>
-                                    <div class="progress" style="height: 20px; width: 100px;">
-                                        <div class="progress-bar bg-<?php echo $rate >= 70 ? 'success' : ($rate >= 40 ? 'warning' : 'danger'); ?>" 
-                                             style="width: <?php echo $rate; ?>%"><?php echo $rate; ?>%</div>
+            <div class="table-responsive">
+                <table class="saas-table">
+                    <thead>
+                        <tr>
+                            <th>Team Member</th>
+                            <th>Employee ID</th>
+                            <th>Days Present</th>
+                            <th>Verified Sessions</th>
+                            <th>Total Logged Hours</th>
+                            <th>Punctuality Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($attendanceSummary as $row): 
+                            $initials = strtoupper(substr($row['name'], 0, 1));
+                            $present = intval($row['total_days'] ?? 0);
+                            $approved = intval($row['approved'] ?? 0);
+                            $approvalPct = $present > 0 ? round(($approved / $present) * 100) : 100;
+                        ?>
+                        <tr>
+                            <td>
+                                <div class="saas-user-cell">
+                                    <?php if (!empty($row['avatar'])): ?>
+                                    <img src="<?php echo getAvatar($row['avatar']); ?>" class="saas-avatar" style="width: 38px; height: 38px;" alt="">
+                                    <?php else: ?>
+                                    <div class="saas-avatar-initials" style="width: 38px; height: 38px; font-size: 13px;"><?php echo $initials; ?></div>
+                                    <?php endif; ?>
+                                    <div>
+                                        <div class="fw-bold text-dark small"><?php echo htmlspecialchars($row['name']); ?></div>
                                     </div>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="saas-id-badge"><?php echo htmlspecialchars($row['employee_id']); ?></span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark"><?php echo $present; ?></span> <small class="text-muted">days</small>
+                            </td>
+                            <td>
+                                <span class="saas-tag emerald"><?php echo $approved; ?> verified</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark"><?php echo $row['total_hours'] ? substr($row['total_hours'], 0, 5) . ' hrs' : '00:00 hrs'; ?></span>
+                            </td>
+                            <td>
+                                <span class="saas-tag <?php echo $approvalPct >= 80 ? 'emerald' : ($approvalPct >= 50 ? 'amber' : 'rose'); ?>">
+                                    <?php echo $approvalPct; ?>% Verified
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
-        
-        <?php else: ?>
-        <!-- Employee Report -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-people me-2"></i>Employee Directory</h5>
+
+        <?php elseif ($reportType === 'tasks'): ?>
+        <!-- Task Report Table -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title">
+                    <?php echo pika_icon('tasks', 'text-primary', 20); ?>
+                    Employee Deliverable Velocity & Task Summary
+                </h5>
                 <div class="d-flex gap-2">
-                    <a href="?type=employees&export=csv" class="btn btn-sm btn-success">
-                        <i class="bi bi-download me-1"></i>CSV
+                    <a href="?type=tasks&export=csv" class="btn btn-sm btn-outline-success">
+                        <?php echo pika_icon('download', 'me-1', 13); ?> CSV
                     </a>
-                    <a href="?type=employees&export=pdf" class="btn btn-sm btn-danger">
-                        <i class="bi bi-file-pdf me-1"></i>PDF
+                    <a href="?type=tasks&export=pdf" class="btn btn-sm btn-outline-danger">
+                        <?php echo pika_icon('file-text', 'me-1', 13); ?> PDF
                     </a>
                 </div>
             </div>
-            <div class="card-body p-0">
-                <?php $employees = fetchAll(
+            <div class="table-responsive">
+                <table class="saas-table">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Employee ID</th>
+                            <th>Total Assigned</th>
+                            <th>Finished</th>
+                            <th>Overdue</th>
+                            <th>Completion Velocity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($taskSummary as $row): 
+                            $rate = $row['total_tasks'] > 0 ? round(($row['completed'] / $row['total_tasks']) * 100) : 0;
+                            $initials = strtoupper(substr($row['name'], 0, 1));
+                        ?>
+                        <tr>
+                            <td>
+                                <div class="saas-user-cell">
+                                    <?php if (!empty($row['avatar'])): ?>
+                                    <img src="<?php echo getAvatar($row['avatar']); ?>" class="saas-avatar" style="width: 38px; height: 38px;" alt="">
+                                    <?php else: ?>
+                                    <div class="saas-avatar-initials" style="width: 38px; height: 38px; font-size: 13px;"><?php echo $initials; ?></div>
+                                    <?php endif; ?>
+                                    <div>
+                                        <div class="fw-bold text-dark small"><?php echo htmlspecialchars($row['name']); ?></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="saas-id-badge"><?php echo htmlspecialchars($row['employee_id']); ?></span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark"><?php echo $row['total_tasks'] ?? 0; ?></span>
+                            </td>
+                            <td>
+                                <span class="saas-tag emerald"><?php echo $row['completed'] ?? 0; ?> Done</span>
+                            </td>
+                            <td>
+                                <?php if (($row['overdue'] ?? 0) > 0): ?>
+                                <span class="saas-tag rose"><?php echo $row['overdue']; ?> Overdue</span>
+                                <?php else: ?>
+                                <span class="text-muted small">0</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress rounded-pill flex-grow-1" style="height: 8px; min-width: 80px;">
+                                        <div class="progress-bar <?php echo $rate >= 70 ? 'bg-success' : ($rate >= 40 ? 'bg-warning' : 'bg-danger'); ?>" 
+                                             style="width: <?php echo $rate; ?>%"></div>
+                                    </div>
+                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-1 small"><?php echo $rate; ?>%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <?php else: ?>
+        <!-- Employee Roster Report Table -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title">
+                    <?php echo pika_icon('users', 'text-primary', 20); ?>
+                    Master Employee Directory Roster
+                </h5>
+                <div class="d-flex gap-2">
+                    <a href="?type=employees&export=csv" class="btn btn-sm btn-outline-success">
+                        <?php echo pika_icon('download', 'me-1', 13); ?> CSV
+                    </a>
+                    <a href="?type=employees&export=pdf" class="btn btn-sm btn-outline-danger">
+                        <?php echo pika_icon('file-text', 'me-1', 13); ?> PDF
+                    </a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <?php $employeesRoster = fetchAll(
                     "SELECT e.*, d.name as domain_name, d.code as domain_code 
                      FROM employees e 
                      LEFT JOIN domains d ON e.domain_id = d.id 
                      ORDER BY e.name"
                 ); ?>
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Domain</th>
-                                <th>Designation</th>
-                                <th>Status</th>
-                                <th>Joined</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($employees as $emp): ?>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="<?php echo getAvatar($emp['avatar']); ?>" class="avatar avatar-sm me-2" alt="">
-                                        <div>
-                                            <div class="fw-semibold"><?php echo $emp['name']; ?></div>
-                                            <small class="text-muted"><?php echo $emp['email']; ?></small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <?php if ($emp['domain_name']): ?>
-                                    <span class="badge bg-primary"><?php echo $emp['domain_code']; ?></span>
-                                    <?php echo $emp['domain_name']; ?>
+                <table class="saas-table">
+                    <thead>
+                        <tr>
+                            <th>Team Member</th>
+                            <th>Employee ID</th>
+                            <th>Domain / Dept</th>
+                            <th>Designation</th>
+                            <th>Status</th>
+                            <th>Date of Joining</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($employeesRoster as $emp): 
+                            $initials = strtoupper(substr($emp['name'], 0, 1));
+                        ?>
+                        <tr>
+                            <td>
+                                <div class="saas-user-cell">
+                                    <?php if (!empty($emp['avatar'])): ?>
+                                    <img src="<?php echo getAvatar($emp['avatar']); ?>" class="saas-avatar" style="width: 38px; height: 38px;" alt="">
                                     <?php else: ?>
-                                    -
+                                    <div class="saas-avatar-initials" style="width: 38px; height: 38px; font-size: 13px;"><?php echo $initials; ?></div>
                                     <?php endif; ?>
-                                </td>
-                                <td><?php echo $emp['designation'] ?? '-'; ?></td>
-                                <td><span class="badge badge-<?php echo $emp['status']; ?>"><?php echo ucfirst($emp['status']); ?></span></td>
-                                <td><?php echo $emp['date_of_joining'] ? formatDate($emp['date_of_joining']) : '-'; ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small"><?php echo htmlspecialchars($emp['name']); ?></div>
+                                        <small class="text-muted"><?php echo htmlspecialchars($emp['email']); ?></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="saas-id-badge"><?php echo htmlspecialchars($emp['employee_id']); ?></span>
+                            </td>
+                            <td>
+                                <?php if ($emp['domain_name']): ?>
+                                <span class="saas-tag primary">
+                                    <?php echo htmlspecialchars($emp['domain_name']); ?>
+                                </span>
+                                <?php else: ?>
+                                <span class="text-muted small">—</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark small"><?php echo htmlspecialchars($emp['designation'] ?? 'Employee'); ?></span>
+                            </td>
+                            <td>
+                                <span class="saas-tag <?php echo $emp['status'] === 'active' ? 'emerald' : 'amber'; ?>">
+                                    <?php echo ucfirst($emp['status']); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-dark small"><?php echo $emp['date_of_joining'] ? formatDate($emp['date_of_joining']) : '—'; ?></span>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
         <?php endif; ?>
