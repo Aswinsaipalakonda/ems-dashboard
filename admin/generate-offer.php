@@ -77,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+        }
         .offer-page {
             width: 210mm;
             height: 297mm;
@@ -87,56 +88,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 112px 38px 28px 38px;
+            padding: 130px 42px 42px 42px;
             color: #000000;
-            font-size: 11.2px;
-            line-height: 1.42;
+            font-size: 12.8px;
+            line-height: 1.55;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
         }
         .offer-title {
             text-align: center;
-            font-size: 16px;
+            font-size: 19px;
             font-weight: 800;
-            margin: 0 0 12px 0;
+            margin: 0 0 18px 0;
             color: #000000;
             letter-spacing: -0.2px;
         }
         .meta-line {
             font-weight: 700;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
         .bold-text {
             font-weight: 700;
         }
         p {
-            margin: 4px 0;
+            margin: 8px 0;
         }
         ul {
-            margin: 2px 0 6px 18px;
+            margin: 4px 0 10px 22px;
             padding: 0;
             list-style-type: disc;
         }
         li {
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         .section-title {
             font-weight: 700;
-            margin-top: 8px;
-            margin-bottom: 2px;
+            margin-top: 14px;
+            margin-bottom: 4px;
         }
         .sign-row {
             margin-top: auto;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-bottom: 18px;
+            padding-bottom: 22px;
             padding-right: 10px;
         }
         .cand-sign {
             font-weight: 700;
-            font-size: 11.5px;
+            font-size: 12.5px;
         }
         @media print {
             body {
@@ -428,25 +429,25 @@ Submit a final report and presentation outlining your work, achievements, and le
                     </div>
                     <div class="card-body p-3" style="background: #F1F5F9; border-radius: 0 0 20px 20px; overflow-y: auto; max-height: 800px;">
                         <!-- Interactive Letter Paper with Authentic Letterhead -->
-                        <div id="offerLetterPreview" style="background-color: #FFFFFF; background-image: url('<?php echo asset('assets/img/offer-letterhead-template.png'); ?>'); background-size: 100% 100%; background-repeat: no-repeat; width: 100%; max-width: 595px; aspect-ratio: 210 / 297; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.12); border-radius: 4px; padding: 96px 28px 22px 28px; position: relative; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10.2px; line-height: 1.38; color: #000000; display: flex; flex-direction: column; justify-content: flex-start;">
+                        <div id="offerLetterPreview" style="background-color: #FFFFFF; background-image: url('<?php echo asset('assets/img/offer-letterhead-template.png'); ?>'); background-size: 100% 100%; background-repeat: no-repeat; width: 100%; max-width: 650px; min-height: 920px; aspect-ratio: 210 / 297; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.12); border-radius: 4px; padding: 110px 32px 36px 32px; position: relative; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10.8px; line-height: 1.54; color: #000000; display: flex; flex-direction: column; justify-content: flex-start;">
                             
-                            <h3 id="prevTitle" style="text-align: center; font-size: 14.5px; font-weight: 800; color: #000000; margin: 0 0 10px; letter-spacing: -0.2px; font-family: 'Inter', sans-serif;">
+                            <h3 id="prevTitle" style="text-align: center; font-size: 16px; font-weight: 800; color: #000000; margin: 0 0 16px; letter-spacing: -0.2px; font-family: 'Inter', sans-serif;">
                                 Internship Offer Letter
                             </h3>
 
-                            <div style="font-weight: 700; margin-bottom: 2px;" id="prevDate">Date: <?php echo date('d-m-Y'); ?></div>
-                            <div style="font-weight: 700; margin-bottom: 6px;" id="prevSubject">Subject: Offer Letter for Software Development Engineer (SDE) Intern</div>
+                            <div style="font-weight: 700; margin-bottom: 3px;" id="prevDate">Date: <?php echo date('d-m-Y'); ?></div>
+                            <div style="font-weight: 700; margin-bottom: 10px;" id="prevSubject">Subject: Offer Letter for Software Development Engineer (SDE) Intern</div>
 
-                            <p style="margin-bottom: 4px;"><strong>Dear <span id="prevName">[Candidate Name]</span>,</strong></p>
+                            <p style="margin-bottom: 7px;"><strong>Dear <span id="prevName">[Candidate Name]</span>,</strong></p>
 
-                            <p style="margin-bottom: 4px;">
+                            <p style="margin-bottom: 8px;">
                                 We are pleased to offer you the position of <strong id="prevPosInline">[Position Title]</strong> at Clientura, for a duration of <strong id="prevDurationInline">45 days</strong>, starting from <strong id="prevDatesInline">[Start Date] to [End Date]</strong>. This <span id="prevEmpTypeInline">internship</span> is part of our commitment to nurturing talented individuals and providing practical exposure to modern software engineering practices.
                             </p>
 
-                            <p style="font-weight: 700; margin-bottom: 3px; margin-top: 4px;">
+                            <p style="font-weight: 700; margin-bottom: 4px; margin-top: 8px;">
                                 During your <span id="prevEmpTypeInline2">internship</span>, you will work closely with our Engineering Team on real-world software development projects involving:
                             </p>
-                            <ul id="prevRespList" style="margin: 2px 0 5px 16px; padding: 0; line-height: 1.35;">
+                            <ul id="prevRespList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5;">
                                 <li>Software Design and Development</li>
                                 <li>Data Structures and Algorithms Implementation</li>
                                 <li>Backend Development and API Integration</li>
@@ -455,37 +456,37 @@ Submit a final report and presentation outlining your work, achievements, and le
                                 <li>Version Control and Collaborative Development</li>
                             </ul>
 
-                            <p style="margin-bottom: 4px;">
+                            <p style="margin-bottom: 8px;">
                                 You are expected to maintain a high level of professionalism, meet project deadlines, actively collaborate with team members, and contribute to the successful delivery of software solutions.
                             </p>
 
-                            <div style="font-weight: 700; margin-top: 5px; margin-bottom: 2px;"><span id="prevDetailsTitle">Internship</span> Details:</div>
+                            <div style="font-weight: 700; margin-top: 10px; margin-bottom: 2px;"><span id="prevDetailsTitle">Internship</span> Details:</div>
                             <p style="margin: 1px 0;"><strong>Position:</strong> <span id="prevPosBlock">[Position Title]</span></p>
                             <p style="margin: 1px 0;"><strong>Location:</strong> <span id="prevLoc">Hybrid</span></p>
                             <p style="margin: 1px 0;"><strong>Start Date:</strong> <span id="prevStart">--</span></p>
                             <p style="margin: 1px 0;"><strong>End Date:</strong> <span id="prevEnd">--</span></p>
 
-                            <div style="font-weight: 700; margin-top: 5px; margin-bottom: 2px;">Terms & Conditions:</div>
-                            <ul id="prevTermsList" style="margin: 2px 0 5px 16px; padding: 0; line-height: 1.35;">
+                            <div style="font-weight: 700; margin-top: 10px; margin-bottom: 2px;">Terms & Conditions:</div>
+                            <ul id="prevTermsList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5;">
                                 <li>Maintain confidentiality of all company code, software architectures, project information, and business data.</li>
                                 <li>Follow development standards, documentation practices, and security guidelines established by the organization.</li>
                                 <li>Submit a final report and presentation outlining your work, achievements, and learning outcomes at the end of the internship.</li>
                             </ul>
 
-                            <p style="margin-bottom: 4px; margin-top: 4px;">
+                            <p style="margin-bottom: 7px; margin-top: 8px;">
                                 To confirm your acceptance of this offer, please reply to this letter or sign and return. Upon receiving your confirmation, we will proceed with the onboarding process and provide further details regarding your project assignments.
                             </p>
 
-                            <p style="margin-bottom: 6px;">
+                            <p style="margin-bottom: 10px;">
                                 We look forward to welcoming you to our team and supporting your professional growth as a <span id="prevRoleClosing">[Position Title]</span>.
                             </p>
 
-                            <div id="prevSignRow" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-bottom: 14px; padding-right: 10px;">
+                            <div id="prevSignRow" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-bottom: 18px; padding-right: 10px;">
                                 <div>
                                     <p style="margin-bottom: 2px;"><strong>Warm regards,</strong></p>
                                     <p style="font-weight: 700; margin: 0;">Clientura</p>
                                 </div>
-                                <div style="font-weight: 700; font-size: 10.5px;">
+                                <div style="font-weight: 700; font-size: 11px;">
                                     Signature of candidate
                                 </div>
                             </div>
@@ -622,7 +623,7 @@ document.getElementById('empSelector').addEventListener('change', function() {
 // Initial sync
 syncPreview();
 
-// Live Preview Function - Opens high-fidelity letterhead fitted in screen
+// Live Preview Function - Opens authentic full A4 letterhead document
 function openLivePreviewTab() {
     const previewWindow = window.open('', '_blank');
     if (!previewWindow) {
@@ -640,6 +641,7 @@ function openLivePreviewTab() {
     <title>Live Preview - Clientura Offer Letter</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="<?php echo asset('assets/js/html2pdf.bundle.min.js'); ?>"><\/script>
     <style>
         @page { size: A4 portrait; margin: 0; }
         * { box-sizing: border-box; }
@@ -658,7 +660,7 @@ function openLivePreviewTab() {
             z-index: 999;
             background: #0A1138;
             color: #FFFFFF;
-            padding: 10px 24px;
+            padding: 12px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -667,11 +669,19 @@ function openLivePreviewTab() {
         .btn-tb {
             border: none;
             cursor: pointer;
-            padding: 7px 18px;
+            padding: 8px 20px;
             font-weight: 700;
             border-radius: 9999px;
-            font-size: 12.5px;
+            font-size: 13px;
             transition: all 0.2s;
+        }
+        .btn-dl {
+            background: #2563EB;
+            color: #FFFFFF;
+        }
+        .btn-dl:hover {
+            background: #1D4ED8;
+            transform: translateY(-1px);
         }
         .btn-print {
             background: #FFA500;
@@ -687,56 +697,51 @@ function openLivePreviewTab() {
             margin-left: 8px;
         }
         .offer-wrapper {
-            padding: 15px 10px;
+            padding: 30px 15px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
             min-height: calc(100vh - 55px);
         }
         .offer-page {
             width: 210mm;
-            max-width: 100%;
             height: 297mm;
-            max-height: calc(100vh - 80px);
-            aspect-ratio: 210 / 297;
             box-sizing: border-box;
             background-color: #FFFFFF;
             background-image: url('${bgUrl}');
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            padding: 108px 36px 24px 36px;
+            padding: 130px 42px 42px 42px;
             font-family: 'Inter', sans-serif;
-            font-size: 10.8px;
-            line-height: 1.4;
+            font-size: 12.8px;
+            line-height: 1.55;
             color: #000000;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            transition: all 0.2s ease;
-        }
-        .offer-page.actual-size {
-            max-height: none;
-            width: 210mm;
         }
         .offer-page h3 {
-            font-size: 16px !important;
-            margin: 0 0 10px 0 !important;
+            font-size: 19px !important;
+            margin: 0 0 18px 0 !important;
             letter-spacing: -0.2px;
+            text-align: center !important;
+            font-weight: 800 !important;
         }
         .offer-page p {
-            margin: 4px 0 !important;
+            margin: 8px 0 !important;
         }
         .offer-page ul {
-            margin: 2px 0 6px 18px !important;
-            line-height: 1.36 !important;
+            margin: 4px 0 10px 22px !important;
+            line-height: 1.55 !important;
+            padding: 0 !important;
         }
         .offer-page li {
-            margin-bottom: 2px !important;
+            margin-bottom: 3px !important;
         }
         .offer-page #prevSignRow {
             margin-top: auto !important;
-            padding-bottom: 18px !important;
+            padding-bottom: 22px !important;
+            padding-right: 10px !important;
         }
         @media print {
             body { background: transparent; }
@@ -747,7 +752,6 @@ function openLivePreviewTab() {
                 margin: 0;
                 width: 210mm !important;
                 height: 297mm !important;
-                max-height: none !important;
             }
         }
     </style>
@@ -755,12 +759,12 @@ function openLivePreviewTab() {
 <body>
     <div class="preview-toolbar">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-weight: 700; font-size: 14.5px;">Clientura Official Offer Letter</span>
-            <span style="background: rgba(255,255,255,0.15); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">A4 Format</span>
+            <span style="font-weight: 700; font-size: 15px;">Clientura Official Offer Letter</span>
+            <span style="background: rgba(255,255,255,0.15); font-size: 11.5px; padding: 2px 10px; border-radius: 9999px;">A4 Format</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 6px;">
-            <button class="btn-tb" id="btnFitToggle" onclick="toggleFit()" style="background: rgba(255,255,255,0.18); color: white;">
-                Actual Size
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn-tb btn-dl" id="btnDownloadPDF" onclick="downloadPDF()">
+                Download PDF
             </button>
             <button class="btn-tb btn-print" onclick="window.print()">
                 Print / Save PDF
@@ -776,18 +780,27 @@ function openLivePreviewTab() {
         </div>
     </div>
     <script>
-        let isFit = true;
-        function toggleFit() {
-            isFit = !isFit;
-            const doc = document.getElementById('printDoc');
-            const btn = document.getElementById('btnFitToggle');
-            if (isFit) {
-                doc.classList.remove('actual-size');
-                btn.innerText = 'Actual Size';
-            } else {
-                doc.classList.add('actual-size');
-                btn.innerText = 'Fit to Screen';
-            }
+        function downloadPDF() {
+            const btn = document.getElementById('btnDownloadPDF');
+            btn.disabled = true;
+            btn.innerText = 'Generating PDF...';
+            const element = document.getElementById('printDoc');
+            const opt = {
+                margin: 0,
+                filename: 'Clientura_Offer_Letter.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.disabled = false;
+                btn.innerText = 'Download PDF';
+            }).catch(err => {
+                console.error(err);
+                btn.disabled = false;
+                btn.innerText = 'Download PDF';
+                window.print();
+            });
         }
     <\/script>
 </body>

@@ -1,7 +1,7 @@
 <?php
 /**
  * Official Clientura Offer Letter PDF Builder
- * Generates exact A4 single-page vector PDF documents on branded letterhead using FPDF
+ * Generates exact A4 single-page vector PDF documents on branded letterhead matching reference offer.pdf
  */
 require_once __DIR__ . '/fpdf/fpdf.php';
 
@@ -9,7 +9,7 @@ class OfferPDFBuilder extends FPDF {
     public function __construct() {
         parent::__construct('P', 'mm', 'A4');
         $this->SetAutoPageBreak(false); // Exactly 1 page
-        $this->SetMargins(16, 12, 16);
+        $this->SetMargins(12, 10, 12);
     }
 }
 
@@ -45,66 +45,72 @@ function buildOfferLetterPDF(array $data, ?string $outputPath = null, string $de
     $pdf = new OfferPDFBuilder();
     $pdf->AddPage();
 
-    // 1. Draw Branded Letterhead Canvas Background (210 x 297 mm full bleed)
+    // 1. Draw Branded Letterhead Background (210 x 297 mm full bleed)
     $bgImg = __DIR__ . '/../assets/img/offer-letterhead-template.png';
     if (file_exists($bgImg)) {
         $pdf->Image($bgImg, 0, 0, 210, 297);
     }
 
     // 2. Heading: Title
-    // FIX: Never output trailing dash if roleCode is empty
+    // Exactly matches reference: Centered at Y=46mm, 16pt Bold
     $heading = ucfirst($empType) . ' Offer Letter';
     if (!empty($roleCode)) {
         $heading .= ' - ' . $roleCode;
     }
 
-    $pdf->SetY(41);
-    $pdf->SetFont('Arial', 'B', 14);
+    $pdf->SetY(46);
+    $pdf->SetFont('Arial', 'B', 16);
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(178, 7, $heading, 0, 1, 'C');
+    $pdf->Cell(186, 7, $heading, 0, 1, 'C');
 
-    $pdf->Ln(2);
+    // 3. Meta: Date & Subject (Y ~ 63mm)
+    $pdf->SetY(63);
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Write(4.8, 'Date: ');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Write(4.8, $issueDate);
+    $pdf->Ln(5.0);
 
-    // 3. Meta: Date & Subject
-    $pdf->SetFont('Arial', 'B', 9.5);
-    $pdf->Cell(178, 4.8, 'Date: ' . $issueDate, 0, 1, 'L');
-    $pdf->Cell(178, 4.8, 'Subject: Offer Letter for ' . $designation, 0, 1, 'L');
-    $pdf->Ln(2);
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Write(4.8, 'Subject: ');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Write(4.8, 'Offer Letter for ' . $designation);
+    $pdf->Ln(6.5);
 
     // 4. Salutation
-    $pdf->Cell(178, 4.8, 'Dear ' . $candName . ',', 0, 1, 'L');
-    $pdf->Ln(1);
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(186, 4.8, 'Dear ' . $candName . ',', 0, 1, 'L');
+    $pdf->Ln(1.8);
 
     // 5. Intro Paragraph
-    $pdf->SetFont('Arial', '', 9.2);
+    $pdf->SetFont('Arial', '', 9.6);
     $introText = "We are pleased to offer you the position of {$designation} at Clientura, for a duration of {$durationText}, starting from {$startDate} to {$endDate}. This {$empType} is part of our commitment to nurturing talented individuals and providing practical exposure to modern software engineering practices.";
-    $pdf->MultiCell(178, 4.4, $introText, 0, 'L');
-    $pdf->Ln(2);
+    $pdf->MultiCell(186, 4.8, $introText, 0, 'L');
+    $pdf->Ln(2.6);
 
     // 6. Responsibilities Intro
-    $pdf->SetFont('Arial', 'B', 9.2);
-    $pdf->MultiCell(178, 4.4, "During your {$empType}, you will work closely with our Engineering Team on real-world software development projects involving:", 0, 'L');
-    $pdf->Ln(1);
+    $pdf->SetFont('Arial', 'B', 9.6);
+    $pdf->MultiCell(186, 4.8, "During your {$empType}, you will work closely with our Engineering Team on real-world software development projects involving:", 0, 'L');
+    $pdf->Ln(1.5);
 
     // Responsibilities bullets
-    $pdf->SetFont('Arial', '', 8.8);
+    $pdf->SetFont('Arial', '', 9.4);
     foreach ($resp as $r) {
-        $pdf->Cell(5, 4.0, chr(149), 0, 0, 'R');
-        $pdf->Cell(2, 4.0, '', 0, 0);
-        $pdf->Cell(171, 4.0, $r, 0, 1, 'L');
+        $pdf->SetX(16);
+        $pdf->Cell(4, 4.4, chr(149), 0, 0, 'L');
+        $pdf->MultiCell(166, 4.4, $r, 0, 'L');
     }
-    $pdf->Ln(2);
+    $pdf->Ln(2.5);
 
     // Professionalism paragraph
-    $pdf->SetFont('Arial', '', 9.2);
-    $pdf->MultiCell(178, 4.4, 'You are expected to maintain a high level of professionalism, meet project deadlines, actively collaborate with team members, and contribute to the successful delivery of software solutions.', 0, 'L');
-    $pdf->Ln(2);
+    $pdf->SetFont('Arial', '', 9.6);
+    $pdf->MultiCell(186, 4.8, 'You are expected to maintain a high level of professionalism, meet project deadlines, actively collaborate with team members, and contribute to the successful delivery of software solutions.', 0, 'L');
+    $pdf->Ln(2.8);
 
-    // 7. Details Block
-    $pdf->SetFont('Arial', 'B', 9.2);
-    $pdf->Cell(178, 4.4, ucfirst($empType) . ' Details:', 0, 1, 'L');
+    // 7. Details Block (Inline label + value with exact natural spacing)
+    $pdf->SetFont('Arial', 'B', 9.8);
+    $pdf->Cell(186, 4.8, ucfirst($empType) . ' Details:', 0, 1, 'L');
     
-    $pdf->SetFont('Arial', '', 8.8);
     $details = [
         'Position'   => $designation,
         'Location'   => $location,
@@ -112,41 +118,43 @@ function buildOfferLetterPDF(array $data, ?string $outputPath = null, string $de
         'End Date'   => $endDate,
     ];
     foreach ($details as $k => $v) {
-        $pdf->SetFont('Arial', 'B', 8.8);
-        $pdf->Cell(24, 4.0, $k . ':', 0, 0, 'L');
-        $pdf->SetFont('Arial', '', 8.8);
-        $pdf->Cell(154, 4.0, $v, 0, 1, 'L');
+        $pdf->SetX(12);
+        $pdf->SetFont('Arial', 'B', 9.5);
+        $pdf->Write(4.5, $k . ': ');
+        $pdf->SetFont('Arial', '', 9.5);
+        $pdf->Write(4.5, $v);
+        $pdf->Ln(4.5);
     }
-    $pdf->Ln(2);
+    $pdf->Ln(2.8);
 
     // 8. Terms & Conditions
-    $pdf->SetFont('Arial', 'B', 9.2);
-    $pdf->Cell(178, 4.4, 'Terms & Conditions:', 0, 1, 'L');
-    $pdf->SetFont('Arial', '', 8.8);
+    $pdf->SetFont('Arial', 'B', 9.8);
+    $pdf->Cell(186, 4.8, 'Terms & Conditions:', 0, 1, 'L');
     foreach ($terms as $t) {
-        $pdf->Cell(5, 4.0, chr(149), 0, 0, 'R');
-        $pdf->Cell(2, 4.0, '', 0, 0);
-        $pdf->MultiCell(171, 4.0, $t, 0, 'L');
+        $pdf->SetX(16);
+        $pdf->SetFont('Arial', '', 9.4);
+        $pdf->Cell(4, 4.4, chr(149), 0, 0, 'L');
+        $pdf->MultiCell(166, 4.4, $t, 0, 'L');
     }
-    $pdf->Ln(2);
+    $pdf->Ln(2.6);
 
     // 9. Closing Text
-    $pdf->SetFont('Arial', '', 9.2);
-    $closingText = "To confirm your acceptance of this offer, please reply to this email / letter. Upon receiving your confirmation, we will proceed with the onboarding process and provide further details regarding your {$empType} responsibilities and project assignments.";
-    $pdf->MultiCell(178, 4.3, $closingText, 0, 'L');
-    $pdf->Ln(1.5);
+    $pdf->SetFont('Arial', '', 9.6);
+    $closingText = "To confirm your acceptance of this offer, please reply to this email. Upon receiving your confirmation, we will proceed with the onboarding process and provide further details regarding your {$empType} responsibilities and project assignments.";
+    $pdf->MultiCell(186, 4.8, $closingText, 0, 'L');
+    $pdf->Ln(2.0);
 
-    $pdf->MultiCell(178, 4.3, "We look forward to welcoming you to our team and supporting your professional growth as a {$designation}.", 0, 'L');
+    $pdf->MultiCell(186, 4.8, "We look forward to welcoming you to our team and supporting your professional growth as a {$designation}.", 0, 'L');
 
-    // 10. Sign-off Footer Row (Pinned cleanly at the bottom)
-    $pdf->SetY(260);
-    $pdf->SetFont('Arial', 'B', 9.5);
-    $pdf->Cell(90, 4.5, 'Warm regards,', 0, 0, 'L');
-    $pdf->Cell(88, 4.5, '', 0, 1, 'R');
+    // 10. Sign-off Footer Row (Pinned at Y=254mm matching reference offer.pdf)
+    $pdf->SetY(254);
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(93, 4.8, 'Warm regards,', 0, 0, 'L');
+    $pdf->Cell(93, 4.8, '', 0, 1, 'R');
 
-    $pdf->Cell(90, 4.5, 'Clientura', 0, 0, 'L');
-    $pdf->SetFont('Arial', '', 9.0);
-    $pdf->Cell(88, 4.5, 'Signature of candidate', 0, 1, 'R');
+    $pdf->Cell(93, 4.8, 'Clientura', 0, 0, 'L');
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(93, 4.8, 'Signature of candidate', 0, 1, 'R');
 
     if ($dest === 'F') {
         if ($outputPath) {

@@ -47,35 +47,33 @@ if (isset($_GET['action']) && $_GET['action'] === 'download' && isset($_GET['id'
     $offerId = (int)$_GET['id'];
     $offer = fetchOne("SELECT * FROM offer_letters WHERE id = ?", "i", [$offerId]);
     if ($offer) {
-        $pdfPath = null;
-        // Check if existing file is already PDF
-        if (!empty($offer['file_path']) && str_ends_with($offer['file_path'], '.pdf') && file_exists(__DIR__ . '/../' . $offer['file_path'])) {
-            $pdfPath = __DIR__ . '/../' . $offer['file_path'];
-        } else {
-            // Generate or fetch PDF using offer-pdf-builder
-            require_once __DIR__ . '/../includes/offer-pdf-builder.php';
-            $safeBaseName = 'offer_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['offer_id']) . '_' . time();
-            $newPdfPath = UPLOAD_PATH . 'offers/' . $safeBaseName . '.pdf';
-            
-            $pdfData = [
-                'employment_type' => $offer['employment_type'],
-                'candidate_name'  => $offer['candidate_name'],
-                'designation'     => $offer['designation'],
-                'role_code'       => '',
-                'duration_text'   => $offer['duration_text'],
-                'start_date'      => date('d-m-Y', strtotime($offer['start_date'])),
-                'end_date'        => date('d-m-Y', strtotime($offer['end_date'])),
-                'issue_date'      => date('d-m-Y', strtotime($offer['created_at'] ?? 'now')),
-                'location'        => $offer['location'],
-                'responsibilities'=> $offer['responsibilities'] ?? '',
-                'terms'           => $offer['terms_conditions'] ?? ''
-            ];
-            buildOfferLetterPDF($pdfData, $newPdfPath, 'F');
-            if (file_exists($newPdfPath)) {
-                $pdfPath = $newPdfPath;
-                $relPdf = 'uploads/offers/' . $safeBaseName . '.pdf';
-                executeQuery("UPDATE offer_letters SET file_path = ? WHERE id = ?", "si", [$relPdf, $offer['id']]);
-            }
+        require_once __DIR__ . '/../includes/offer-pdf-builder.php';
+        $safeBaseName = 'offer_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['offer_id']) . '_' . time();
+        $newPdfPath = UPLOAD_PATH . 'offers/' . $safeBaseName . '.pdf';
+        
+        $roleCode = '';
+        if (preg_match('/\(([^)]+)\)/', $offer['designation'], $m)) {
+            $roleCode = trim($m[1]);
+        }
+        
+        $pdfData = [
+            'employment_type' => $offer['employment_type'],
+            'candidate_name'  => $offer['candidate_name'],
+            'designation'     => $offer['designation'],
+            'role_code'       => $roleCode,
+            'duration_text'   => $offer['duration_text'],
+            'start_date'      => date('d-m-Y', strtotime($offer['start_date'])),
+            'end_date'        => date('d-m-Y', strtotime($offer['end_date'])),
+            'issue_date'      => date('d-m-Y', strtotime($offer['created_at'] ?? 'now')),
+            'location'        => $offer['location'],
+            'responsibilities'=> $offer['responsibilities'] ?? '',
+            'terms'           => $offer['terms_conditions'] ?? ''
+        ];
+        buildOfferLetterPDF($pdfData, $newPdfPath, 'F');
+        if (file_exists($newPdfPath)) {
+            $pdfPath = $newPdfPath;
+            $relPdf = 'uploads/offers/' . $safeBaseName . '.pdf';
+            executeQuery("UPDATE offer_letters SET file_path = ? WHERE id = ?", "si", [$relPdf, $offer['id']]);
         }
 
         if ($pdfPath && file_exists($pdfPath)) {
