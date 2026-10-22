@@ -142,16 +142,27 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 </div>
                             </div>
 
-                            <!-- Program / Role -->
-                            <div class="mb-3">
-                                <label class="form-label font-weight-bold text-dark small">Program / Designation Role <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="programName" name="program_name" placeholder="Enter program or designation" value="" required style="border-radius: 12px;">
+                            <!-- Gender / Pronoun & Role Row -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <label class="form-label font-weight-bold text-dark small">Pronoun <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="pronounSelect" name="pronoun" style="border-radius: 12px; font-weight: 600;">
+                                        <option value="her" selected>her (Female)</option>
+                                        <option value="his">his (Male)</option>
+                                        <option value="their">their (Neutral)</option>
+                                    </select>
+                                </div>
+                                <div class="col-8">
+                                    <label class="form-label font-weight-bold text-dark small">Program / Designation Role <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="programName" name="program_name" placeholder="Enter program or designation" value="" required style="border-radius: 12px;">
+                                </div>
                             </div>
 
-                            <!-- Duration Text -->
+                            <!-- Contributions Domain (Projects) -->
                             <div class="mb-3">
-                                <label class="form-label font-weight-bold text-dark small">Program Duration Text</label>
-                                <input type="text" class="form-control" id="durationText" name="duration_text" placeholder="Enter duration (e.g. Six Months)" value="" style="border-radius: 12px;">
+                                <label class="form-label font-weight-bold text-dark small">Contributions To (Project Domain) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="contributionsDomain" name="contributions_domain" value="software development projects" placeholder="e.g. software development projects, digital marketing campaigns" style="border-radius: 12px; font-weight: 500;">
+                                <small class="text-muted" style="font-size: 11px;">Customizes dynamically based on role (e.g. digital marketing, UI/UX, software development).</small>
                             </div>
 
                             <!-- Dates Row -->
@@ -404,37 +415,51 @@ function drawCanvasContent() {
     ctx.fillStyle = rawName ? '#DF9E1D' : 'rgba(223, 158, 29, 0.45)';
     ctx.fillText(name, 1000, 730);
 
-    // 4. Recognition Paragraph (Large, Readable 34px Font)
-    ctx.font = '400 34px "Inter", sans-serif';
-    ctx.fillStyle = '#334155';
-    const p1 = 'In recognition of her efforts and achievement in completing the';
-    ctx.fillText(p1, 1000, 845);
+    // 4. Recognition Statement (User Requested Format)
+    // For "[her/his/their]" successful completion of the "[Role]" Internship Program at Clientura,
+    // demonstrating outstanding dedication, strong work ethic and valuable contributions to "[project domain]".
+    const pronounEl = document.getElementById('pronounSelect');
+    const pronoun = (pronounEl ? pronounEl.value : 'her').trim();
+    const domainEl = document.getElementById('contributionsDomain');
+    const domainText = (domainEl && domainEl.value.trim()) ? domainEl.value.trim() : 'software development projects';
 
-    // Line 2: "{Duration} internship program as {Role}." perfectly centered
-    const p2Prefix = duration + ' internship program as ';
-    const p2Role = role + '.';
-    
-    ctx.font = '400 34px "Inter", sans-serif';
-    const prefixW = ctx.measureText(p2Prefix).width;
-    ctx.font = '700 34px "Inter", sans-serif';
-    const roleW = ctx.measureText(p2Role).width;
-    const totalW = prefixW + roleW;
-    const startX = 1000 - (totalW / 2);
+    const cleanRole = (rawRole || 'Software Development').replace(/\s+Intern(ship)?$/i, '').trim();
 
-    ctx.textAlign = 'left';
-    ctx.font = '400 34px "Inter", sans-serif';
-    ctx.fillStyle = '#334155';
-    ctx.fillText(p2Prefix, startX, 905);
-
-    ctx.font = '700 34px "Inter", sans-serif';
-    ctx.fillStyle = '#0A1138';
-    ctx.fillText(p2Role, startX + prefixW, 905);
-
-    // Line 3: "Conducted From START DATE - END DATE"
     ctx.textAlign = 'center';
-    ctx.font = '700 34px "Inter", sans-serif';
+
+    const line1 = 'For ' + pronoun + ' successful completion of the ' + cleanRole + ' Internship Program at Clientura,';
+    const line2 = 'demonstrating outstanding dedication, strong work ethic and valuable contributions to';
+    const line3 = domainText + '.';
+
+    // Dynamic sizing to guarantee perfect fit
+    let cFontSize = 32;
+    ctx.font = '500 ' + cFontSize + 'px "Inter", sans-serif';
+    while (ctx.measureText(line1).width > 1750 && cFontSize > 22) {
+        cFontSize -= 1;
+        ctx.font = '500 ' + cFontSize + 'px "Inter", sans-serif';
+    }
+
+    // Line 1
+    ctx.font = '500 ' + cFontSize + 'px "Inter", sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(line1, 1000, 845);
+
+    // Line 2
+    ctx.font = '400 ' + cFontSize + 'px "Inter", sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(line2, 1000, 905);
+
+    // Line 3 (Domain highlighted slightly bolder/darker)
+    ctx.font = '700 ' + (cFontSize + 1) + 'px "Inter", sans-serif';
     ctx.fillStyle = '#0A1138';
-    ctx.fillText('Conducted From ' + sDate + ' - ' + eDate, 1000, 980);
+    ctx.fillText(line3, 1000, 965);
+
+    // Line 4 (Optional Dates)
+    if (sDateRaw || eDateRaw) {
+        ctx.font = '700 28px "Inter", sans-serif';
+        ctx.fillStyle = '#DF9E1D';
+        ctx.fillText('Conducted From ' + sDate + ' - ' + eDate, 1000, 1030);
+    }
 
     // 5. Bottom Left: Emp id, Date of issue & Certificate id
     const rawEmpCode = document.getElementById('empCodeInput') ? document.getElementById('empCodeInput').value.trim() : '';
@@ -513,11 +538,50 @@ function formatDate(dateStr) {
     return dateStr;
 }
 
+// Helper to suggest/auto-update contributions domain from role
+function inferDomainFromRole(roleName) {
+    if (!roleName) return 'software development projects';
+    const r = roleName.toLowerCase();
+    if (r.includes('market') || r.includes('seo') || r.includes('social media')) {
+        return 'digital marketing campaigns and growth initiatives';
+    } else if (r.includes('ui') || r.includes('ux') || r.includes('design') || r.includes('graphic')) {
+        return 'UI/UX design and product branding projects';
+    } else if (r.includes('data') || r.includes('analyst') || r.includes('bi')) {
+        return 'data analytics and business intelligence projects';
+    } else if (r.includes('sales') || r.includes('bd') || r.includes('business development')) {
+        return 'business development and client acquisition projects';
+    } else if (r.includes('content') || r.includes('copy')) {
+        return 'content marketing and editorial projects';
+    } else if (r.includes('hr') || r.includes('talent') || r.includes('recruit')) {
+        return 'human resource operations and talent management';
+    } else {
+        return 'software development projects';
+    }
+}
+
 // Event Listeners for live form changes
-['recipientName', 'empCodeInput', 'programName', 'durationText', 'startDate', 'endDate', 'issueDate', 'certificateId'].forEach(id => {
+['recipientName', 'empCodeInput', 'programName', 'pronounSelect', 'contributionsDomain', 'durationText', 'startDate', 'endDate', 'issueDate', 'certificateId'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('input', renderCertificate);
+    if (el) {
+        el.addEventListener('input', renderCertificate);
+        el.addEventListener('change', renderCertificate);
+    }
 });
+
+// Auto-suggest domain when programName changes if user hasn't explicitly customized
+let domainUserEdited = false;
+const domainInput = document.getElementById('contributionsDomain');
+if (domainInput) {
+    domainInput.addEventListener('input', () => { domainUserEdited = true; });
+}
+const progInput = document.getElementById('programName');
+if (progInput) {
+    progInput.addEventListener('input', () => {
+        if (!domainUserEdited && domainInput) {
+            domainInput.value = inferDomainFromRole(progInput.value);
+        }
+    });
+}
 
 document.getElementById('signatorySelect').addEventListener('change', updateSignatureAndRender);
 
@@ -529,6 +593,12 @@ document.getElementById('empSelector').addEventListener('change', function() {
         document.getElementById('recipientName').value = selected.getAttribute('data-name') || '';
         const role = selected.getAttribute('data-role') || 'Software Development Engineer';
         document.getElementById('programName').value = role;
+        
+        // Auto-update contributions domain based on selected employee role
+        if (!domainUserEdited && domainInput) {
+            domainInput.value = inferDomainFromRole(role);
+        }
+
         const joining = selected.getAttribute('data-joining');
         const start = joining ? new Date(joining) : new Date(Date.now() - 180*24*60*60*1000);
         document.getElementById('startDate').value = start.toISOString().split('T')[0];
@@ -549,6 +619,7 @@ document.getElementById('empSelector').addEventListener('change', function() {
         document.getElementById('durationText').value = '';
         document.getElementById('startDate').value = '';
         document.getElementById('endDate').value = '';
+        if (!domainUserEdited && domainInput) domainInput.value = 'software development projects';
         renderCertificate();
     }
 });

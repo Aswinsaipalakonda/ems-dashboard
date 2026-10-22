@@ -65,12 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <style>
         @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 0 !important;
         }
         * {
             box-sizing: border-box;
         }
-        body {
+        html, body {
             margin: 0;
             padding: 0;
             background: #E2E8F0;
@@ -81,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         .offer-page {
             width: 210mm;
             height: 297mm;
+            max-height: 297mm;
             margin: 20px auto;
             position: relative;
             background-color: #FFFFFF;
@@ -88,69 +89,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 130px 42px 42px 42px;
+            padding: 105px 36px 20px 36px;
             color: #000000;
-            font-size: 12.8px;
-            line-height: 1.55;
+            font-size: 10.8px;
+            line-height: 1.40;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            overflow: hidden;
+            page-break-after: avoid;
+            page-break-inside: avoid;
         }
         .offer-title {
             text-align: center;
-            font-size: 19px;
+            font-size: 17px;
             font-weight: 800;
-            margin: 0 0 18px 0;
+            margin: 0 0 12px 0;
             color: #000000;
             letter-spacing: -0.2px;
         }
         .meta-line {
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         .bold-text {
             font-weight: 700;
         }
         p {
-            margin: 8px 0;
+            margin: 5px 0;
         }
         ul {
-            margin: 4px 0 10px 22px;
+            margin: 2px 0 6px 18px;
             padding: 0;
             list-style-type: disc;
+            line-height: 1.38;
         }
         li {
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         .section-title {
             font-weight: 700;
-            margin-top: 14px;
-            margin-bottom: 4px;
+            margin-top: 8px;
+            margin-bottom: 2px;
         }
         .sign-row {
             margin-top: auto;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-bottom: 22px;
+            padding-bottom: 16px;
             padding-right: 10px;
         }
         .cand-sign {
             font-weight: 700;
-            font-size: 12.5px;
+            font-size: 11px;
         }
         @media print {
-            body {
+            html, body {
                 background: transparent;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
             }
             .no-print {
                 display: none !important;
             }
             .offer-page {
-                margin: 0;
-                box-shadow: none;
-                width: 210mm;
-                height: 297mm;
+                margin: 0 !important;
+                box-shadow: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                overflow: hidden !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
             }
         }
     </style>
@@ -705,53 +717,66 @@ function openLivePreviewTab() {
         .offer-page {
             width: 210mm;
             height: 297mm;
+            max-height: 297mm;
             box-sizing: border-box;
             background-color: #FFFFFF;
             background-image: url('${bgUrl}');
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            padding: 130px 42px 42px 42px;
+            padding: 105px 36px 20px 36px;
             font-family: 'Inter', sans-serif;
-            font-size: 12.8px;
-            line-height: 1.55;
+            font-size: 10.8px;
+            line-height: 1.40;
             color: #000000;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            overflow: hidden;
+            page-break-after: avoid;
+            page-break-inside: avoid;
         }
         .offer-page h3 {
-            font-size: 19px !important;
-            margin: 0 0 18px 0 !important;
+            font-size: 17px !important;
+            margin: 0 0 12px 0 !important;
             letter-spacing: -0.2px;
             text-align: center !important;
             font-weight: 800 !important;
         }
         .offer-page p {
-            margin: 8px 0 !important;
+            margin: 5px 0 !important;
         }
         .offer-page ul {
-            margin: 4px 0 10px 22px !important;
-            line-height: 1.55 !important;
+            margin: 2px 0 6px 18px !important;
+            line-height: 1.38 !important;
             padding: 0 !important;
         }
         .offer-page li {
-            margin-bottom: 3px !important;
+            margin-bottom: 2px !important;
         }
         .offer-page #prevSignRow {
             margin-top: auto !important;
-            padding-bottom: 22px !important;
+            padding-bottom: 16px !important;
             padding-right: 10px !important;
         }
         @media print {
-            body { background: transparent; }
+            html, body {
+                background: transparent;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
             .preview-toolbar { display: none !important; }
-            .offer-wrapper { padding: 0; margin: 0; }
+            .offer-wrapper { padding: 0 !important; margin: 0 !important; }
             .offer-page {
-                box-shadow: none;
-                margin: 0;
+                box-shadow: none !important;
+                margin: 0 !important;
                 width: 210mm !important;
                 height: 297mm !important;
+                max-height: 297mm !important;
+                overflow: hidden !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
             }
         }
     </style>
