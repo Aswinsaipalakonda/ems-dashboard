@@ -25,18 +25,27 @@ if (file_exists($envPath)) {
 }
 
 // Environment-specific database configuration
-// For production, these are loaded from .env or environment variables
+// Auto-detect Hostinger production environment
+$isHostinger = (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'clientura.in') !== false) 
+    || (isset($_SERVER['SERVER_NAME']) && strpos($_SERVER['SERVER_NAME'], 'clientura.in') !== false)
+    || (strpos(__DIR__, 'u545827212') !== false);
+
+$defaultHost = 'localhost';
+$defaultUser = $isHostinger ? 'u545827212_ems' : 'root';
+$defaultPass = $isHostinger ? 'Ems@2025' : '';
+$defaultName = $isHostinger ? 'u545827212_ems' : 'ems_dashboard';
+
 if (!defined('DB_HOST')) {
-    define('DB_HOST', getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost'));
+    define('DB_HOST', getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? $defaultHost));
 }
 if (!defined('DB_USER')) {
-    define('DB_USER', getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root'));
+    define('DB_USER', getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? $defaultUser));
 }
 if (!defined('DB_PASS')) {
-    define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : ($_ENV['DB_PASS'] ?? ''));
+    define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : ($_ENV['DB_PASS'] ?? $defaultPass));
 }
 if (!defined('DB_NAME')) {
-    define('DB_NAME', getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'ems_dashboard'));
+    define('DB_NAME', getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? $defaultName));
 }
 
 // Create connection
