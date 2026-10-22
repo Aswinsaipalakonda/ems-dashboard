@@ -60,9 +60,13 @@ CREATE TABLE IF NOT EXISTS `offer_letters` (
   INDEX (`employee_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 4. Address column in employees table (Safe if not exists)
+ALTER TABLE `employees` ADD COLUMN IF NOT EXISTS `address` TEXT DEFAULT NULL AFTER `phone`;
+
 -- Default Signatories (Insert if not exists)
 INSERT INTO `signatories` (`id`, `name`, `designation`, `signature_path`, `is_active`) VALUES
 (1, 'Mr. P. Sowsheel', 'Founder & CEO Clientura', NULL, 1),
 (2, 'Mr. P. Aswinsai', 'Co-Founder & CTO Clientura', NULL, 1),
 (3, 'Mr. V. K. Viswanadh', 'Co-Founder & CMO Clientura', NULL, 1)
 ON DUPLICATE KEY UPDATE `designation` = VALUES(`designation`);
+
