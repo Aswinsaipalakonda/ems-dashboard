@@ -26,41 +26,29 @@ $teamLeadCheckinRequired = fetchOne(
         </a>
     </div>
     
-    <div class="sidebar-user-info px-3 py-2 mb-2">
-        <div class="d-flex align-items-center">
-            <img src="<?php echo getAvatar($_SESSION['avatar'] ?? ''); ?>" class="avatar avatar-sm me-2" alt="">
-            <div>
-                <div class="fw-semibold text-white small"><?php echo $_SESSION['user_name'] ?? 'User'; ?></div>
-                <span class="badge bg-warning text-dark small">Team Lead</span>
-            </div>
-        </div>
-    </div>
-    
     <ul class="sidebar-menu">
         <li>
             <a href="<?php echo url('teamlead/dashboard'); ?>" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
-                <i class="bi bi-grid-1x2"></i>
+                <?php echo pika_icon('dashboard'); ?>
                 <span>Dashboard</span>
             </a>
         </li>
         
-        <li class="sidebar-section-title">My Team</li>
-        
         <li>
             <a href="<?php echo url('teamlead/team'); ?>" class="<?php echo $currentPage === 'team.php' ? 'active' : ''; ?>">
-                <i class="bi bi-people"></i>
+                <?php echo pika_icon('users'); ?>
                 <span>Team Members</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('teamlead/team-attendance'); ?>" class="<?php echo $currentPage === 'team-attendance.php' ? 'active' : ''; ?>">
-                <i class="bi bi-calendar-check"></i>
+                <?php echo pika_icon('calendar'); ?>
                 <span>Team Attendance</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('teamlead/approvals'); ?>" class="<?php echo $currentPage === 'approvals.php' ? 'active' : ''; ?>">
-                <i class="bi bi-check-circle"></i>
+                <?php echo pika_icon('check-circle'); ?>
                 <span>Approvals</span>
                 <?php
                 $teamMemberIds = getTeamMemberIds($_SESSION['user_id']);
@@ -81,36 +69,34 @@ $teamLeadCheckinRequired = fetchOne(
         </li>
         <li>
             <a href="<?php echo url('teamlead/team-tasks'); ?>" class="<?php echo $currentPage === 'team-tasks.php' ? 'active' : ''; ?>">
-                <i class="bi bi-list-task"></i>
+                <?php echo pika_icon('tasks'); ?>
                 <span>Team Tasks</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('teamlead/team-reports'); ?>" class="<?php echo $currentPage === 'team-reports.php' ? 'active' : ''; ?>">
-                <i class="bi bi-bar-chart-line"></i>
+                <?php echo pika_icon('reports'); ?>
                 <span>Team Reports</span>
             </a>
         </li>
         
-        <li class="sidebar-section-title">My Account</li>
-        
         <?php if ($teamLeadCheckinRequired): ?>
         <li>
             <a href="<?php echo url('teamlead/my-attendance'); ?>" class="<?php echo $currentPage === 'my-attendance.php' ? 'active' : ''; ?>">
-                <i class="bi bi-calendar-check"></i>
+                <?php echo pika_icon('calendar'); ?>
                 <span>My Attendance</span>
             </a>
         </li>
         <?php endif; ?>
         <li>
             <a href="<?php echo url('teamlead/my-tasks'); ?>" class="<?php echo $currentPage === 'my-tasks.php' ? 'active' : ''; ?>">
-                <i class="bi bi-check2-square"></i>
+                <?php echo pika_icon('tasks'); ?>
                 <span>My Tasks</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('teamlead/profile'); ?>" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
-                <i class="bi bi-person-circle"></i>
+                <?php echo pika_icon('profile'); ?>
                 <span>Profile</span>
             </a>
         </li>
@@ -119,9 +105,18 @@ $teamLeadCheckinRequired = fetchOne(
         
         <li>
             <a href="<?php echo url('logout'); ?>" class="text-danger">
-                <i class="bi bi-box-arrow-left"></i>
+                <?php echo pika_icon('logout'); ?>
                 <span>Logout</span>
             </a>
         </li>
     </ul>
+
+    <!-- Bottom User Profile Card -->
+    <div class="sidebar-user-card">
+        <img src="<?php echo !empty($_SESSION['avatar']) ? url('uploads/avatars/' . $_SESSION['avatar']) : url('assets/img/default-avatar.png'); ?>" alt="Avatar" class="sidebar-user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'Lead'); ?>&background=0A1138&color=FFA500';">
+        <div class="sidebar-user-details">
+            <div class="sidebar-user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Team Lead'); ?></div>
+            <div class="sidebar-user-role">Team Lead</div>
+        </div>
+    </div>
 </aside>

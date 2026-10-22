@@ -27,14 +27,13 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Create database if not exists
-$sql = "CREATE DATABASE IF NOT EXISTS " . DB_NAME;
-if ($conn->query($sql) !== TRUE) {
-    die("Error creating database: " . $conn->error);
+// Select database (safe for Hostinger shared hosting where CREATE DATABASE privilege is restricted)
+if (!$conn->select_db(DB_NAME)) {
+    @$conn->query("CREATE DATABASE IF NOT EXISTS " . DB_NAME);
+    if (!$conn->select_db(DB_NAME)) {
+        die("Error selecting database " . DB_NAME . ": " . $conn->error);
+    }
 }
-
-// Select database
-$conn->select_db(DB_NAME);
 
 // Set charset
 $conn->set_charset("utf8mb4");

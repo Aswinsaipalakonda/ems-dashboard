@@ -1,5 +1,6 @@
 # Ignore SQL dump files
 *.sql
+!database/*.sql
 
 # Environment files
 .env
@@ -21,4 +22,6 @@
 # Ignore build artifacts
 /dist/
 /build/
+.playwright-mcp/
+assets/references/
 

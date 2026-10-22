@@ -4,21 +4,32 @@
  */
 
 :root {
-    --primary-color: #4f46e5;
-    --primary-dark: #4338ca;
-    --primary-light: #818cf8;
+    --primary-color: #0A1138;       /* Clientura Deep Corporate Navy */
+    --primary-dark: #050926;
+    --primary-light: #16205B;
+    --accent-orange: #FFA500;       /* Clientura Swoosh Vibrant Amber/Orange */
+    --accent-orange-hover: #E68A00;
+    --accent-orange-light: #FFF7ED;
+    --accent-orange-glow: rgba(255, 165, 0, 0.3);
     --secondary-color: #64748b;
-    --success-color: #22c55e;
+    --success-color: #10b981;
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
-    --info-color: #3b82f6;
+    --info-color: #0ea5e9;
     --light-color: #f8fafc;
-    --dark-color: #1e293b;
-    --sidebar-width: 260px;
-    --header-height: 64px;
-    --border-radius: 12px;
-    --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --dark-color: #0A1138;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #94A3B8;
+    --sidebar-width: 220px;
+    --header-height: 65px;
+    --border-radius-pill: 9999px;
+    --border-radius-card: 20px;
+    --border-radius-sm: 12px;
+    --border-subtle: rgba(10, 17, 56, 0.07);
+    --box-shadow: 0 4px 20px -2px rgba(10, 17, 56, 0.04), 0 2px 6px -1px rgba(10, 17, 56, 0.02);
+    --box-shadow-lg: 0 12px 32px -8px rgba(10, 17, 56, 0.08), 0 4px 12px -2px rgba(10, 17, 56, 0.03);
+    --box-shadow-orange: 0 8px 24px -4px rgba(10, 17, 56, 0.25);
 }
 
 * {
@@ -28,183 +39,248 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background-color: #f1f5f9;
-    color: var(--dark-color);
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F8FAFC;
+    color: var(--text-primary);
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Login Page Styles */
-.login-page {
-    min-height: 100vh;
-    display: flex;
+/* Rounded Corner Buttons System (Pill Style) */
+.btn,
+button.btn,
+a.btn,
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info,
+.btn-light,
+.btn-dark,
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-danger,
+.btn-outline-success,
+.btn-login,
+.btn-glow {
+    border-radius: var(--border-radius-pill) !important;
+    padding: 9px 20px !important;
+    font-weight: 600 !important;
+    font-size: 13.5px !important;
+    letter-spacing: 0.2px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    padding: 20px;
+    gap: 8px;
 }
 
-.login-container {
-    width: 100%;
-    max-width: 420px;
+.btn-sm {
+    padding: 5px 14px !important;
+    font-size: 12px !important;
 }
 
-.login-card {
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow-lg);
-    padding: 40px;
+.btn-lg {
+    padding: 12px 28px !important;
+    font-size: 15px !important;
 }
 
-.login-logo {
-    text-align: center;
-    margin-bottom: 30px;
+/* Primary Vibrant Navy Blue Buttons with White Text */
+.btn-primary {
+    background: linear-gradient(135deg, #0A1138 0%, #151D52 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(10, 17, 56, 0.25) !important;
 }
 
-.login-logo i {
-    font-size: 48px;
-    color: var(--primary-color);
+.btn-primary:hover {
+    background: linear-gradient(135deg, #151D52 0%, #1E2968 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 22px rgba(10, 17, 56, 0.35) !important;
+    color: #FFFFFF !important;
 }
 
-.login-logo h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--dark-color);
-    margin-top: 10px;
+.btn-navy {
+    background: linear-gradient(135deg, #0A1138 0%, #16205B 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(10, 17, 56, 0.25) !important;
 }
 
-.login-form .form-label {
-    font-weight: 500;
-    color: var(--secondary-color);
-    font-size: 14px;
+.btn-navy:hover {
+    background: linear-gradient(135deg, #16205B 0%, #202D75 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(10, 17, 56, 0.35) !important;
+    color: #FFFFFF !important;
 }
 
-.login-form .form-control {
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    font-size: 15px;
-    transition: all 0.3s ease;
+.btn-outline-primary {
+    background: transparent !important;
+    border: 1.5px solid #0A1138 !important;
+    color: #0A1138 !important;
 }
 
-.login-form .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+.btn-outline-primary:hover {
+    background: #0A1138 !important;
+    color: #FFFFFF !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 14px rgba(10, 17, 56, 0.2) !important;
 }
 
-.login-form .input-group-text {
-    background: white;
-    border-radius: 8px 0 0 8px;
-    border: 1px solid #e2e8f0;
-    border-right: none;
-    color: var(--secondary-color);
+.btn-glow {
+    box-shadow: 0 6px 18px rgba(10, 17, 56, 0.28) !important;
 }
 
-.login-form .input-group .form-control {
-    border-radius: 0 8px 8px 0;
-}
-
-.btn-login {
-    padding: 12px 24px;
-    font-weight: 600;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    border: none;
-    transition: all 0.3s ease;
-}
-
-.btn-login:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
-}
-
-/* Sidebar Styles */
+/* Dark-Mode Modern Sidebar */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    background: linear-gradient(180deg, var(--dark-color) 0%, #0f172a 100%);
-    padding: 20px 0;
+    background: linear-gradient(180deg, #0A1138 0%, #070B24 100%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 16px 8px !important;
     z-index: 1000;
     transition: all 0.3s ease;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar-header {
-    padding: 0 20px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 20px;
+    padding: 4px 8px 16px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-bottom: 10px !important;
 }
 
 .sidebar-logo {
     display: flex;
     align-items: center;
+    gap: 10px;
     text-decoration: none;
 }
 
-.sidebar-logo i {
-    font-size: 32px;
-    color: var(--primary-light);
-    margin-right: 12px;
+.sidebar-logo img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
 }
 
 .sidebar-logo span {
-    font-size: 20px;
+    font-size: 16.5px !important;
     font-weight: 700;
-    color: white;
+    color: #FFFFFF !important;
+    letter-spacing: -0.3px;
 }
 
 .sidebar-menu {
-    list-style: none;
-    padding: 0 12px;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 1;
 }
 
 .sidebar-menu li {
-    margin-bottom: 4px;
+    margin-bottom: 2px !important;
+    list-style: none !important;
 }
 
 .sidebar-menu a {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    color: #94a3b8;
+    padding: 9px 12px !important;
+    color: #94A3B8 !important;
     text-decoration: none;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    border-radius: var(--border-radius-pill) !important;
+    transition: all 0.2s ease;
     font-weight: 500;
+    font-size: 13px !important;
+    gap: 10px !important;
 }
 
-.sidebar-menu a:hover,
+.sidebar-menu a svg,
+.sidebar-menu a i {
+    font-size: 17px !important;
+    color: #94A3B8 !important;
+    transition: transform 0.2s ease;
+}
+
+.sidebar-menu a:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #FFFFFF !important;
+    transform: translateX(3px);
+}
+
+.sidebar-menu a:hover svg,
+.sidebar-menu a:hover i {
+    color: #FFFFFF !important;
+    transform: scale(1.08);
+}
+
 .sidebar-menu a.active {
-    background: rgba(79, 70, 229, 0.2);
-    color: white;
+    background: linear-gradient(135deg, #1C2766 0%, #29388C 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+    border-left: 3px solid #FFA500 !important;
 }
 
-.sidebar-menu a.active {
-    background: var(--primary-color);
-}
-
-.sidebar-menu i {
-    font-size: 20px;
-    margin-right: 12px;
-    width: 24px;
+.sidebar-menu a.active svg,
+.sidebar-menu a.active i {
+    color: #FFA500 !important;
 }
 
 .sidebar-divider {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-    margin: 20px 12px;
+    height: 1px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    margin: 10px 4px !important;
 }
 
-.sidebar-section-title {
-    padding: 8px 20px;
-    font-size: 12px;
+/* Remove category headings completely */
+.sidebar-section-title,
+.sidebar-heading {
+    display: none !important;
+}
+
+/* User Card in Sidebar Bottom */
+.sidebar-user-card {
+    margin-top: auto !important;
+    padding: 10px 12px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: var(--border-radius-card);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-user-avatar {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FFA500 !important;
+}
+
+.sidebar-user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-user-name {
+    font-size: 12.5px !important;
     font-weight: 600;
-    text-transform: uppercase;
-    color: #64748b;
-    letter-spacing: 0.5px;
+    color: #FFFFFF !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+    font-size: 10.5px !important;
+    color: #94A3B8 !important;
 }
 
 /* Main Content Area */
@@ -324,161 +400,170 @@ body {
 
 /* Content Area */
 .content-wrapper {
-    padding: 24px;
+    padding: 28px;
 }
 
-/* Cards */
+/* Cards (Seto & Toota Inspired) */
 .card {
-    background: white;
-    border-radius: var(--border-radius);
-    border: none;
+    background: #FFFFFF;
+    border-radius: var(--border-radius-card);
+    border: 1px solid var(--border-subtle);
     box-shadow: var(--box-shadow);
     margin-bottom: 24px;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease;
+}
+
+.card:hover {
+    box-shadow: var(--box-shadow-lg);
 }
 
 .card-header {
     background: transparent;
-    border-bottom: 1px solid #f1f5f9;
-    padding: 16px 20px;
-    font-weight: 600;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 18px 24px;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .card-body {
-    padding: 20px;
+    padding: 24px;
 }
 
-/* Stats Cards */
+/* Modern Stats Cards (Toota Style) */
 .stats-card {
-    background: white;
-    border-radius: var(--border-radius);
+    background: #FFFFFF;
+    border-radius: var(--border-radius-card);
     padding: 24px;
     display: flex;
     align-items: center;
+    border: 1px solid var(--border-subtle);
     box-shadow: var(--box-shadow);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
 }
 
 .stats-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--box-shadow-lg);
+    border-color: rgba(255, 165, 0, 0.3);
 }
 
 .stats-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    margin-right: 16px;
+    margin-right: 18px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover .stats-icon {
+    transform: scale(1.08) rotate(4deg);
 }
 
 .stats-icon.primary {
-    background: rgba(79, 70, 229, 0.1);
+    background: rgba(10, 17, 56, 0.08);
     color: var(--primary-color);
 }
 
+.stats-icon.orange,
+.stats-icon.accent {
+    background: rgba(255, 165, 0, 0.14);
+    color: var(--accent-orange);
+}
+
 .stats-icon.success {
-    background: rgba(34, 197, 94, 0.1);
+    background: rgba(16, 185, 129, 0.12);
     color: var(--success-color);
 }
 
 .stats-icon.warning {
-    background: rgba(245, 158, 11, 0.1);
+    background: rgba(245, 158, 11, 0.12);
     color: var(--warning-color);
 }
 
 .stats-icon.danger {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(239, 68, 68, 0.12);
     color: var(--danger-color);
 }
 
 .stats-icon.info {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(14, 165, 233, 0.12);
     color: var(--info-color);
 }
 
+.stats-info {
+    flex: 1;
+}
+
 .stats-info h3 {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--dark-color);
-    margin-bottom: 4px;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 2px;
+    letter-spacing: -0.5px;
+    font-family: 'Outfit', sans-serif;
 }
 
 .stats-info p {
-    font-size: 14px;
-    color: var(--secondary-color);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
     margin: 0;
 }
 
-/* Buttons */
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    border: none;
-    padding: 10px 20px;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+/* Modern Pill Badges */
+.badge {
+    padding: 6px 14px !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    border-radius: var(--border-radius-pill) !important;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
-    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+/* Modern Pill Pagination */
+.pagination {
+    gap: 6px;
 }
 
-.btn-success {
-    background: var(--success-color);
-    border: none;
-}
-
-.btn-danger {
-    background: var(--danger-color);
-    border: none;
-}
-
-.btn-outline-primary {
-    border-color: var(--primary-color);
+.pagination .page-item .page-link {
+    border-radius: var(--border-radius-pill) !important;
+    min-width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-subtle);
     color: var(--primary-color);
-}
-
-.btn-outline-primary:hover {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-/* Tables */
-.table {
-    margin-bottom: 0;
-}
-
-.table thead th {
-    background: var(--light-color);
-    border: none;
     font-weight: 600;
     font-size: 13px;
-    text-transform: uppercase;
-    color: var(--secondary-color);
-    padding: 14px 16px;
+    background: #FFFFFF;
+    transition: all 0.2s ease;
 }
 
-.table tbody td {
-    padding: 14px 16px;
-    vertical-align: middle;
-    border-color: #f1f5f9;
+.pagination .page-item .page-link:hover {
+    background: rgba(255, 165, 0, 0.12);
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+    transform: translateY(-2px);
 }
 
-.table tbody tr:hover {
-    background: #f8fafc;
-}
-
-/* Badges */
-.badge {
-    padding: 6px 12px;
-    font-weight: 500;
-    font-size: 12px;
-    border-radius: 6px;
+.pagination .page-item.active .page-link {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(10, 17, 56, 0.25);
 }
 
 .badge-pending {

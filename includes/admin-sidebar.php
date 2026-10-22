@@ -22,34 +22,32 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <ul class="sidebar-menu">
         <li>
             <a href="<?php echo url('admin/dashboard'); ?>" class="<?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>">
-                <i class="bi bi-grid-1x2"></i>
+                <?php echo pika_icon('dashboard'); ?>
                 <span>Dashboard</span>
             </a>
         </li>
         
-        <li class="sidebar-section-title">Management</li>
-        
         <li>
             <a href="<?php echo url('admin/employees'); ?>" class="<?php echo $currentPage === 'employees.php' ? 'active' : ''; ?>">
-                <i class="bi bi-people"></i>
+                <?php echo pika_icon('users'); ?>
                 <span>Employees</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('admin/domains'); ?>" class="<?php echo $currentPage === 'domains.php' ? 'active' : ''; ?>">
-                <i class="bi bi-grid"></i>
+                <?php echo pika_icon('domains'); ?>
                 <span>Domains</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('admin/attendance'); ?>" class="<?php echo $currentPage === 'attendance.php' ? 'active' : ''; ?>">
-                <i class="bi bi-calendar-check"></i>
+                <?php echo pika_icon('calendar'); ?>
                 <span>Attendance</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('admin/approvals'); ?>" class="<?php echo $currentPage === 'approvals.php' ? 'active' : ''; ?>">
-                <i class="bi bi-check-circle"></i>
+                <?php echo pika_icon('check-circle'); ?>
                 <span>Approvals</span>
                 <?php
                 $pendingCount = fetchOne("SELECT COUNT(*) as count FROM attendance WHERE status = 'pending'")['count'] ?? 0;
@@ -61,37 +59,49 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </li>
         <li>
             <a href="<?php echo url('admin/tasks'); ?>" class="<?php echo $currentPage === 'tasks.php' ? 'active' : ''; ?>">
-                <i class="bi bi-list-task"></i>
+                <?php echo pika_icon('tasks'); ?>
                 <span>Tasks</span>
             </a>
         </li>
-        
-        <li class="sidebar-section-title">Reports</li>
-        
+        <li>
+            <a href="<?php echo url('admin/offer-letters'); ?>" class="<?php echo in_array($currentPage, ['offer-letters.php', 'generate-offer.php']) ? 'active' : ''; ?>">
+                <?php echo pika_icon('offer-letter'); ?>
+                <span>Offer Letters</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo url('admin/certificates'); ?>" class="<?php echo in_array($currentPage, ['certificates.php', 'generate-certificate.php']) ? 'active' : ''; ?>">
+                <?php echo pika_icon('certificate'); ?>
+                <span>Certificates</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo url('admin/signatories'); ?>" class="<?php echo $currentPage === 'signatories.php' ? 'active' : ''; ?>">
+                <?php echo pika_icon('signature'); ?>
+                <span>Signatories</span>
+            </a>
+        </li>
         <li>
             <a href="<?php echo url('admin/reports'); ?>" class="<?php echo $currentPage === 'reports.php' ? 'active' : ''; ?>">
-                <i class="bi bi-bar-chart-line"></i>
+                <?php echo pika_icon('reports'); ?>
                 <span>Reports</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('admin/activity-logs'); ?>" class="<?php echo $currentPage === 'activity-logs.php' ? 'active' : ''; ?>">
-                <i class="bi bi-clock-history"></i>
+                <?php echo pika_icon('activity'); ?>
                 <span>Activity Logs</span>
             </a>
         </li>
-        
-        <li class="sidebar-section-title">Settings</li>
-        
         <li>
             <a href="<?php echo url('admin/settings'); ?>" class="<?php echo $currentPage === 'settings.php' ? 'active' : ''; ?>">
-                <i class="bi bi-gear"></i>
+                <?php echo pika_icon('settings'); ?>
                 <span>Settings</span>
             </a>
         </li>
         <li>
             <a href="<?php echo url('admin/profile'); ?>" class="<?php echo $currentPage === 'profile.php' ? 'active' : ''; ?>">
-                <i class="bi bi-person-circle"></i>
+                <?php echo pika_icon('profile'); ?>
                 <span>Profile</span>
             </a>
         </li>
@@ -100,9 +110,18 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         
         <li>
             <a href="<?php echo url('logout'); ?>" class="text-danger">
-                <i class="bi bi-box-arrow-left"></i>
+                <?php echo pika_icon('logout'); ?>
                 <span>Logout</span>
             </a>
         </li>
     </ul>
+
+    <!-- Inset User Profile at Sidebar Bottom -->
+    <div class="sidebar-user-card">
+        <img src="<?php echo !empty($_SESSION['avatar']) ? url('uploads/avatars/' . $_SESSION['avatar']) : url('assets/img/default-avatar.png'); ?>" alt="Avatar" class="sidebar-user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'Admin'); ?>&background=0A1138&color=FFA500';">
+        <div class="sidebar-user-details">
+            <div class="sidebar-user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Administrator'); ?></div>
+            <div class="sidebar-user-role"><?php echo ucfirst($_SESSION['role'] ?? 'Admin'); ?></div>
+        </div>
+    </div>
 </aside>
