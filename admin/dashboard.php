@@ -373,12 +373,13 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                                     <img src="<?php echo getAvatar($pending['avatar']); ?>" alt="" class="saas-user-avatar">
                                                     <div>
                                                         <div class="saas-user-name"><?php echo htmlspecialchars($pending['name']); ?></div>
-                                                        <div class="saas-user-sub font-monospace"><?php echo htmlspecialchars($pending['employee_id']); ?></div>
+                                                        <div class="mt-1"><span class="saas-id-badge"><?php echo htmlspecialchars($pending['employee_id']); ?></span></div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="badge bg-primary-subtle text-primary">
+                                                <span class="saas-tag primary">
+                                                    <?php echo pika_icon('building', '', 12); ?>
                                                     <?php echo htmlspecialchars($pending['domain_name'] ?? 'General'); ?>
                                                 </span>
                                             </td>
@@ -464,18 +465,19 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                             </td>
                                             <td>
                                                 <span class="font-weight-600 text-dark small d-block"><?php echo htmlspecialchars($emp['designation'] ?? 'Team Member'); ?></span>
-                                                <span class="text-muted font-monospace" style="font-size: 11px;"><?php echo htmlspecialchars($emp['employee_id']); ?></span>
+                                                <span class="saas-id-badge mt-1"><?php echo htmlspecialchars($emp['employee_id']); ?></span>
                                             </td>
                                             <td>
-                                                <span class="badge bg-light text-dark border">
+                                                <span class="saas-tag primary">
+                                                    <?php echo pika_icon('building', '', 12); ?>
                                                     <?php echo htmlspecialchars($emp['domain_name'] ?? 'General'); ?>
                                                 </span>
                                             </td>
                                             <td>
-                                                <small class="text-muted"><?php echo formatDate($emp['created_at'], 'M d, Y'); ?></small>
+                                                <small class="text-muted font-weight-500"><?php echo formatDate($emp['created_at'], 'M d, Y'); ?></small>
                                             </td>
                                             <td class="text-end">
-                                                <span class="badge <?php echo $emp['status'] === 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'; ?>">
+                                                <span class="saas-tag <?php echo $emp['status'] === 'active' ? 'emerald' : 'rose'; ?>">
                                                     <?php echo ucfirst($emp['status']); ?>
                                                 </span>
                                             </td>
@@ -528,24 +530,31 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             Manage
                         </a>
                     </div>
-                    <div class="saas-card-body">
+                    <div class="saas-card-body p-3">
                         <?php if (count($domainStats) > 0): ?>
-                            <?php foreach ($domainStats as $idx => $dom): ?>
-                                <?php 
-                                    $share = $totalEmployees > 0 ? round(($dom['count'] / $totalEmployees) * 100) : 0;
-                                    $colors = ['#0A1138', '#10B981', '#FFA500', '#0284C7', '#8B5CF6'];
-                                    $color = $colors[$idx % count($colors)];
-                                ?>
-                                <div class="domain-row">
-                                    <div class="domain-meta">
-                                        <span class="text-dark"><?php echo htmlspecialchars($dom['name']); ?></span>
-                                        <span class="text-muted font-monospace"><?php echo $dom['count']; ?> (<?php echo $share; ?>%)</span>
+                            <div class="d-flex flex-column gap-2">
+                                <?php foreach ($domainStats as $idx => $dom): ?>
+                                    <?php 
+                                        $share = $totalEmployees > 0 ? round(($dom['count'] / $totalEmployees) * 100) : 0;
+                                    ?>
+                                    <div class="d-flex align-items-center justify-content-between p-2 rounded-3" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="d-inline-flex align-items-center justify-content-center rounded-2" style="width: 32px; height: 32px; background: rgba(15, 23, 42, 0.06); color: #0F172A;">
+                                                <?php echo pika_icon('building', '', 14); ?>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-600 text-dark small"><?php echo htmlspecialchars($dom['name']); ?></div>
+                                                <span class="saas-id-badge" style="font-size: 10px; padding: 2px 8px;"><?php echo htmlspecialchars($dom['code'] ?? 'DOM'); ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="saas-tag primary" style="font-size: 11px; padding: 3px 10px;">
+                                                <?php echo $dom['count']; ?> Staff (<?php echo $share; ?>%)
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="domain-progress">
-                                        <div class="domain-progress-bar" style="width: <?php echo max(5, $share); ?>%; background: <?php echo $color; ?>;"></div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </div>
                         <?php else: ?>
                             <p class="text-muted small mb-0 text-center py-3">No department metrics available.</p>
                         <?php endif; ?>

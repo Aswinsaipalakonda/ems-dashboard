@@ -438,17 +438,17 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-dark">Department Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control rounded-pill px-3 py-2" name="name" required placeholder="e.g. Web Development">
+                        <input type="text" class="form-control rounded-pill px-3 py-2" name="name" required placeholder="Enter department name">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-dark">Code Prefix <span class="text-danger">*</span></label>
                         <input type="text" class="form-control rounded-pill px-3 py-2" name="code" required maxlength="3" minlength="2" 
-                               placeholder="e.g. WD" style="text-transform: uppercase;">
+                               placeholder="Enter code prefix" style="text-transform: uppercase;">
                         <small class="text-muted">2-3 uppercase characters used in Employee IDs (e.g. WD-INT-001)</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-dark">Description</label>
-                        <textarea class="form-control rounded-4 p-3" name="description" rows="2" placeholder="Brief outline of departmental operations..."></textarea>
+                        <textarea class="form-control rounded-4 p-3" name="description" rows="2" placeholder="Enter department description..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer bg-light border-0 px-4 py-3">

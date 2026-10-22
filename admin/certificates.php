@@ -113,7 +113,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Light SaaS Hero -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-6 col-lg-5">
                     <div class="saas-hero-content">
                         <div class="saas-hero-pills">
                             <span class="saas-pill">
@@ -127,13 +127,15 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </p>
                     </div>
                 </div>
-                <div class="col-lg-5 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-6 col-lg-7 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
                         <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-saas-light">
-                            <?php echo pika_icon('edit', '', 15); ?> Manage Signatories
+                            <?php echo pika_icon('edit', '', 15); ?>
+                            <span>Manage Signatories</span>
                         </a>
                         <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-saas-dark">
-                            <?php echo pika_icon('plus', '', 15); ?> Issue New Certificate
+                            <?php echo pika_icon('plus', '', 15); ?>
+                            <span>Issue New Certificate</span>
                         </a>
                     </div>
                 </div>

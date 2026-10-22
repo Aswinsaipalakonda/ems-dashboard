@@ -663,11 +663,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <div class="col-12">
                             <label class="form-label fw-bold text-dark small">Task Title <span class="text-danger">*</span></label>
                             <input type="text" class="form-control rounded-pill px-3 py-2" name="title" required 
-                                   value="<?php echo htmlspecialchars($task['title'] ?? ''); ?>" placeholder="e.g. Implement Clientura Cloud Certificate Verification Portal">
+                                   value="<?php echo htmlspecialchars($task['title'] ?? ''); ?>" placeholder="Enter task title">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold text-dark small">Briefing & Specifications</label>
-                            <textarea class="form-control rounded-4 p-3" name="description" rows="3" placeholder="Describe the task scope, key deliverables, and documentation requirements..."><?php echo htmlspecialchars($task['description'] ?? ''); ?></textarea>
+                            <textarea class="form-control rounded-4 p-3" name="description" rows="3" placeholder="Enter task briefing and requirements..."><?php echo htmlspecialchars($task['description'] ?? ''); ?></textarea>
                         </div>
 
                         <!-- Assignees Selector -->
@@ -850,7 +850,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-dark">Revision Feedback <span class="text-danger">*</span></label>
                         <textarea class="form-control rounded-3 p-3" name="reviewer_feedback" rows="3" required 
-                                  placeholder="Specify requirements or changes required before final sign-off..."></textarea>
+                                  placeholder="Enter revision feedback or changes required..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer bg-light border-0 px-4 py-3">

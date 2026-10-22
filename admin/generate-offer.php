@@ -353,7 +353,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             <div class="row g-2 mb-3">
                                 <div class="col-7">
                                     <label class="form-label font-weight-bold text-dark small">Candidate Full Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="candName" name="candidate_name" value="" placeholder="Candidate Full Name" required style="border-radius: 12px; font-weight: 600;">
+                                    <input type="text" class="form-control" id="candName" name="candidate_name" value="" placeholder="Enter full name" required style="border-radius: 12px; font-weight: 600;">
                                 </div>
                                 <div class="col-5">
                                     <label class="form-label font-weight-bold text-dark small">Offer ID <span class="text-danger">*</span></label>
@@ -363,18 +363,18 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
 
                             <div class="mb-3">
                                 <label class="form-label font-weight-bold text-dark small">Candidate Email</label>
-                                <input type="email" class="form-control" id="candEmail" name="candidate_email" value="" placeholder="candidate@example.com" style="border-radius: 12px;">
+                                <input type="email" class="form-control" id="candEmail" name="candidate_email" value="" placeholder="Enter email" style="border-radius: 12px;">
                             </div>
 
                             <!-- Position & Code -->
                             <div class="row g-2 mb-3">
                                 <div class="col-8">
                                     <label class="form-label font-weight-bold text-dark small">Position Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="posTitle" name="designation" value="" placeholder="e.g. Software Development Engineer (SDE) Intern" required style="border-radius: 12px;">
+                                    <input type="text" class="form-control" id="posTitle" name="designation" value="" placeholder="Enter job designation" required style="border-radius: 12px;">
                                 </div>
                                 <div class="col-4">
                                     <label class="form-label font-weight-bold text-dark small">Role Code</label>
-                                    <input type="text" class="form-control" id="roleCode" name="role_code" value="" placeholder="e.g. SDE" style="border-radius: 12px;">
+                                    <input type="text" class="form-control" id="roleCode" name="role_code" value="" placeholder="Enter role code" style="border-radius: 12px;">
                                 </div>
                             </div>
 

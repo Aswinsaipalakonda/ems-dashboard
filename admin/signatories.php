@@ -220,7 +220,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Light SaaS Hero -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-6 col-lg-5">
                     <div class="saas-hero-content">
                         <div class="saas-hero-pills">
                             <span class="saas-pill">
@@ -234,13 +234,15 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </p>
                     </div>
                 </div>
-                <div class="col-lg-5 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-6 col-lg-7 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
                         <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-saas-light">
-                            <?php echo pika_icon('certificate', '', 15); ?> View Certificates
+                            <?php echo pika_icon('certificate', '', 15); ?>
+                            <span>View Certificates</span>
                         </a>
                         <button type="button" class="btn btn-saas-dark" data-bs-toggle="modal" data-bs-target="#addSignatoryModal">
-                            <?php echo pika_icon('plus', '', 15); ?> Add Signatory
+                            <?php echo pika_icon('plus', '', 15); ?>
+                            <span>Add Signatory</span>
                         </button>
                     </div>
                 </div>
@@ -413,11 +415,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <div class="modal-body p-4">
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark small">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control rounded-pill px-3 py-2" placeholder="e.g. Dr. Rajesh Kumar" required>
+                                <input type="text" name="name" class="form-control rounded-pill px-3 py-2" placeholder="Enter signatory full name" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark small">Official Title / Designation <span class="text-danger">*</span></label>
-                                <input type="text" name="designation" class="form-control rounded-pill px-3 py-2" placeholder="e.g. Chief Technology Officer, Clientura" required>
+                                <input type="text" name="designation" class="form-control rounded-pill px-3 py-2" placeholder="Enter official designation" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark small">Signature Image (PNG, JPG, WEBP)</label>

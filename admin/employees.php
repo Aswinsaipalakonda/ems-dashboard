@@ -591,26 +591,26 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark small">Full Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control rounded-pill px-3 py-2" name="name" id="empNameInput" 
-                                           placeholder="e.g. Rahul Sharma" required 
+                                           placeholder="Enter full name" required 
                                            value="<?php echo htmlspecialchars($employee['name'] ?? ''); ?>">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark small">Email Address <span class="text-danger">*</span></label>
                                     <input type="email" class="form-control rounded-pill px-3 py-2" name="email" id="empEmailInput"
-                                           placeholder="e.g. rahul@clientura.in" required 
+                                           placeholder="Enter email" required 
                                            value="<?php echo htmlspecialchars($employee['email'] ?? ''); ?>">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark small">Phone Number</label>
                                     <input type="text" class="form-control rounded-pill px-3 py-2" name="phone" id="empPhoneInput"
-                                           placeholder="+91 98765 43210"
+                                           placeholder="Enter phone number"
                                            value="<?php echo htmlspecialchars($employee['phone'] ?? ''); ?>">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark small">
                                         Password <?php echo $action === 'add' ? '<span class="text-muted fw-normal">(Default: password123)</span>' : '<span class="text-muted fw-normal">(Leave blank to keep current)</span>'; ?>
                                     </label>
-                                    <input type="password" class="form-control rounded-pill px-3 py-2" name="password" placeholder="••••••••">
+                                    <input type="password" class="form-control rounded-pill px-3 py-2" name="password" placeholder="Enter password">
                                 </div>
 
                                 <div class="col-md-6">

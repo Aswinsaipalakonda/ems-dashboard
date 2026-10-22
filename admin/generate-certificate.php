@@ -133,19 +133,19 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             <!-- Recipient Name -->
                             <div class="mb-3">
                                 <label class="form-label font-weight-bold text-dark small">Recipient Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="recipientName" name="recipient_name" placeholder="e.g. JOHN DOE" value="" required style="border-radius: 12px; font-weight: 600;">
+                                <input type="text" class="form-control" id="recipientName" name="recipient_name" placeholder="Enter recipient full name" value="" required style="border-radius: 12px; font-weight: 600;">
                             </div>
 
                             <!-- Program / Role -->
                             <div class="mb-3">
                                 <label class="form-label font-weight-bold text-dark small">Program / Designation Role <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="programName" name="program_name" placeholder="e.g. Data analyst or Software Development Engineer" value="" required style="border-radius: 12px;">
+                                <input type="text" class="form-control" id="programName" name="program_name" placeholder="Enter program or designation" value="" required style="border-radius: 12px;">
                             </div>
 
                             <!-- Duration Text -->
                             <div class="mb-3">
                                 <label class="form-label font-weight-bold text-dark small">Program Duration Text</label>
-                                <input type="text" class="form-control" id="durationText" name="duration_text" placeholder="e.g. Six months or 45 days" value="" style="border-radius: 12px;">
+                                <input type="text" class="form-control" id="durationText" name="duration_text" placeholder="Enter duration (e.g. Six Months)" value="" style="border-radius: 12px;">
                             </div>
 
                             <!-- Dates Row -->

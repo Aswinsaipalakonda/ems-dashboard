@@ -219,7 +219,7 @@ $pageTitle = 'Certificate Verification';
 
                 <form method="GET" action="<?php echo url('verify-certificate'); ?>" class="row g-2 justify-content-center">
                     <div class="col-md-7">
-                        <input type="text" name="id" class="form-control" placeholder="e.g. CL-CERT-2026-001" required style="border-radius: 9999px; padding: 12px 20px;">
+                        <input type="text" name="id" class="form-control" placeholder="Enter certificate ID" required style="border-radius: 9999px; padding: 12px 20px;">
                     </div>
                     <div class="col-md-3">
                         <button type="submit" class="btn btn-primary w-100 py-2">

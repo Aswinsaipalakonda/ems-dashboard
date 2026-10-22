@@ -220,7 +220,7 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Designation</label>
-                            <input type="text" name="designation" class="form-control" value="<?php echo $employee['designation'] ?? ''; ?>" placeholder="e.g. Junior Developer, Senior Analyst">
+                            <input type="text" name="designation" class="form-control" value="<?php echo $employee['designation'] ?? ''; ?>" placeholder="Enter designation">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Role *</label>

@@ -278,14 +278,16 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <div class="mb-3">
                                     <label class="form-label fw-bold text-dark small">Supervisor Remarks (Optional)</label>
                                     <textarea class="form-control rounded-4 p-3" name="remarks" rows="2" 
-                                              placeholder="Provide remarks or reason if rejecting..."></textarea>
+                                              placeholder="Enter supervisor remarks or rejection reason..."></textarea>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <button type="submit" name="approval_action" value="approve" class="btn btn-primary btn-glow px-4">
-                                        <?php echo pika_icon('check', 'me-1', 16); ?> Approve Check-in
+                                    <button type="submit" name="approval_action" value="approve" class="btn btn-saas-dark px-4">
+                                        <?php echo pika_icon('check', '', 16); ?>
+                                        <span>Approve Check-in</span>
                                     </button>
                                     <button type="submit" name="approval_action" value="reject" class="btn btn-outline-danger px-4">
-                                        <?php echo pika_icon('x', 'me-1', 16); ?> Reject Check-in
+                                        <?php echo pika_icon('x', '', 16); ?>
+                                        <span>Reject Check-in</span>
                                     </button>
                                 </div>
                             </form>
@@ -599,7 +601,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 <p class="mb-3">Rejecting attendance record for <strong id="rejectEmpName" class="text-dark"></strong>.</p>
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-dark">Reason / Remarks (Optional)</label>
-                    <textarea class="form-control rounded-3 p-3" id="rejectRemarksInput" rows="2" placeholder="e.g. Invalid selfie or location mismatch"></textarea>
+                    <textarea class="form-control rounded-3 p-3" id="rejectRemarksInput" rows="2" placeholder="Enter rejection reason..."></textarea>
                 </div>
             </div>
             <div class="modal-footer bg-light border-0 px-4 py-3">
