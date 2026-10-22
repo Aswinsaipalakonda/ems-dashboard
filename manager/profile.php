@@ -189,20 +189,20 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Full Name *</label>
-                                    <input type="text" name="name" class="form-control" required value="<?php echo $employee['name']; ?>">
+                                    <input type="text" name="name" class="form-control" required value="<?php echo htmlspecialchars($employee['name'] ?? ''); ?>" placeholder="Enter full name">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" value="<?php echo $employee['email']; ?>" disabled>
+                                    <input type="email" class="form-control" value="<?php echo htmlspecialchars($employee['email'] ?? ''); ?>" disabled>
                                     <small class="text-muted">Contact admin to change email</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Phone</label>
-                                    <input type="text" name="phone" class="form-control" value="<?php echo $employee['phone']; ?>">
+                                    <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($employee['phone'] ?? ''); ?>" placeholder="Enter phone number">
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label class="form-label">Address</label>
-                                    <textarea name="address" class="form-control" rows="2"><?php echo $employee['address']; ?></textarea>
+                                    <textarea name="address" class="form-control" rows="2" placeholder="Enter residential address"><?php echo htmlspecialchars($employee['address'] ?? ''); ?></textarea>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">
@@ -223,15 +223,15 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">Current Password *</label>
-                                    <input type="password" name="current_password" class="form-control" required>
+                                    <input type="password" name="current_password" class="form-control" required placeholder="Enter current password">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">New Password *</label>
-                                    <input type="password" name="new_password" class="form-control" required>
+                                    <input type="password" name="new_password" class="form-control" required placeholder="Enter new password">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Confirm Password *</label>
-                                    <input type="password" name="confirm_password" class="form-control" required>
+                                    <input type="password" name="confirm_password" class="form-control" required placeholder="Confirm new password">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-warning">

@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `employees` (
   `email` VARCHAR(100) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `phone` VARCHAR(20) DEFAULT NULL,
+  `address` TEXT DEFAULT NULL,
   `domain_id` INT DEFAULT NULL,
   `designation` VARCHAR(100) DEFAULT NULL,
   `date_of_joining` DATE DEFAULT NULL,

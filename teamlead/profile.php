@@ -226,7 +226,7 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($employee['phone'] ?? ''); ?>">
+                                    <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($employee['phone'] ?? ''); ?>" placeholder="Enter phone number">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Gender</label>
@@ -234,7 +234,7 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label class="form-label">Address</label>
-                                    <textarea name="address" class="form-control" rows="3"><?php echo htmlspecialchars($employee['address'] ?? ''); ?></textarea>
+                                    <textarea name="address" class="form-control" rows="3" placeholder="Enter residential address"><?php echo htmlspecialchars($employee['address'] ?? ''); ?></textarea>
                                 </div>
                             </div>
                             <button type="submit" name="update_profile" class="btn btn-primary">
@@ -254,15 +254,15 @@ require_once __DIR__ . '/../includes/teamlead-sidebar.php';
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">Current Password</label>
-                                    <input type="password" name="current_password" class="form-control" required>
+                                    <input type="password" name="current_password" class="form-control" required placeholder="Enter current password">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">New Password</label>
-                                    <input type="password" name="new_password" class="form-control" required minlength="6">
+                                    <input type="password" name="new_password" class="form-control" required minlength="6" placeholder="Enter new password">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Confirm New Password</label>
-                                    <input type="password" name="confirm_password" class="form-control" required minlength="6">
+                                    <input type="password" name="confirm_password" class="form-control" required minlength="6" placeholder="Confirm new password">
                                 </div>
                             </div>
                             <button type="submit" name="change_password" class="btn btn-warning">

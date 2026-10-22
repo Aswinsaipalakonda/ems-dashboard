@@ -197,7 +197,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Phone</label>
-                                    <input type="text" class="form-control" name="phone" value="<?php echo $employee['phone'] ?? ''; ?>">
+                                    <input type="text" class="form-control" name="phone" value="<?php echo htmlspecialchars($employee['phone'] ?? ''); ?>" placeholder="Enter phone number">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Profile Photo</label>
@@ -217,7 +217,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label class="form-label">Address</label>
-                                    <textarea class="form-control" name="address" rows="2"><?php echo $employee['address'] ?? ''; ?></textarea>
+                                    <textarea class="form-control" name="address" rows="2" placeholder="Enter residential address"><?php echo htmlspecialchars($employee['address'] ?? ''); ?></textarea>
                                 </div>
                             </div>
                             
@@ -240,15 +240,15 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Current Password</label>
-                                    <input type="password" class="form-control" name="current_password" required>
+                                    <input type="password" class="form-control" name="current_password" required placeholder="Enter current password">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">New Password</label>
-                                    <input type="password" class="form-control" name="new_password" required minlength="6">
+                                    <input type="password" class="form-control" name="new_password" required minlength="6" placeholder="Enter new password">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Confirm Password</label>
-                                    <input type="password" class="form-control" name="confirm_password" required>
+                                    <input type="password" class="form-control" name="confirm_password" required placeholder="Confirm new password">
                                 </div>
                             </div>
                             

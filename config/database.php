@@ -38,6 +38,9 @@ if (!$conn->select_db(DB_NAME)) {
 // Set charset
 $conn->set_charset("utf8mb4");
 
+// Auto-migration guard: ensure address column exists on employees
+@$conn->query("ALTER TABLE employees ADD COLUMN IF NOT EXISTS address TEXT DEFAULT NULL AFTER phone");
+
 /**
  * Execute a prepared statement
  * @param string $sql SQL query with placeholders
