@@ -17,24 +17,24 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.clientura.org/">
+    <meta property="og:url" content="https://www.clientura.in/">
     <meta property="og:title" content="Clientura EMS - Employee Management System">
     <meta property="og:description" content="Streamline your workforce management with Clientura EMS. Track attendance, assign tasks, manage teams, and boost productivity effortlessly.">
-    <meta property="og:image" content="assets/img/clientura-logo.png">
+    <meta property="og:image" content="assets/img/clientura-bg.png">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://www.clientura.org/">
+    <meta property="twitter:url" content="https://www.clientura.in/">
     <meta property="twitter:title" content="Clientura EMS - Employee Management System">
     <meta property="twitter:description" content="Streamline your workforce management with Clientura EMS. Track attendance, assign tasks, manage teams, and boost productivity effortlessly.">
-    <meta property="twitter:image" content="assets/img/clientura-logo.png">
+    <meta property="twitter:image" content="assets/img/clientura-bg.png">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/img/clientura-logo.png">
-    <link rel="apple-touch-icon" href="assets/img/clientura-logo.png">
+    <link rel="icon" type="image/png" href="assets/img/clientura-with-bg.png">
+    <link rel="apple-touch-icon" href="assets/img/clientura-with-bg.png">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://www.clientura.org/">
+    <link rel="canonical" href="https://www.clientura.in/">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -73,36 +73,39 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
 
 /* Hero Welcome Section */
 .welcome-hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f64f59 100%);
+    background: linear-gradient(135deg, #0A1138 0%, #16246F 60%, #1E3A8A 100%);
     border-radius: 24px;
-    padding: 40px;
+    padding: 38px 40px;
     color: white;
     position: relative;
     overflow: hidden;
-    margin-bottom: 30px;
-    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    margin-bottom: 28px;
+    box-shadow: 0 16px 40px rgba(10, 17, 56, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .welcome-hero::before {
     content: '';
     position: absolute;
-    width: 300px;
-    height: 300px;
-    background: rgba(255,255,255,0.1);
+    width: 340px;
+    height: 340px;
+    background: radial-gradient(circle, rgba(255, 165, 0, 0.2) 0%, transparent 70%);
     border-radius: 50%;
-    top: -100px;
-    right: -50px;
+    top: -80px;
+    right: -40px;
+    pointer-events: none;
 }
 
 .welcome-hero::after {
     content: '';
     position: absolute;
-    width: 200px;
-    height: 200px;
-    background: rgba(255,255,255,0.08);
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     border-radius: 50%;
     bottom: -80px;
-    left: 100px;
+    left: 120px;
+    pointer-events: none;
 }
 
 .welcome-content {
@@ -113,33 +116,39 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
 .welcome-hero h2 {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.3px;
 }
 
 .welcome-hero p {
     opacity: 0.9;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     margin-bottom: 0;
 }
 
 .welcome-meta {
     display: flex;
-    gap: 30px;
-    margin-top: 25px;
+    gap: 16px;
+    margin-top: 22px;
 }
 
 .meta-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255,255,255,0.15);
-    padding: 10px 20px;
-    border-radius: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 8px 18px;
+    border-radius: 9999px;
     backdrop-filter: blur(10px);
+    font-size: 0.92rem;
+    font-weight: 500;
 }
 
 .meta-item i {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
+    color: #FFA500;
 }
 
 /* Stats Grid */
@@ -147,88 +156,99 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
-    margin-bottom: 30px;
+    margin-bottom: 28px;
 }
 
 .stat-card {
     background: white;
     border-radius: 20px;
-    padding: 28px;
+    padding: 24px 26px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 4px 20px -2px rgba(10, 17, 56, 0.05);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(10, 17, 56, 0.06);
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px -6px rgba(10, 17, 56, 0.12);
+    border-color: rgba(255, 165, 0, 0.35);
 }
 
 .stat-card .stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
-    margin-bottom: 20px;
+    font-size: 1.45rem;
+    margin-bottom: 16px;
+    transition: transform 0.25s ease;
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.08);
 }
 
 .stat-card .stat-icon.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: rgba(10, 17, 56, 0.08);
+    color: #0A1138;
 }
 
 .stat-card .stat-icon.success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
+    background: rgba(16, 185, 129, 0.12);
+    color: #10B981;
 }
 
 .stat-card .stat-icon.warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
+    background: rgba(255, 165, 0, 0.14);
+    color: #FFA500;
 }
 
 .stat-card .stat-icon.info {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
+    background: rgba(14, 165, 233, 0.12);
+    color: #0284C7;
 }
 
 .stat-card h3 {
     font-size: 2.2rem;
     font-weight: 800;
-    color: #1a1a2e;
-    margin-bottom: 5px;
+    color: #0A1138;
+    margin-bottom: 4px;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.5px;
 }
 
 .stat-card p {
-    color: #6b7280;
-    font-size: 0.95rem;
+    color: #64748B;
+    font-size: 0.9rem;
     font-weight: 500;
     margin: 0;
 }
 
 .stat-card .stat-trend {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 0.85rem;
-    padding: 5px 12px;
-    border-radius: 20px;
+    top: 22px;
+    right: 22px;
+    font-size: 0.78rem;
     font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .stat-card .stat-trend.up {
-    background: rgba(34, 197, 94, 0.1);
-    color: #22c55e;
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
 }
 
 .stat-card .stat-trend.down {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    background: rgba(239, 68, 68, 0.12);
+    color: #DC2626;
 }
 
 /* Dashboard Grid */
@@ -278,40 +298,41 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
 }
 
 .modern-card .card-header h5 .header-icon.purple {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    color: #667eea;
+    background: rgba(10, 17, 56, 0.08);
+    color: #0A1138;
 }
 
 .modern-card .card-header h5 .header-icon.orange {
-    background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(234, 88, 12, 0.1) 100%);
-    color: #f97316;
+    background: rgba(255, 165, 0, 0.14);
+    color: #FFA500;
 }
 
 .modern-card .card-header h5 .header-icon.blue {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
-    color: #3b82f6;
+    background: rgba(14, 165, 233, 0.12);
+    color: #0284C7;
 }
 
 .modern-card .card-header h5 .header-icon.green {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
-    color: #22c55e;
+    background: rgba(16, 185, 129, 0.12);
+    color: #10B981;
 }
 
 .btn-view-all {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0A1138;
     color: white;
     border: none;
-    padding: 8px 20px;
-    border-radius: 10px;
-    font-size: 0.85rem;
+    padding: 7px 18px;
+    border-radius: 9999px;
+    font-size: 0.82rem;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .btn-view-all:hover {
+    background: #16246F;
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 14px rgba(10, 17, 56, 0.25);
     color: white;
 }
 
@@ -413,21 +434,22 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
 }
 
 .action-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border: none;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0A1138;
     color: white;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    background: #16246F;
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(10, 17, 56, 0.3);
 }
 
 /* Quick Actions */

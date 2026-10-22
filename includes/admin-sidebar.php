@@ -15,7 +15,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <div class="sidebar-header">
         <a href="<?php echo url('admin/dashboard'); ?>" class="sidebar-brand">
             <div class="sidebar-brand-icon">
-                <img src="<?php echo APP_URL; ?>/assets/img/clientura-logo.png" alt="<?php echo APP_NAME; ?>">
+                <img src="<?php echo APP_URL; ?>/assets/img/clientura-bg.png" alt="<?php echo APP_NAME; ?>">
             </div>
             <div class="sidebar-brand-text">
                 <div class="brand-title">Clientura EMS</div>

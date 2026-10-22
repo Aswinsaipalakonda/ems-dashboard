@@ -39,7 +39,7 @@ $pageTitle = 'Certificate Verification';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $certificate ? htmlspecialchars($certificate['recipient_name']) . ' - Verified Certificate' : 'Verify Certificate'; ?> | Clientura EMS</title>
-    <link rel="icon" type="image/png" href="<?php echo asset('assets/img/clientura-logo.png'); ?>">
+    <link rel="icon" type="image/png" href="<?php echo asset('assets/img/clientura-with-bg.png'); ?>">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">

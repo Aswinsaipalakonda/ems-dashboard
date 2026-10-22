@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?> - <?php echo APP_NAME; ?></title>
-    <link rel="icon" type="image/png" href="<?php echo APP_URL; ?>/assets/img/clientura-logo.png">
+    <link rel="icon" type="image/png" href="<?php echo APP_URL; ?>/assets/img/clientura-with-bg.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #090E24;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -167,12 +167,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #fff;
             border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
         }
         
         /* Left Side - Branding */
         .login-brand {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0A1138 0%, #16246F 60%, #1E3A8A 100%);
             padding: 60px 50px;
             display: flex;
             flex-direction: column;
@@ -368,9 +368,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .input-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #0A1138;
             background: #fff;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(10, 17, 56, 0.1);
         }
         
         .toggle-password {
@@ -387,7 +387,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .toggle-password:hover {
-            color: #667eea;
+            color: #0A1138;
         }
         
         .remember-row {
@@ -406,7 +406,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .checkbox-wrapper input[type="checkbox"] {
             width: 18px;
             height: 18px;
-            accent-color: #667eea;
+            accent-color: #0A1138;
             cursor: pointer;
         }
         
@@ -417,7 +417,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .forgot-link {
-            color: #667eea;
+            color: #0A1138;
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
@@ -425,15 +425,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .forgot-link:hover {
-            color: #764ba2;
+            color: #FFA500;
         }
         
         .btn-login {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0A1138;
             border: none;
-            border-radius: 12px;
+            border-radius: 9999px;
             color: #fff;
             font-size: 1rem;
             font-weight: 600;
@@ -442,12 +442,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
         
         .btn-login:hover {
+            background: #16246F;
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(10, 17, 56, 0.4);
         }
         
         .btn-login:active {
