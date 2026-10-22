@@ -20,7 +20,7 @@ $totalDomains = fetchOne("SELECT COUNT(*) as count FROM domains")['count'] ?? 0;
 $completedTasks = fetchOne("SELECT COUNT(*) as count FROM tasks WHERE status = 'completed'")['count'] ?? 0;
 
 // Offer Letters & Certificates Counts
-$totalCertificates = fetchOne("SELECT COUNT(*) as count FROM completion_certificates WHERE status = 'active'")['count'] ?? 0;
+$totalCertificates = fetchOne("SELECT COUNT(*) as count FROM certificates WHERE status = 'active'")['count'] ?? 0;
 $totalOffers = fetchOne("SELECT COUNT(*) as count FROM offer_letters")['count'] ?? 0;
 
 // Calculate Rates
@@ -69,504 +69,6 @@ $domainStats = fetchAll(
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/admin-sidebar.php';
 ?>
-
-<style>
-/* SaaS Command Center Design System */
-.main-content {
-    background: #F8FAFC;
-    min-height: 100vh;
-}
-
-.content-wrapper {
-    padding: 28px 32px;
-}
-
-/* Hero Command Hub */
-.saas-hero {
-    background: linear-gradient(135deg, #0A1138 0%, #121E52 55%, #1A2B75 100%);
-    border-radius: 24px;
-    padding: 34px 38px;
-    color: #FFFFFF;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 28px;
-    box-shadow: 0 16px 40px rgba(10, 17, 56, 0.18);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.saas-hero::before {
-    content: '';
-    position: absolute;
-    width: 380px;
-    height: 380px;
-    background: radial-gradient(circle, rgba(255, 165, 0, 0.22) 0%, transparent 68%);
-    border-radius: 50%;
-    top: -120px;
-    right: -60px;
-    pointer-events: none;
-}
-
-.saas-hero::after {
-    content: '';
-    position: absolute;
-    width: 280px;
-    height: 280px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    bottom: -100px;
-    left: 20%;
-    pointer-events: none;
-}
-
-.saas-hero-content {
-    position: relative;
-    z-index: 2;
-}
-
-.saas-hero-title {
-    font-size: 1.85rem;
-    font-weight: 800;
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.4px;
-    margin-bottom: 6px;
-    color: #FFFFFF;
-}
-
-.saas-hero-subtitle {
-    font-size: 0.98rem;
-    color: rgba(255, 255, 255, 0.82);
-    margin-bottom: 22px;
-    max-width: 650px;
-}
-
-.saas-hero-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
-
-.saas-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    padding: 7px 16px;
-    border-radius: 9999px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #FFFFFF;
-    backdrop-filter: blur(10px);
-}
-
-.saas-pill i, .saas-pill svg {
-    color: #FFA500;
-}
-
-.saas-pill.live-pulse {
-    background: rgba(16, 185, 129, 0.2);
-    border-color: rgba(16, 185, 129, 0.4);
-    color: #A7F3D0;
-}
-
-.saas-pill.live-pulse .pulse-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #10B981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
-    animation: pulseGlow 1.8s infinite;
-}
-
-@keyframes pulseGlow {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.6; }
-}
-
-.saas-hero-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-/* Dynamic SaaS Metric Cards */
-.metric-card {
-    background: #FFFFFF;
-    border-radius: 20px;
-    padding: 24px;
-    border: 1px solid rgba(10, 17, 56, 0.06);
-    box-shadow: 0 4px 20px -2px rgba(10, 17, 56, 0.04);
-    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    text-decoration: none !important;
-}
-
-.metric-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px -6px rgba(10, 17, 56, 0.12);
-    border-color: rgba(255, 165, 0, 0.35);
-}
-
-.metric-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
-
-.metric-icon-badge {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.25s ease;
-}
-
-.metric-card:hover .metric-icon-badge {
-    transform: scale(1.08);
-}
-
-.metric-icon-badge.navy {
-    background: rgba(10, 17, 56, 0.07);
-    color: #0A1138;
-}
-
-.metric-icon-badge.emerald {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10B981;
-}
-
-.metric-icon-badge.amber {
-    background: rgba(255, 165, 0, 0.14);
-    color: #FFA500;
-}
-
-.metric-icon-badge.sky {
-    background: rgba(14, 165, 233, 0.12);
-    color: #0284C7;
-}
-
-.metric-trend-pill {
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-}
-
-.metric-trend-pill.active {
-    background: rgba(16, 185, 129, 0.12);
-    color: #059669;
-}
-
-.metric-trend-pill.warning {
-    background: rgba(255, 165, 0, 0.14);
-    color: #D97706;
-}
-
-.metric-trend-pill.sky {
-    background: rgba(14, 165, 233, 0.12);
-    color: #0284C7;
-}
-
-.metric-value {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #0A1138;
-    line-height: 1.1;
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.5px;
-    margin-bottom: 4px;
-}
-
-.metric-label {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #64748B;
-    margin-bottom: 14px;
-}
-
-.metric-progress {
-    height: 6px;
-    border-radius: 9999px;
-    background: #F1F5F9;
-    overflow: hidden;
-    margin-top: auto;
-}
-
-.metric-progress-bar {
-    height: 100%;
-    border-radius: 9999px;
-}
-
-.metric-progress-bar.navy { background: #0A1138; }
-.metric-progress-bar.emerald { background: #10B981; }
-.metric-progress-bar.amber { background: #FFA500; }
-.metric-progress-bar.sky { background: #0284C7; }
-
-/* Interactive SaaS Command Hub / Quick Actions */
-.saas-action-card {
-    background: #FFFFFF;
-    border-radius: 18px;
-    padding: 20px 22px;
-    border: 1px solid rgba(10, 17, 56, 0.06);
-    box-shadow: 0 4px 18px -2px rgba(10, 17, 56, 0.04);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    text-decoration: none !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    height: 100%;
-}
-
-.saas-action-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px -4px rgba(10, 17, 56, 0.1);
-    border-color: rgba(255, 165, 0, 0.35);
-}
-
-.saas-action-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: transform 0.25s ease;
-}
-
-.saas-action-card:hover .saas-action-icon {
-    transform: scale(1.1);
-}
-
-.saas-action-text {
-    flex: 1;
-    min-width: 0;
-}
-
-.saas-action-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #0A1138;
-    margin-bottom: 2px;
-    font-family: 'Outfit', sans-serif;
-}
-
-.saas-action-desc {
-    font-size: 0.8rem;
-    color: #64748B;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.saas-action-arrow {
-    color: #94A3B8;
-    transition: all 0.25s ease;
-}
-
-.saas-action-card:hover .saas-action-arrow {
-    color: #0A1138;
-    transform: translateX(4px);
-}
-
-/* Modern Card Layouts */
-.saas-card {
-    background: #FFFFFF;
-    border-radius: 20px;
-    border: 1px solid rgba(10, 17, 56, 0.06);
-    box-shadow: 0 4px 20px -2px rgba(10, 17, 56, 0.04);
-    margin-bottom: 24px;
-    overflow: visible;
-}
-
-.saas-card-header {
-    padding: 20px 26px;
-    border-bottom: 1px solid rgba(10, 17, 56, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.saas-card-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0A1138;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-family: 'Outfit', sans-serif;
-}
-
-.saas-card-title-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.saas-card-title-icon.navy { background: rgba(10, 17, 56, 0.07); color: #0A1138; }
-.saas-card-title-icon.amber { background: rgba(255, 165, 0, 0.14); color: #FFA500; }
-.saas-card-title-icon.emerald { background: rgba(16, 185, 129, 0.12); color: #10B981; }
-.saas-card-title-icon.sky { background: rgba(14, 165, 233, 0.12); color: #0284C7; }
-
-.saas-card-body {
-    padding: 24px 26px;
-}
-
-/* User & Employee Avatar Cells */
-.saas-user-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.saas-user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 1.5px solid rgba(10, 17, 56, 0.08);
-}
-
-.saas-user-name {
-    font-weight: 700;
-    font-size: 0.92rem;
-    color: #0A1138;
-    line-height: 1.25;
-}
-
-.saas-user-sub {
-    font-size: 0.78rem;
-    color: #64748B;
-    font-weight: 500;
-}
-
-/* Mini Action Buttons */
-.saas-btn-action {
-    width: 34px;
-    height: 34px;
-    border-radius: 9999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    transition: all 0.2s ease;
-    text-decoration: none !important;
-}
-
-.saas-btn-action.approve {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10B981;
-}
-
-.saas-btn-action.approve:hover {
-    background: #10B981;
-    color: #FFFFFF;
-    transform: scale(1.08);
-}
-
-.saas-btn-action.reject {
-    background: rgba(239, 68, 68, 0.12);
-    color: #EF4444;
-}
-
-.saas-btn-action.reject:hover {
-    background: #EF4444;
-    color: #FFFFFF;
-    transform: scale(1.08);
-}
-
-.saas-btn-action.view {
-    background: rgba(10, 17, 56, 0.08);
-    color: #0A1138;
-}
-
-.saas-btn-action.view:hover {
-    background: #0A1138;
-    color: #FFFFFF;
-    transform: scale(1.08);
-}
-
-/* Domain Progress Row */
-.domain-row {
-    margin-bottom: 18px;
-}
-
-.domain-row:last-child {
-    margin-bottom: 0;
-}
-
-.domain-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.domain-progress {
-    height: 8px;
-    border-radius: 9999px;
-    background: #F1F5F9;
-    overflow: hidden;
-}
-
-.domain-progress-bar {
-    height: 100%;
-    border-radius: 9999px;
-    transition: width 0.6s ease;
-}
-
-/* Empty State */
-.saas-empty-state {
-    padding: 48px 24px;
-    text-align: center;
-}
-
-.saas-empty-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 18px;
-    background: rgba(16, 185, 129, 0.1);
-    color: #10B981;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 1.8rem;
-}
-
-/* Responsive Fixes */
-@media (max-width: 991.98px) {
-    .content-wrapper {
-        padding: 20px 16px;
-    }
-    
-    .saas-hero {
-        padding: 26px 20px;
-    }
-    
-    .saas-hero-actions {
-        justify-content: flex-start;
-        margin-top: 16px;
-    }
-}
-</style>
 
 <!-- Main Content Area -->
 <div class="main-content">
@@ -650,64 +152,55 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
     
     <!-- Main Content Container -->
     <div class="content-wrapper">
-        <!-- Hero Command Hub -->
+        <!-- Light SaaS Hero (Matches Image 3) -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8 saas-hero-content">
-                    <h2 class="saas-hero-title">Welcome back, <?php echo htmlspecialchars($_SESSION['user_name']); ?>! 👋</h2>
-                    <p class="saas-hero-subtitle">
-                        Here's what's happening across Clientura EMS today. Monitor active personnel, verify attendance requests, and manage corporate credentialing.
-                    </p>
-                    
+                <div class="col-lg-7 saas-hero-content">
                     <div class="saas-hero-pills">
-                        <div class="saas-pill">
-                            <i class="bi bi-calendar3"></i>
-                            <span><?php echo date('l, M j, Y'); ?></span>
-                        </div>
-                        <div class="saas-pill">
-                            <?php echo pika_icon('clock', '', 14); ?>
-                            <span id="current-time"><?php echo date('h:i A'); ?></span>
-                        </div>
+                        <span class="saas-pill">
+                            <?php echo pika_icon('sparkles', '', 14); ?>
+                            Workforce Operations Command
+                        </span>
                         <div class="saas-pill live-pulse">
                             <span class="pulse-dot"></span>
-                            <span>EMS Cloud Online</span>
+                            <span>Live Analytics Active</span>
                         </div>
                     </div>
+                    <h2 class="saas-hero-title">Academic Operations Command</h2>
+                    <p class="saas-hero-subtitle">
+                        Real-time monitoring of workforce attendance, team deliverables, and departmental platform infrastructure.
+                    </p>
                 </div>
                 
-                <div class="col-lg-4 mt-4 mt-lg-0 text-lg-end saas-hero-content">
-                    <div class="bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur border border-white border-opacity-10 d-inline-block text-start" style="min-width: 260px;">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-white-50 small font-weight-500">Today's Turnout</span>
-                            <span class="font-weight-700 text-white font-monospace"><?php echo $attendanceRate; ?>%</span>
-                        </div>
-                        <div class="progress" style="height: 6px; background: rgba(255,255,255,0.15); border-radius: 9999px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: <?php echo $attendanceRate; ?>%; border-radius: 9999px;"></div>
-                        </div>
-                        <div class="mt-2 text-white-50 small">
-                            <span class="text-white font-weight-600"><?php echo $todayAttendance; ?></span> of <span class="text-white font-weight-600"><?php echo $totalEmployees; ?></span> employees checked in
-                        </div>
+                <div class="col-lg-5 mt-3 mt-lg-0 text-lg-end saas-hero-content">
+                    <div class="saas-hero-actions">
+                        <a href="<?php echo url('admin/employees'); ?>?action=add" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                            <?php echo pika_icon('user-plus', 'me-1', 15); ?> Onboard Member
+                        </a>
+                        <a href="<?php echo url('admin/tasks'); ?>" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold">
+                            <?php echo pika_icon('tasks', 'me-1', 15); ?> Manage Tasks
+                        </a>
+                        <a href="<?php echo url('admin/reports'); ?>" class="btn btn-light border rounded-pill px-3 py-2 fw-semibold">
+                            <?php echo pika_icon('reports', 'me-1', 15); ?> Reports
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Primary Metrics Row -->
+        <!-- Primary Metrics Row (Tiled Text, Squircle Icon, No Progress Bars) -->
         <div class="row g-4 mb-4">
             <!-- Metric 1: Total Employees -->
             <div class="col-12 col-sm-6 col-xl-3">
                 <a href="<?php echo url('admin/employees'); ?>" class="metric-card">
                     <div class="metric-card-top">
+                        <span class="metric-tiled-title">WORKFORCE</span>
                         <div class="metric-icon-badge navy">
-                            <?php echo pika_icon('users', '', 22); ?>
+                            <?php echo pika_icon('users', '', 20); ?>
                         </div>
-                        <span class="metric-trend-pill active">Active</span>
                     </div>
                     <div class="metric-value"><?php echo number_format($totalEmployees); ?></div>
-                    <div class="metric-label">Total Active Workforce</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
-                    </div>
+                    <div class="metric-label">Active Team Members</div>
                 </a>
             </div>
             
@@ -715,52 +208,41 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
             <div class="col-12 col-sm-6 col-xl-3">
                 <a href="<?php echo url('admin/attendance'); ?>" class="metric-card">
                     <div class="metric-card-top">
+                        <span class="metric-tiled-title">HOURS & TURNOUT</span>
                         <div class="metric-icon-badge emerald">
-                            <?php echo pika_icon('calendar', '', 22); ?>
+                            <?php echo pika_icon('clock', '', 20); ?>
                         </div>
-                        <span class="metric-trend-pill active">Today</span>
                     </div>
-                    <div class="metric-value"><?php echo number_format($todayAttendance); ?></div>
-                    <div class="metric-label">Today's Check-ins (<?php echo $attendanceRate; ?>%)</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: <?php echo max(5, $attendanceRate); ?>%;"></div>
-                    </div>
+                    <div class="metric-value"><?php echo $attendanceRate; ?>%</div>
+                    <div class="metric-label"><?php echo $todayAttendance; ?> of <?php echo $totalEmployees; ?> Active Today</div>
                 </a>
             </div>
             
-            <!-- Metric 3: Pending Approvals -->
-            <div class="col-12 col-sm-6 col-xl-3">
-                <a href="<?php echo url('admin/approvals'); ?>" class="metric-card">
-                    <div class="metric-card-top">
-                        <div class="metric-icon-badge amber">
-                            <?php echo pika_icon('clock', '', 22); ?>
-                        </div>
-                        <span class="metric-trend-pill <?php echo $pendingApprovals > 0 ? 'warning' : 'active'; ?>">
-                            <?php echo $pendingApprovals > 0 ? 'Needs Review' : 'All Clear'; ?>
-                        </span>
-                    </div>
-                    <div class="metric-value"><?php echo number_format($pendingApprovals); ?></div>
-                    <div class="metric-label">Pending Approval Requests</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: <?php echo min(100, $pendingApprovals * 20); ?>%;"></div>
-                    </div>
-                </a>
-            </div>
-            
-            <!-- Metric 4: Active Tasks -->
+            <!-- Metric 3: Active Deliverables -->
             <div class="col-12 col-sm-6 col-xl-3">
                 <a href="<?php echo url('admin/tasks'); ?>" class="metric-card">
                     <div class="metric-card-top">
+                        <span class="metric-tiled-title">DELIVERABLES</span>
                         <div class="metric-icon-badge sky">
-                            <?php echo pika_icon('tasks', '', 22); ?>
+                            <?php echo pika_icon('tasks', '', 20); ?>
                         </div>
-                        <span class="metric-trend-pill sky"><?php echo $completedTasks; ?> Done</span>
                     </div>
-                    <div class="metric-value"><?php echo number_format($activeTasks); ?></div>
-                    <div class="metric-label">Active Team Tasks</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar sky" style="width: <?php echo max(8, $taskRate); ?>%;"></div>
+                    <div class="metric-value"><?php echo $completedTasks; ?>/<?php echo $taskTotal; ?></div>
+                    <div class="metric-label">Completed Deliverables</div>
+                </a>
+            </div>
+            
+            <!-- Metric 4: Execution Velocity -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <a href="<?php echo url('admin/approvals'); ?>" class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">EXECUTION VELOCITY</span>
+                        <div class="metric-icon-badge amber">
+                            <?php echo pika_icon('trending-up', '', 20); ?>
+                        </div>
                     </div>
+                    <div class="metric-value"><?php echo $taskRate; ?>%</div>
+                    <div class="metric-label"><?php echo $pendingApprovals; ?> Pending Verifications</div>
                 </a>
             </div>
         </div>

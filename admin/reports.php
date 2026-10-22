@@ -227,9 +227,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $staffCount; ?></div>
                     <div class="metric-label">Active Team Members</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -243,9 +240,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo substr($totalHoursLogged, 0, 5); ?>h</div>
                     <div class="metric-label">Approved Hours Logged</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: 85%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -259,9 +253,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalTasksDone; ?>/<?php echo $totalTasksIssued; ?></div>
                     <div class="metric-label">Completed Tasks</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar sky" style="width: <?php echo $taskSuccessRate; ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -275,9 +266,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $taskSuccessRate; ?>%</div>
                     <div class="metric-label">Execution Velocity</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: <?php echo $taskSuccessRate; ?>%;"></div>
-                    </div>
                 </div>
             </div>
         </div>

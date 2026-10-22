@@ -212,9 +212,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalDomains; ?></div>
                     <div class="metric-label">Registered Domains</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -228,9 +225,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $activeDomains; ?></div>
                     <div class="metric-label">Active Deployments</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: <?php echo $totalDomains > 0 ? round(($activeDomains / $totalDomains) * 100) : 100; ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -244,9 +238,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalAssignedStaff; ?></div>
                     <div class="metric-label">Staff Members Assigned</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar sky" style="width: 90%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -260,9 +251,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value">2-3</div>
                     <div class="metric-label">Character Code Format</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
         </div>

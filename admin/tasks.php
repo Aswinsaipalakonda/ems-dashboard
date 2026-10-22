@@ -342,9 +342,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $activeTasksCount; ?></div>
                     <div class="metric-label">Active / In Progress</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 80%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -358,9 +355,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $submittedCountGlobal; ?></div>
                     <div class="metric-label">Submitted Deliverables</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: <?php echo min(100, $submittedCountGlobal * 20); ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -374,9 +368,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $completedCountGlobal; ?></div>
                     <div class="metric-label">Completed Deliverables</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -390,9 +381,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $overdueCountGlobal; ?></div>
                     <div class="metric-label">Missed Deadlines</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar rose" style="width: <?php echo min(100, $overdueCountGlobal * 25); ?>%;"></div>
-                    </div>
                 </div>
             </div>
         </div>

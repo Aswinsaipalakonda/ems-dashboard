@@ -349,9 +349,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $pendingCount; ?></div>
                     <div class="metric-label">Pending Reviews</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: <?php echo min(100, $pendingCount * 15); ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -365,9 +362,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $approvedToday; ?></div>
                     <div class="metric-label">Approved Today</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -381,9 +375,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $rejectedTotal; ?></div>
                     <div class="metric-label">Total Rejected</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar rose" style="width: <?php echo min(100, $rejectedTotal * 10); ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -397,9 +388,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $approvalRate; ?>%</div>
                     <div class="metric-label">Overall Approval Rate</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar sky" style="width: <?php echo $approvalRate; ?>%;"></div>
-                    </div>
                 </div>
             </div>
         </div>

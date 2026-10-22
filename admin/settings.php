@@ -157,9 +157,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalStaff; ?></div>
                     <div class="metric-label">Enrolled Employees</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -173,9 +170,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalAttendance; ?></div>
                     <div class="metric-label">Verified Check-in Sessions</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: 95%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -189,9 +183,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalTasks; ?></div>
                     <div class="metric-label">Workstream Tasks Logged</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar sky" style="width: 85%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -205,9 +196,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalLogs; ?></div>
                     <div class="metric-label">Security Audit Events</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: 90%;"></div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -147,9 +147,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalOffers; ?></div>
                     <div class="metric-label">Total Offers Generated</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -163,9 +160,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $internOffers; ?></div>
                     <div class="metric-label">Internship Agreements</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: <?php echo $totalOffers > 0 ? round(($internOffers / $totalOffers) * 100) : 100; ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -179,9 +173,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $fulltimeOffers; ?></div>
                     <div class="metric-label">Full-Time Roles</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: <?php echo $totalOffers > 0 ? round(($fulltimeOffers / $totalOffers) * 100) : 100; ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -195,9 +186,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $activeOffers; ?></div>
                     <div class="metric-label">Active / Valid Offers</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar sky" style="width: <?php echo $issuanceRate; ?>%;"></div>
-                    </div>
                 </div>
             </div>
         </div>

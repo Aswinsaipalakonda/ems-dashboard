@@ -16,9 +16,70 @@ $pageTitle = 'Signatory Management';
 $successMsg = '';
 $errorMsg = '';
 
-// Handle Signature Upload / Update
+// Handle Signature Upload / Update / Add
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if ($_POST['action'] === 'update_signatory') {
+    if ($_POST['action'] === 'add_signatory') {
+        $name = trim($_POST['name'] ?? '');
+        $designation = trim($_POST['designation'] ?? '');
+
+        if (empty($name) || empty($designation)) {
+            $errorMsg = 'Name and Designation cannot be empty.';
+        } else {
+            $signaturePath = null;
+            if (isset($_FILES['signature_image']) && $_FILES['signature_image']['error'] === UPLOAD_ERR_OK) {
+                $fileTmp = $_FILES['signature_image']['tmp_name'];
+                $fileName = $_FILES['signature_image']['name'];
+                $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $allowed = ['png', 'webp', 'jpg', 'jpeg'];
+                if (in_array($fileExt, $allowed)) {
+                    $newFileName = 'sig_new_' . time() . '.png';
+                    $destPath = UPLOAD_PATH . 'signatures/' . $newFileName;
+                    $bgHandled = false;
+                    if (function_exists('imagecreatefromstring')) {
+                        $rawImg = @imagecreatefromstring(file_get_contents($fileTmp));
+                        if ($rawImg) {
+                            $w = imagesx($rawImg);
+                            $h = imagesy($rawImg);
+                            $transImg = imagecreatetruecolor($w, $h);
+                            imagealphablending($transImg, false);
+                            imagesavealpha($transImg, true);
+                            $transparent = imagecolorallocatealpha($transImg, 0, 0, 0, 127);
+                            imagefilledrectangle($transImg, 0, 0, $w, $h, $transparent);
+                            for ($x = 0; $x < $w; $x++) {
+                                for ($y = 0; $y < $h; $y++) {
+                                    $rgba = imagecolorat($rawImg, $x, $y);
+                                    $r = ($rgba >> 16) & 0xFF;
+                                    $g = ($rgba >> 8) & 0xFF;
+                                    $b = $rgba & 0xFF;
+                                    if ($r > 205 && $g > 205 && $b > 205) {
+                                        imagesetpixel($transImg, $x, $y, $transparent);
+                                    } else {
+                                        $origColor = imagecolorallocatealpha($transImg, $r, $g, $b, 0);
+                                        imagesetpixel($transImg, $x, $y, $origColor);
+                                    }
+                                }
+                            }
+                            imagepng($transImg, $destPath);
+                            imagedestroy($rawImg);
+                            imagedestroy($transImg);
+                            $bgHandled = true;
+                        }
+                    }
+                    if (!$bgHandled) {
+                        move_uploaded_file($fileTmp, $destPath);
+                    }
+                    $signaturePath = 'uploads/signatures/' . $newFileName;
+                } else {
+                    $errorMsg = 'Invalid image format. Allowed: PNG, WEBP, JPG.';
+                }
+            }
+
+            if (empty($errorMsg)) {
+                executeQuery("INSERT INTO signatories (name, designation, signature_path, created_at) VALUES (?, ?, ?, NOW())", "sss", [$name, $designation, $signaturePath]);
+                $successMsg = "New signatory <strong>$name</strong> added successfully.";
+            }
+        }
+    } elseif ($_POST['action'] === 'update_signatory') {
         $signatoryId = (int)($_POST['signatory_id'] ?? 0);
         $name = trim($_POST['name'] ?? '');
         $designation = trim($_POST['designation'] ?? '');
@@ -92,6 +153,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $sigId = (int)$_GET['id'];
+    $sig = fetchOne("SELECT signature_path FROM signatories WHERE id = ?", "i", [$sigId]);
+    if ($sig && !empty($sig['signature_path']) && file_exists(__DIR__ . '/../' . $sig['signature_path'])) {
+        @unlink(__DIR__ . '/../' . $sig['signature_path']);
+    }
+    executeQuery("DELETE FROM signatories WHERE id = ?", "i", [$sigId]);
+    $successMsg = 'Signatory member has been removed.';
+}
+
 // Fetch all signatories
 $signatories = fetchAll("SELECT * FROM signatories ORDER BY id ASC");
 
@@ -146,36 +217,93 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         </div>
         <?php endif; ?>
 
-        <!-- Hero Hub -->
+        <!-- Light SaaS Hero -->
         <div class="saas-hero">
             <div class="row align-items-center">
                 <div class="col-lg-8">
                     <div class="saas-hero-content">
+                        <div class="saas-hero-pills">
+                            <span class="saas-pill">
+                                <?php echo pika_icon('sparkles', '', 14); ?>
+                                Executive Signatory Governance
+                            </span>
+                        </div>
                         <h2 class="saas-hero-title">Authorized Certificate Signatories</h2>
                         <p class="saas-hero-subtitle">
                             Configure executive officers (CEO, CTO, CMO) with automated background-isolated digital signatures rendered directly onto Clientura Completion Certificates.
                         </p>
-                        <div class="saas-hero-pills">
-                            <span class="saas-pill live-pulse">
-                                <span class="pulse-dot"></span>
-                                <?php echo count($signatories); ?> Configured Officers
-                            </span>
-                            <span class="saas-pill">
-                                <?php echo pika_icon('signature', '', 14); ?>
-                                Automatic Transparent Alpha Extraction
-                            </span>
-                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-outline-light">
-                            <?php echo pika_icon('certificate', 'me-1', 16); ?> View Certificates
+                        <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold">
+                            <?php echo pika_icon('certificate', 'me-1', 15); ?> View Certificates
                         </a>
-                        <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-primary btn-glow">
-                            <?php echo pika_icon('plus', 'me-1', 16); ?> Issue Certificate
-                        </a>
+                        <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addSignatoryModal">
+                            <?php echo pika_icon('plus', 'me-1', 15); ?> Add Signatory
+                        </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Dynamic Metric Cards (Tiled Text, Squircle Icon, No Progress Bars) -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">TOTAL OFFICERS</span>
+                        <div class="metric-icon-badge navy">
+                            <?php echo pika_icon('users', '', 20); ?>
+                        </div>
+                    </div>
+                    <div class="metric-value"><?php echo count($signatories); ?></div>
+                    <div class="metric-label">Configured Executives</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">SIGNATURES ON FILE</span>
+                        <div class="metric-icon-badge purple">
+                            <?php echo pika_icon('signature', '', 20); ?>
+                        </div>
+                    </div>
+                    <?php 
+                    $withSigs = 0;
+                    foreach ($signatories as $s) {
+                        if (!empty($s['signature_path'])) $withSigs++;
+                    }
+                    ?>
+                    <div class="metric-value"><?php echo $withSigs; ?></div>
+                    <div class="metric-label">Uploaded Signatures</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">ALPHA EXTRACTION</span>
+                        <div class="metric-icon-badge emerald">
+                            <?php echo pika_icon('sparkles', '', 20); ?>
+                        </div>
+                    </div>
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Auto-Transparent Removal</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">STATUS</span>
+                        <div class="metric-icon-badge amber">
+                            <?php echo pika_icon('shield-check', '', 20); ?>
+                        </div>
+                    </div>
+                    <div class="metric-value">Active</div>
+                    <div class="metric-label">Ready For Issuance</div>
                 </div>
             </div>
         </div>
@@ -187,7 +315,16 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 <div class="saas-card h-100">
                     <div class="saas-card-header">
                         <span class="saas-id-badge">Signatory #<?php echo $sig['id']; ?></span>
-                        <span class="saas-tag emerald">Active</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="saas-tag emerald">Active</span>
+                            <?php if (count($signatories) > 1): ?>
+                            <a href="<?php echo url('admin/signatories?action=delete&id=' . $sig['id']); ?>" 
+                               class="text-danger p-1 rounded hover-bg" title="Delete Signatory"
+                               onclick="return confirm('Remove signatory profile for <?php echo addslashes($sig['name']); ?>?');">
+                                <?php echo pika_icon('trash', '', 14); ?>
+                            </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <div class="saas-card-body text-center p-4">
                         <div class="mb-3 d-flex justify-content-center align-items-center rounded-4 border border-dashed p-3" 
@@ -243,8 +380,8 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 </div>
                             </div>
                             <div class="modal-footer bg-light border-0 px-4 py-3">
-                                <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary btn-glow px-4">
+                                <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">
                                     <?php echo pika_icon('check', 'me-1', 14); ?> Save Changes
                                 </button>
                             </div>
@@ -253,6 +390,46 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 </div>
             </div>
             <?php endforeach; ?>
+        </div>
+
+        <!-- Add Signatory Modal -->
+        <div class="modal fade" id="addSignatoryModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="action" value="add_signatory">
+                        
+                        <div class="modal-header text-white border-0 px-4 py-3" style="background: #0A1138;">
+                            <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2">
+                                <?php echo pika_icon('plus', 'text-white', 20); ?>
+                                Add New Authorized Signatory
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark small">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control rounded-pill px-3 py-2" placeholder="e.g. Dr. Rajesh Kumar" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark small">Official Title / Designation <span class="text-danger">*</span></label>
+                                <input type="text" name="designation" class="form-control rounded-pill px-3 py-2" placeholder="e.g. Chief Technology Officer, Clientura" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark small">Signature Image (PNG, JPG, WEBP)</label>
+                                <input type="file" name="signature_image" class="form-control rounded-pill px-3 py-2" accept="image/png,image/webp,image/jpeg">
+                                <small class="text-muted d-block mt-1">Signatures with white/light backgrounds will be automatically processed to transparent alpha PNG.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light border-0 px-4 py-3">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <?php echo pika_icon('check', 'me-1', 14); ?> Add Officer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

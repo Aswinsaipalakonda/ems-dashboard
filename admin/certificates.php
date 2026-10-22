@@ -23,6 +23,16 @@ if (isset($_GET['action']) && $_GET['action'] === 'revoke' && isset($_GET['id'])
     $successMsg = 'Certificate credential has been revoked successfully.';
 }
 
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $certId = (int)$_GET['id'];
+    $cert = fetchOne("SELECT file_path FROM certificates WHERE id = ?", "i", [$certId]);
+    if ($cert && !empty($cert['file_path']) && file_exists(__DIR__ . '/../' . $cert['file_path'])) {
+        @unlink(__DIR__ . '/../' . $cert['file_path']);
+    }
+    executeQuery("DELETE FROM certificates WHERE id = ?", "i", [$certId]);
+    $successMsg = 'Certificate credential has been permanently deleted.';
+}
+
 // Fetch certificates with employee and signatory details
 $search = trim($_GET['search'] ?? '');
 $statusFilter = trim($_GET['status'] ?? '');
@@ -100,107 +110,87 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         </div>
         <?php endif; ?>
 
-        <!-- Hero Hub -->
+        <!-- Light SaaS Hero -->
         <div class="saas-hero">
             <div class="row align-items-center">
                 <div class="col-lg-8">
                     <div class="saas-hero-content">
-                        <h2 class="saas-hero-title">Credential Verification Hub</h2>
-                        <p class="saas-hero-subtitle">
-                            Issue cryptographic certificates of completion with central QR codes linking directly to the live authentication verification portal on Clientura.
-                        </p>
                         <div class="saas-hero-pills">
-                            <span class="saas-pill live-pulse">
-                                <span class="pulse-dot"></span>
-                                <?php echo $totalCerts; ?> Total Certificates Issued
-                            </span>
                             <span class="saas-pill">
-                                <?php echo pika_icon('shield-check', '', 14); ?>
-                                <?php echo $activeCerts; ?> Authenticated Credentials
-                            </span>
-                            <span class="saas-pill">
-                                <?php echo pika_icon('qr-code', '', 14); ?>
-                                Live QR Engine
+                                <?php echo pika_icon('sparkles', '', 14); ?>
+                                Credential Governance Center
                             </span>
                         </div>
+                        <h2 class="saas-hero-title">Completion Certificates</h2>
+                        <p class="saas-hero-subtitle">
+                            Generate, issue, and manage authenticated internship & employee completion certificates with QR verification.
+                        </p>
                     </div>
                 </div>
                 <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-outline-light">
-                            <?php echo pika_icon('signature', 'me-1', 16); ?> Signatories
+                        <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold">
+                            <?php echo pika_icon('edit', 'me-1', 15); ?> Manage Signatories
                         </a>
-                        <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-primary btn-glow">
-                            <?php echo pika_icon('plus', 'me-1', 16); ?> Issue Certificate
+                        <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                            <?php echo pika_icon('plus', 'me-1', 15); ?> Issue New Certificate
                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 4 Dynamic Metric Cards -->
+        <!-- 4 Dynamic Metric Cards (Tiled Text, Squircle Icon, No Progress Bars) -->
         <div class="row g-4 mb-4">
             <div class="col-sm-6 col-xl-3">
                 <div class="metric-card">
                     <div class="metric-card-top">
-                        <div class="metric-icon-badge navy">
-                            <?php echo pika_icon('certificate', '', 24); ?>
+                        <span class="metric-tiled-title">TOTAL ISSUED</span>
+                        <div class="metric-icon-badge purple">
+                            <?php echo pika_icon('award', '', 20); ?>
                         </div>
-                        <span class="metric-trend-pill active">Total Issued</span>
                     </div>
                     <div class="metric-value"><?php echo $totalCerts; ?></div>
-                    <div class="metric-label">Completed Certifications</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
-                    </div>
+                    <div class="metric-label">Total Certificates Issued</div>
                 </div>
             </div>
 
             <div class="col-sm-6 col-xl-3">
                 <div class="metric-card">
                     <div class="metric-card-top">
+                        <span class="metric-tiled-title">ACTIVE & VERIFIED</span>
                         <div class="metric-icon-badge emerald">
-                            <?php echo pika_icon('shield-check', '', 24); ?>
+                            <?php echo pika_icon('check-circle', '', 20); ?>
                         </div>
-                        <span class="metric-trend-pill active"><?php echo $authRate; ?>% Valid</span>
                     </div>
                     <div class="metric-value"><?php echo $activeCerts; ?></div>
-                    <div class="metric-label">Authenticated & Verifiable</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: <?php echo $authRate; ?>%;"></div>
-                    </div>
+                    <div class="metric-label">Active & Verified Credentials</div>
                 </div>
             </div>
 
             <div class="col-sm-6 col-xl-3">
                 <div class="metric-card">
                     <div class="metric-card-top">
+                        <span class="metric-tiled-title">REVOKED STATUS</span>
                         <div class="metric-icon-badge rose">
-                            <?php echo pika_icon('x', '', 24); ?>
+                            <?php echo pika_icon('x', '', 20); ?>
                         </div>
-                        <span class="metric-trend-pill danger">Revoked</span>
                     </div>
                     <div class="metric-value"><?php echo $revokedCerts; ?></div>
                     <div class="metric-label">Revoked Credentials</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar rose" style="width: <?php echo min(100, $revokedCerts * 15); ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
             <div class="col-sm-6 col-xl-3">
                 <div class="metric-card">
                     <div class="metric-card-top">
+                        <span class="metric-tiled-title">AUTHENTICATION</span>
                         <div class="metric-icon-badge sky">
-                            <?php echo pika_icon('qr-code', '', 24); ?>
+                            <?php echo pika_icon('qr-code', '', 20); ?>
                         </div>
-                        <span class="metric-trend-pill sky">Online</span>
                     </div>
                     <div class="metric-value">100%</div>
                     <div class="metric-label">QR Verification Integrity</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar sky" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -222,11 +212,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">
+                    <button type="submit" class="btn btn-primary rounded-pill flex-fill fw-semibold">
                         <?php echo pika_icon('filter', '', 15); ?> Apply
                     </button>
                     <?php if (!empty($search) || !empty($statusFilter)): ?>
-                    <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-outline-secondary" title="Reset Filters">
+                    <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-outline-secondary rounded-pill" title="Reset Filters">
                         <?php echo pika_icon('refresh', '', 15); ?>
                     </a>
                     <?php endif; ?>
@@ -240,17 +230,17 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 <div class="d-flex align-items-center gap-2">
                     <h5 class="saas-card-title">
                         <?php echo pika_icon('certificate', 'text-primary', 20); ?>
-                        Issued Certificates Registry
+                        Issued Certificates Log
                     </h5>
                     <span class="badge bg-light text-dark border px-2 py-1 rounded-pill small">
-                        <?php echo count($certificates); ?> Credentials
+                        <?php echo count($certificates); ?> records found
                     </span>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-sm btn-outline-primary">
+                    <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
                         <?php echo pika_icon('signature', 'me-1', 14); ?> Manage Signatories
                     </a>
-                    <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-sm btn-primary">
+                    <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-sm btn-primary rounded-pill px-3">
                         <?php echo pika_icon('plus', 'me-1', 14); ?> Issue Certificate
                     </a>
                 </div>
@@ -263,10 +253,10 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             <th>Certificate ID</th>
                             <th>Recipient Name</th>
                             <th>Program / Role</th>
-                            <th>Tenure Period</th>
-                            <th>Signatory Executive</th>
+                            <th>Duration & Dates</th>
+                            <th>Signatory</th>
                             <th>Status</th>
-                            <th>Live Verification</th>
+                            <th>QR Verify Link</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
@@ -277,7 +267,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <?php echo pika_icon('certificate', 'opacity-25 d-block mx-auto mb-3', 48); ?>
                                 <h6 class="fw-bold text-dark">No Certificates Issued Yet</h6>
                                 <p class="text-muted small mb-3">Generate completion certificates with official executive signature and QR authentication.</p>
-                                <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-primary btn-sm">
+                                <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-primary rounded-pill px-4 btn-sm">
                                     <?php echo pika_icon('plus', 'me-1', 14); ?> Issue First Certificate
                                 </a>
                             </td>
@@ -309,29 +299,51 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 </td>
                                 <td>
                                     <span class="saas-tag <?php echo $cert['status'] === 'active' ? 'emerald' : 'rose'; ?>">
-                                        <?php echo ucfirst($cert['status']); ?>
+                                        <?php echo strtoupper($cert['status']); ?>
                                     </span>
                                 </td>
                                 <td>
                                     <a href="<?php echo url('verify-certificate/' . urlencode($cert['certificate_id'])); ?>" target="_blank" class="saas-tag sky text-decoration-none">
-                                        <?php echo pika_icon('qr-code', '', 12); ?> Verify Online
+                                        <?php echo pika_icon('qr-code', '', 12); ?> Live Verification <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 10px;"></i>
                                     </a>
                                 </td>
                                 <td class="text-end">
-                                    <div class="d-inline-flex gap-1">
-                                        <a href="<?php echo url($cert['file_path']); ?>" target="_blank" class="saas-action-btn" title="View Document">
-                                            <?php echo pika_icon('eye', '', 15); ?>
-                                        </a>
-                                        <a href="<?php echo url($cert['file_path']); ?>" download class="saas-action-btn success" title="Download Document">
-                                            <?php echo pika_icon('download', '', 15); ?>
-                                        </a>
-                                        <?php if ($cert['status'] === 'active'): ?>
-                                        <a href="<?php echo url('admin/certificates?action=revoke&id=' . $cert['id']); ?>" 
-                                           class="saas-action-btn delete" title="Revoke Certificate"
-                                           onclick="return confirm('Revoke certificate credentials for <?php echo addslashes($cert['recipient_name']); ?>?');">
-                                            <?php echo pika_icon('x', '', 15); ?>
-                                        </a>
-                                        <?php endif; ?>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-sm btn-light border-0 rounded-circle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
+                                            <?php echo pika_icon('more-vertical', 'text-secondary', 16); ?>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2" style="border-radius: 14px; min-width: 200px; z-index: 99999;">
+                                            <li>
+                                                <a class="dropdown-item py-2" href="<?php echo url($cert['file_path']); ?>" target="_blank">
+                                                    <?php echo pika_icon('eye', 'me-2 text-primary', 15); ?> View Document
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-2" href="<?php echo url($cert['file_path']); ?>" download>
+                                                    <?php echo pika_icon('download', 'me-2 text-success', 15); ?> Download PDF
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-2" href="<?php echo url('verify-certificate/' . urlencode($cert['certificate_id'])); ?>" target="_blank">
+                                                    <?php echo pika_icon('qr-code', 'me-2 text-info', 15); ?> Verify Online
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider my-1"></li>
+                                            <?php if ($cert['status'] === 'active'): ?>
+                                            <li>
+                                                <a class="dropdown-item py-2 text-warning" href="<?php echo url('admin/certificates?action=revoke&id=' . $cert['id']); ?>" 
+                                                   onclick="return confirm('Revoke credentials for <?php echo addslashes($cert['recipient_name']); ?>?');">
+                                                    <?php echo pika_icon('x', 'me-2 text-warning', 15); ?> Revoke Credential
+                                                </a>
+                                            </li>
+                                            <?php endif; ?>
+                                            <li>
+                                                <a class="dropdown-item py-2 text-danger" href="<?php echo url('admin/certificates?action=delete&id=' . $cert['id']); ?>" 
+                                                   onclick="return confirm('Are you sure you want to permanently DELETE certificate <?php echo addslashes($cert['certificate_id']); ?> for <?php echo addslashes($cert['recipient_name']); ?>? This action cannot be undone.');">
+                                                    <?php echo pika_icon('trash', 'me-2 text-danger', 15); ?> Delete Certificate
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </td>
                             </tr>

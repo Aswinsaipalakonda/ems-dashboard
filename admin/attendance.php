@@ -233,9 +233,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $totalRecords; ?></div>
                     <div class="metric-label">Total Logged Entries</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar navy" style="width: 100%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -249,9 +246,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $approvedRecords; ?></div>
                     <div class="metric-label">Approved Records</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar emerald" style="width: <?php echo $complianceRate; ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -265,9 +259,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $pendingRecords; ?></div>
                     <div class="metric-label">Pending Approval</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar amber" style="width: <?php echo min(100, $pendingRecords * 15); ?>%;"></div>
-                    </div>
                 </div>
             </div>
 
@@ -281,9 +272,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                     <div class="metric-value"><?php echo $rejectedRecords; ?></div>
                     <div class="metric-label">Rejected Records</div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar rose" style="width: <?php echo min(100, $rejectedRecords * 10); ?>%;"></div>
-                    </div>
                 </div>
             </div>
         </div>
