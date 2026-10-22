@@ -166,18 +166,22 @@ $pageTitle = 'Certificate Verification';
 
                             <div class="row g-3 mb-4">
                                 <div class="col-sm-6">
-                                    <div class="cert-info-label">Certificate ID</div>
-                                    <div class="cert-info-val font-monospace text-primary"><?php echo htmlspecialchars($certificate['certificate_id']); ?></div>
+                                    <div class="cert-info-label">Emp ID</div>
+                                    <div class="cert-info-val font-monospace text-dark"><?php echo htmlspecialchars($certificate['emp_code'] ?: 'N/A'); ?></div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="cert-info-label">Date of Issue</div>
                                     <div class="cert-info-val"><?php echo date('d F Y', strtotime($certificate['issue_date'])); ?></div>
                                 </div>
                                 <div class="col-sm-6">
+                                    <div class="cert-info-label">Certificate ID</div>
+                                    <div class="cert-info-val font-monospace text-primary"><?php echo htmlspecialchars($certificate['certificate_id']); ?></div>
+                                </div>
+                                <div class="col-sm-6">
                                     <div class="cert-info-label">Program Period</div>
                                     <div class="cert-info-val"><?php echo date('d M Y', strtotime($certificate['start_date'])); ?> - <?php echo date('d M Y', strtotime($certificate['end_date'])); ?></div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-12">
                                     <div class="cert-info-label">Issuing Authority</div>
                                     <div class="cert-info-val"><?php echo htmlspecialchars($certificate['signatory_name'] ?? 'Authorized Signatory'); ?></div>
                                     <small class="text-muted"><?php echo htmlspecialchars($certificate['signatory_title'] ?? ''); ?></small>

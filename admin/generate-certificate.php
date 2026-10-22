@@ -77,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// Generate default unique certificate ID
-$randNum = str_pad(mt_rand(1, 999), 3, '0', STR_PAD_LEFT);
-$defaultCertId = 'CL-CERT-' . date('Y') . '-' . $randNum;
+// Generate default unique certificate ID (distinct from employee ID)
+$randNum = mt_rand(10000, 99999);
+$defaultCertId = 'CL-CRT-' . date('Y') . '-' . $randNum;
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/admin-sidebar.php';
@@ -130,10 +130,16 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
 
                             <input type="hidden" id="selectedEmpId" name="employee_id" value="">
 
-                            <!-- Recipient Name -->
-                            <div class="mb-3">
-                                <label class="form-label font-weight-bold text-dark small">Recipient Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="recipientName" name="recipient_name" placeholder="Enter recipient full name" value="" required style="border-radius: 12px; font-weight: 600;">
+                            <!-- Recipient Name & Emp ID Row -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-7">
+                                    <label class="form-label font-weight-bold text-dark small">Recipient Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="recipientName" name="recipient_name" placeholder="Enter full name" value="" required style="border-radius: 12px; font-weight: 600;">
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label font-weight-bold text-dark small">Emp ID (Optional)</label>
+                                    <input type="text" class="form-control" id="empCodeInput" name="employee_code" placeholder="e.g. WD-DEV-001" value="" style="border-radius: 12px; font-weight: 600;">
+                                </div>
                             </div>
 
                             <!-- Program / Role -->
@@ -430,13 +436,24 @@ function drawCanvasContent() {
     ctx.fillStyle = '#0A1138';
     ctx.fillText('Conducted From ' + sDate + ' - ' + eDate, 1000, 980);
 
-    // 5. Bottom Left: Date of Issue & Certificate ID (Prominent 30px / 34px)
+    // 5. Bottom Left: Emp id, Date of issue & Certificate id
+    const rawEmpCode = document.getElementById('empCodeInput') ? document.getElementById('empCodeInput').value.trim() : '';
+    const empCodeDisplay = rawEmpCode || 'N/A';
+
     ctx.textAlign = 'left';
     ctx.fillStyle = '#0A1138';
-    ctx.font = '500 30px "Inter", sans-serif';
-    ctx.fillText('Date of Issue: ' + iDate, 160, 1205);
-    ctx.font = '700 34px "Inter", sans-serif';
-    ctx.fillText('ID: ' + certId, 160, 1255);
+
+    // Emp id
+    ctx.font = '600 28px "Inter", sans-serif';
+    ctx.fillText('Emp id: ' + empCodeDisplay, 160, 1175);
+
+    // Date of issue
+    ctx.font = '500 28px "Inter", sans-serif';
+    ctx.fillText('Date of issue: ' + iDate, 160, 1218);
+
+    // Certificate id
+    ctx.font = '700 30px "Inter", sans-serif';
+    ctx.fillText('Certificate id: ' + certId, 160, 1262);
 
     // 6. Center: QR Code (As requested and marked in Image 4!)
     if (qrImageElement) {
@@ -497,8 +514,9 @@ function formatDate(dateStr) {
 }
 
 // Event Listeners for live form changes
-['recipientName', 'programName', 'durationText', 'startDate', 'endDate', 'issueDate', 'certificateId'].forEach(id => {
-    document.getElementById(id).addEventListener('input', renderCertificate);
+['recipientName', 'empCodeInput', 'programName', 'durationText', 'startDate', 'endDate', 'issueDate', 'certificateId'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', renderCertificate);
 });
 
 document.getElementById('signatorySelect').addEventListener('change', updateSignatureAndRender);
@@ -516,14 +534,17 @@ document.getElementById('empSelector').addEventListener('change', function() {
         document.getElementById('startDate').value = start.toISOString().split('T')[0];
         document.getElementById('endDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('durationText').value = 'Six months';
+        
+        // Populate Emp ID code separately without overriding the distinct unique Certificate ID
         const empCode = selected.getAttribute('data-code');
-        if (empCode) {
-            document.getElementById('certificateId').value = empCode + '-CERT';
+        if (empCode && document.getElementById('empCodeInput')) {
+            document.getElementById('empCodeInput').value = empCode;
         }
         renderCertificate();
     } else {
         document.getElementById('selectedEmpId').value = '';
         document.getElementById('recipientName').value = '';
+        if (document.getElementById('empCodeInput')) document.getElementById('empCodeInput').value = '';
         document.getElementById('programName').value = '';
         document.getElementById('durationText').value = '';
         document.getElementById('startDate').value = '';

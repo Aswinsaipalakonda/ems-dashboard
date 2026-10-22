@@ -23,6 +23,74 @@ if (isset($_GET['action']) && $_GET['action'] === 'revoke' && isset($_GET['id'])
     $successMsg = 'Offer letter revoked successfully.';
 }
 
+// Handle Delete
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $delId = (int)$_GET['id'];
+    $offerToDel = fetchOne("SELECT * FROM offer_letters WHERE id = ?", "i", [$delId]);
+    if ($offerToDel) {
+        if (!empty($offerToDel['file_path']) && file_exists(__DIR__ . '/../' . $offerToDel['file_path'])) {
+            @unlink(__DIR__ . '/../' . $offerToDel['file_path']);
+        }
+        $altExt = str_ends_with($offerToDel['file_path'] ?? '', '.html') ? '.pdf' : '.html';
+        $altPath = preg_replace('/\.(html|pdf)$/', $altExt, $offerToDel['file_path'] ?? '');
+        if (!empty($altPath) && file_exists(__DIR__ . '/../' . $altPath)) {
+            @unlink(__DIR__ . '/../' . $altPath);
+        }
+        executeQuery("DELETE FROM offer_letters WHERE id = ?", "i", [$delId]);
+        logActivity('delete_offer_letter', "Deleted offer letter #{$offerToDel['offer_id']} for {$offerToDel['candidate_name']}");
+        $successMsg = 'Offer letter deleted successfully.';
+    }
+}
+
+// Handle Direct PDF Download
+if (isset($_GET['action']) && $_GET['action'] === 'download' && isset($_GET['id'])) {
+    $offerId = (int)$_GET['id'];
+    $offer = fetchOne("SELECT * FROM offer_letters WHERE id = ?", "i", [$offerId]);
+    if ($offer) {
+        $pdfPath = null;
+        // Check if existing file is already PDF
+        if (!empty($offer['file_path']) && str_ends_with($offer['file_path'], '.pdf') && file_exists(__DIR__ . '/../' . $offer['file_path'])) {
+            $pdfPath = __DIR__ . '/../' . $offer['file_path'];
+        } else {
+            // Generate or fetch PDF using offer-pdf-builder
+            require_once __DIR__ . '/../includes/offer-pdf-builder.php';
+            $safeBaseName = 'offer_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['offer_id']) . '_' . time();
+            $newPdfPath = UPLOAD_PATH . 'offers/' . $safeBaseName . '.pdf';
+            
+            $pdfData = [
+                'employment_type' => $offer['employment_type'],
+                'candidate_name'  => $offer['candidate_name'],
+                'designation'     => $offer['designation'],
+                'role_code'       => '',
+                'duration_text'   => $offer['duration_text'],
+                'start_date'      => date('d-m-Y', strtotime($offer['start_date'])),
+                'end_date'        => date('d-m-Y', strtotime($offer['end_date'])),
+                'issue_date'      => date('d-m-Y', strtotime($offer['created_at'] ?? 'now')),
+                'location'        => $offer['location'],
+                'responsibilities'=> $offer['responsibilities'] ?? '',
+                'terms'           => $offer['terms_conditions'] ?? ''
+            ];
+            buildOfferLetterPDF($pdfData, $newPdfPath, 'F');
+            if (file_exists($newPdfPath)) {
+                $pdfPath = $newPdfPath;
+                $relPdf = 'uploads/offers/' . $safeBaseName . '.pdf';
+                executeQuery("UPDATE offer_letters SET file_path = ? WHERE id = ?", "si", [$relPdf, $offer['id']]);
+            }
+        }
+
+        if ($pdfPath && file_exists($pdfPath)) {
+            $cleanFilename = 'Offer_Letter_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['candidate_name']) . '.pdf';
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $cleanFilename . '"');
+            header('Content-Length: ' . filesize($pdfPath));
+            header('Cache-Control: private, max-age=0, must-revalidate');
+            header('Pragma: public');
+            readfile($pdfPath);
+            exit;
+        }
+    }
+}
+
 // Search and filter
 $search = trim($_GET['search'] ?? '');
 $typeFilter = trim($_GET['type'] ?? '');
@@ -308,16 +376,21 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                         <a href="<?php echo url($offer['file_path']); ?>" target="_blank" class="saas-action-btn" title="View Document">
                                             <?php echo pika_icon('eye', '', 15); ?>
                                         </a>
-                                        <a href="<?php echo url($offer['file_path']); ?>" download class="saas-action-btn success" title="Download Document">
+                                        <a href="<?php echo url('admin/offer-letters?action=download&id=' . $offer['id']); ?>" class="saas-action-btn success" title="Download PDF Document">
                                             <?php echo pika_icon('download', '', 15); ?>
                                         </a>
                                         <?php if ($offer['status'] !== 'revoked'): ?>
                                         <a href="<?php echo url('admin/offer-letters?action=revoke&id=' . $offer['id']); ?>" 
-                                           class="saas-action-btn delete" title="Revoke Offer"
+                                           class="saas-action-btn warning" title="Revoke Offer"
                                            onclick="return confirm('Revoke official offer letter for <?php echo addslashes($offer['candidate_name']); ?>?');">
                                             <?php echo pika_icon('x', '', 15); ?>
                                         </a>
                                         <?php endif; ?>
+                                        <a href="<?php echo url('admin/offer-letters?action=delete&id=' . $offer['id']); ?>" 
+                                           class="saas-action-btn delete" title="Delete Offer Letter"
+                                           onclick="return confirm('Permanently delete offer letter for <?php echo addslashes($offer['candidate_name']); ?>? This cannot be undone.');">
+                                            <?php echo pika_icon('trash', '', 15); ?>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
