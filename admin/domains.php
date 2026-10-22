@@ -168,7 +168,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Hero Hub -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-7 col-lg-6">
                     <div class="saas-hero-content">
                         <h2 class="saas-hero-title">Organizational Domains & Units</h2>
                         <p class="saas-hero-subtitle">
@@ -190,10 +190,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-5 col-lg-6 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <button class="btn btn-primary btn-glow" data-bs-toggle="modal" data-bs-target="#addDomainModal">
-                            <?php echo pika_icon('plus', 'me-1', 16); ?> Add New Department
+                        <button class="btn btn-saas-dark" data-bs-toggle="modal" data-bs-target="#addDomainModal">
+                            <?php echo pika_icon('plus', '', 16); ?>
+                            <span>Add New Department</span>
                         </button>
                     </div>
                 </div>
@@ -267,8 +268,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <?php echo count($domains); ?> Units
                     </span>
                 </div>
-                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDomainModal">
-                    <?php echo pika_icon('plus', 'me-1', 14); ?> Add Department
+                <button class="btn btn-sm btn-saas-dark" data-bs-toggle="modal" data-bs-target="#addDomainModal">
+                    <?php echo pika_icon('plus', '', 14); ?>
+                    <span>Add Department</span>
                 </button>
             </div>
             <div class="table-responsive">
@@ -450,9 +452,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                 </div>
                 <div class="modal-footer bg-light border-0 px-4 py-3">
-                    <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" name="add_domain" class="btn btn-primary btn-glow px-4">
-                        <?php echo pika_icon('check', 'me-1', 14); ?> Create Department
+                    <button type="button" class="btn btn-saas-light px-3" data-bs-dismiss="modal">
+                        <span>Cancel</span>
+                    </button>
+                    <button type="submit" name="add_domain" class="btn btn-saas-dark px-4">
+                        <?php echo pika_icon('check', '', 14); ?>
+                        <span>Create Department</span>
                     </button>
                 </div>
             </form>
@@ -494,9 +499,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
                 </div>
                 <div class="modal-footer bg-light border-0 px-4 py-3">
-                    <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" name="edit_domain" class="btn btn-primary btn-glow px-4">
-                        <?php echo pika_icon('check', 'me-1', 14); ?> Save Changes
+                    <button type="button" class="btn btn-saas-light px-3" data-bs-dismiss="modal">
+                        <span>Cancel</span>
+                    </button>
+                    <button type="submit" name="edit_domain" class="btn btn-saas-dark px-4">
+                        <?php echo pika_icon('check', '', 14); ?>
+                        <span>Save Changes</span>
                     </button>
                 </div>
             </form>

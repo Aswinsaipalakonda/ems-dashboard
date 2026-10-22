@@ -23,7 +23,7 @@ require_once __DIR__ . '/pikaicons.php';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="<?php echo asset('assets/css/style.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('assets/css/style.css'); ?>?v=<?php echo file_exists(__DIR__ . '/../assets/css/style.css') ? filemtime(__DIR__ . '/../assets/css/style.css') : time(); ?>" rel="stylesheet">
     
     <?php if (isset($extraCSS)) echo $extraCSS; ?>
 </head>

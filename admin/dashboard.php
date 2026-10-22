@@ -86,11 +86,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <div class="header-right">
             <!-- Header Quick Action Shortcuts -->
             <div class="d-none d-md-flex align-items-center gap-2 me-2">
-                <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-outline-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-saas-light">
                     <?php echo pika_icon('offer-letter', '', 16); ?>
                     <span>Issue Offer</span>
                 </a>
-                <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-navy btn-sm rounded-pill d-inline-flex align-items-center gap-2">
+                <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-saas-dark">
                     <?php echo pika_icon('certificate', '', 16); ?>
                     <span>Issue Certificate</span>
                 </a>
@@ -155,7 +155,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Light SaaS Hero (Matches Image 3) -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-7 saas-hero-content">
+                <div class="col-xl-6 col-lg-5 saas-hero-content">
                     <div class="saas-hero-pills">
                         <span class="saas-pill">
                             <?php echo pika_icon('sparkles', '', 14); ?>
@@ -172,16 +172,19 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </p>
                 </div>
                 
-                <div class="col-lg-5 mt-3 mt-lg-0 text-lg-end saas-hero-content">
+                <div class="col-xl-6 col-lg-7 mt-3 mt-lg-0 text-lg-end saas-hero-content">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/employees'); ?>?action=add" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
-                            <?php echo pika_icon('user-plus', 'me-1', 15); ?> Onboard Member
+                        <a href="<?php echo url('admin/employees'); ?>?action=add" class="btn btn-saas-dark">
+                            <?php echo pika_icon('user-plus', '', 16); ?>
+                            <span>Onboard Member</span>
                         </a>
-                        <a href="<?php echo url('admin/tasks'); ?>" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold">
-                            <?php echo pika_icon('tasks', 'me-1', 15); ?> Manage Tasks
+                        <a href="<?php echo url('admin/tasks'); ?>" class="btn btn-saas-light">
+                            <?php echo pika_icon('tasks', '', 16); ?>
+                            <span>Manage Tasks</span>
                         </a>
-                        <a href="<?php echo url('admin/reports'); ?>" class="btn btn-light border rounded-pill px-3 py-2 fw-semibold">
-                            <?php echo pika_icon('reports', 'me-1', 15); ?> Reports
+                        <a href="<?php echo url('admin/reports'); ?>" class="btn btn-saas-light">
+                            <?php echo pika_icon('reports', '', 16); ?>
+                            <span>Reports</span>
                         </a>
                     </div>
                 </div>
@@ -344,7 +347,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <span class="badge bg-warning text-dark font-monospace ms-2"><?php echo $pendingApprovals; ?></span>
                             <?php endif; ?>
                         </div>
-                        <a href="<?php echo url('admin/approvals'); ?>" class="btn btn-navy btn-sm rounded-pill d-inline-flex align-items-center gap-1 font-weight-600">
+                        <a href="<?php echo url('admin/approvals'); ?>" class="btn btn-saas-dark btn-sm">
                             <span>Review Queue</span>
                             <?php echo pika_icon('arrow-right', '', 14); ?>
                         </a>
@@ -430,7 +433,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             </div>
                             <span>Recent Workforce Joiners</span>
                         </div>
-                        <a href="<?php echo url('admin/employees'); ?>" class="btn btn-light btn-sm rounded-pill font-weight-600">
+                        <a href="<?php echo url('admin/employees'); ?>" class="btn btn-saas-light btn-sm">
                             Directory
                         </a>
                     </div>
@@ -560,8 +563,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <div class="bg-light p-2 rounded-3 font-monospace small text-primary mb-3 text-truncate border">
                             https://ems.clientura.in/verify-certificate
                         </div>
-                        <a href="<?php echo url('verify-certificate'); ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill w-100 font-weight-600">
-                            Launch Verification Portal <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                        <a href="<?php echo url('verify-certificate'); ?>" target="_blank" class="btn btn-saas-light w-100">
+                            <span>Launch Verification Portal</span>
+                            <i class="bi bi-box-arrow-up-right ms-1 small"></i>
                         </a>
                     </div>
                 </div>

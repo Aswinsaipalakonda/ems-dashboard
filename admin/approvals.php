@@ -305,7 +305,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Approvals Hero Banner -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-7 col-lg-6">
                     <div class="saas-hero-content">
                         <h2 class="saas-hero-title">Attendance & Identity Verification Hub</h2>
                         <p class="saas-hero-subtitle">
@@ -327,10 +327,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-5 col-lg-6 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/attendance'); ?>" class="btn btn-outline-light">
-                            <?php echo pika_icon('calendar', 'me-1', 16); ?> Attendance Log
+                        <a href="<?php echo url('admin/attendance'); ?>" class="btn btn-saas-light">
+                            <?php echo pika_icon('calendar', '', 16); ?>
+                            <span>Attendance Log</span>
                         </a>
                     </div>
                 </div>
@@ -420,11 +421,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                            value="<?php echo htmlspecialchars($dateFilter); ?>" placeholder="Filter by date">
                 </div>
                 <div class="col-lg-3 col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">
-                        <?php echo pika_icon('filter', '', 15); ?> Apply
+                    <button type="submit" class="btn btn-saas-dark flex-fill">
+                        <?php echo pika_icon('filter', '', 15); ?>
+                        <span>Apply</span>
                     </button>
                     <?php if ($dateFilter || ($statusFilter !== 'pending')): ?>
-                    <a href="<?php echo url('admin/approvals'); ?>" class="btn btn-outline-secondary" title="Reset Filters">
+                    <a href="<?php echo url('admin/approvals'); ?>" class="btn btn-saas-light" title="Reset Filters">
                         <?php echo pika_icon('refresh', '', 15); ?>
                     </a>
                     <?php endif; ?>

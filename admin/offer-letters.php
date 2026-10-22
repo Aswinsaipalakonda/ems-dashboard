@@ -103,7 +103,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Hero Hub -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-7 col-lg-6">
                     <div class="saas-hero-content">
                         <h2 class="saas-hero-title">Candidate Offer Letters</h2>
                         <p class="saas-hero-subtitle">
@@ -125,10 +125,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-5 col-lg-6 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-primary btn-glow">
-                            <?php echo pika_icon('plus', 'me-1', 16); ?> Issue New Offer Letter
+                        <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-saas-dark">
+                            <?php echo pika_icon('plus', '', 16); ?>
+                            <span>Issue New Offer Letter</span>
                         </a>
                     </div>
                 </div>
@@ -208,11 +209,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">
-                        <?php echo pika_icon('filter', '', 15); ?> Apply
+                    <button type="submit" class="btn btn-saas-dark flex-fill">
+                        <?php echo pika_icon('filter', '', 15); ?>
+                        <span>Apply</span>
                     </button>
                     <?php if (!empty($search) || !empty($typeFilter)): ?>
-                    <a href="<?php echo url('admin/offer-letters'); ?>" class="btn btn-outline-secondary" title="Reset Filters">
+                    <a href="<?php echo url('admin/offer-letters'); ?>" class="btn btn-saas-light" title="Reset Filters">
                         <?php echo pika_icon('refresh', '', 15); ?>
                     </a>
                     <?php endif; ?>
@@ -232,8 +234,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <?php echo count($offerLetters); ?> Documents Found
                     </span>
                 </div>
-                <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-sm btn-primary">
-                    <?php echo pika_icon('plus', 'me-1', 14); ?> Issue Offer
+                <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-sm btn-saas-dark">
+                    <?php echo pika_icon('plus', '', 14); ?>
+                    <span>Issue Offer</span>
                 </a>
             </div>
 

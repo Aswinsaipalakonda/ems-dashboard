@@ -180,7 +180,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Hero Hub -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-6 col-lg-5">
                     <div class="saas-hero-content">
                         <h2 class="saas-hero-title">Executive Intelligence & Auditing</h2>
                         <p class="saas-hero-subtitle">
@@ -202,13 +202,15 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-6 col-lg-7 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="?type=<?php echo $reportType; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=csv" class="btn btn-outline-light">
-                            <?php echo pika_icon('download', 'me-1', 16); ?> Export CSV
+                        <a href="?type=<?php echo $reportType; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=csv" class="btn btn-saas-light">
+                            <?php echo pika_icon('download', '', 16); ?>
+                            <span>Export CSV</span>
                         </a>
-                        <a href="?type=<?php echo $reportType; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=pdf" class="btn btn-primary btn-glow">
-                            <?php echo pika_icon('file-text', 'me-1', 16); ?> Download PDF Report
+                        <a href="?type=<?php echo $reportType; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>&export=pdf" class="btn btn-saas-dark">
+                            <?php echo pika_icon('file-text', '', 16); ?>
+                            <span>Download PDF Report</span>
                         </a>
                     </div>
                 </div>
@@ -303,8 +305,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <option value="<?php echo $i; ?>" <?php echo $year == $i ? 'selected' : ''; ?>><?php echo $i; ?></option>
                         <?php endfor; ?>
                     </select>
-                    <button type="submit" class="btn btn-sm btn-primary">
-                        <?php echo pika_icon('filter', '', 14); ?> Filter
+                    <button type="submit" class="btn btn-sm btn-saas-dark">
+                        <?php echo pika_icon('filter', '', 14); ?>
+                        <span>Filter</span>
                     </button>
                 </form>
                 <?php endif; ?>

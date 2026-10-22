@@ -298,7 +298,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- Hero Hub -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-7 col-lg-6">
                     <div class="saas-hero-content">
                         <h2 class="saas-hero-title">Task & Project Operations Hub</h2>
                         <p class="saas-hero-subtitle">
@@ -320,10 +320,11 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-5 col-lg-6 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="?action=add" class="btn btn-primary btn-glow">
-                            <?php echo pika_icon('plus', 'me-1', 16); ?> Create New Task
+                        <a href="?action=add" class="btn btn-saas-dark">
+                            <?php echo pika_icon('plus', '', 16); ?>
+                            <span>Create New Task</span>
                         </a>
                     </div>
                 </div>
@@ -419,11 +420,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">
-                        <?php echo pika_icon('filter', '', 15); ?> Apply
+                    <button type="submit" class="btn btn-saas-dark flex-fill">
+                        <?php echo pika_icon('filter', '', 15); ?>
+                        <span>Apply</span>
                     </button>
                     <?php if ($statusFilter || $priorityFilter || $employeeFilter): ?>
-                    <a href="tasks" class="btn btn-outline-secondary" title="Reset Filters">
+                    <a href="tasks" class="btn btn-saas-light" title="Reset Filters">
                         <?php echo pika_icon('refresh', '', 15); ?>
                     </a>
                     <?php endif; ?>
@@ -443,8 +445,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <?php echo count($groupedTasks); ?> Workstreams (<?php echo count($tasks); ?> Assignees)
                     </span>
                 </div>
-                <a href="?action=add" class="btn btn-sm btn-primary">
-                    <?php echo pika_icon('plus', 'me-1', 14); ?> New Task
+                <a href="?action=add" class="btn btn-sm btn-saas-dark">
+                    <?php echo pika_icon('plus', '', 14); ?>
+                    <span>New Task</span>
                 </a>
             </div>
 
@@ -751,11 +754,13 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </div>
 
                     <div class="d-flex gap-2 mt-4 pt-2">
-                        <button type="submit" class="btn btn-primary btn-glow px-4">
-                            <?php echo pika_icon('check', 'me-1', 16); ?>
-                            <?php echo $action === 'add' ? 'Deploy Task' : 'Save Changes'; ?>
+                        <button type="submit" class="btn btn-saas-dark px-4">
+                            <?php echo pika_icon('check', '', 16); ?>
+                            <span><?php echo $action === 'add' ? 'Deploy Task' : 'Save Changes'; ?></span>
                         </button>
-                        <a href="tasks" class="btn btn-outline-secondary px-3">Cancel</a>
+                        <a href="tasks" class="btn btn-saas-light px-3">
+                            <span>Cancel</span>
+                        </a>
                     </div>
                 </form>
             </div>

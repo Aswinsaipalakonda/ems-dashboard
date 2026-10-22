@@ -94,8 +94,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 <p class="text-muted mb-0">Live interactive preview with dynamic signatures and production QR verification link.</p>
             </div>
             <div>
-                <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-outline-primary">
-                    <i class="bi bi-arrow-left me-1"></i> Back to Certificates
+                <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-saas-light">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    <span>Back to Certificates</span>
                 </a>
             </div>
         </div>
@@ -192,8 +193,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             </div>
 
                             <!-- Submit Button -->
-                            <button type="button" class="btn btn-primary w-100 py-3 font-weight-bold" id="btnIssueCert">
-                                <i class="bi bi-award me-1"></i> Issue & Generate Verified Certificate
+                            <button type="button" class="btn btn-saas-dark w-100 py-3" id="btnIssueCert">
+                                <i class="bi bi-award me-1"></i>
+                                <span>Issue & Generate Verified Certificate</span>
                             </button>
                         </form>
                     </div>
@@ -209,8 +211,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             <span class="badge bg-success-subtle text-success">
                                 <i class="bi bi-shield-check me-1"></i> QR Verified
                             </span>
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnDownloadPreview">
-                                <i class="bi bi-download"></i> Download PNG
+                            <button type="button" class="btn btn-sm btn-saas-light" id="btnDownloadPreview">
+                                <i class="bi bi-download me-1"></i>
+                                <span>Download PNG</span>
                             </button>
                         </div>
                     </div>

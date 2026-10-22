@@ -21,7 +21,7 @@
     --text-primary: #0F172A;
     --text-secondary: #475569;
     --text-muted: #94A3B8;
-    --sidebar-width: 276px;
+    --sidebar-width: 260px;
     --header-height: 65px;
     --border-radius-pill: 9999px;
     --border-radius-card: 20px;
@@ -2492,5 +2492,191 @@ a.btn,
     color: #FFFFFF;
     border-color: #FFA500;
 }
+
+/* Sleek SaaS Buttons (Black Pill Button matching user reference Image 3) */
+.btn-saas-dark, 
+.btn-primary, 
+.btn-navy {
+    background: #0F172A !important;
+    color: #FFFFFF !important;
+    border: 1px solid #0F172A !important;
+    border-radius: 9999px !important;
+    padding: 10px 22px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    line-height: 1.2 !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.16) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    white-space: nowrap !important;
+    cursor: pointer;
+}
+
+.btn-saas-dark:hover, 
+.btn-primary:hover, 
+.btn-navy:hover {
+    background: #020617 !important;
+    color: #FFFFFF !important;
+    border-color: #020617 !important;
+    transform: translateY(-1.5px) !important;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.24) !important;
+}
+
+.btn-saas-dark svg, 
+.btn-primary svg, 
+.btn-navy svg {
+    color: #FFFFFF !important;
+    flex-shrink: 0;
+}
+
+/* Secondary Sleek Light Pill Button */
+.btn-saas-light, 
+.btn-outline-secondary {
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1.5px solid #E2E8F0 !important;
+    border-radius: 9999px !important;
+    padding: 9.5px 20px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    line-height: 1.2 !important;
+    text-decoration: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    cursor: pointer;
+}
+
+.btn-saas-light:hover, 
+.btn-outline-secondary:hover {
+    background: #F8FAFC !important;
+    color: #0F172A !important;
+    border-color: #CBD5E1 !important;
+    transform: translateY(-1.5px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.btn-saas-light svg, 
+.btn-outline-secondary svg {
+    color: #475569 !important;
+    flex-shrink: 0;
+}
+
+/* Hero Action Bar Alignment */
+.saas-hero-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    flex-wrap: nowrap !important;
+}
+
+@media (max-width: 991px) {
+    .saas-hero-actions {
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+        margin-top: 14px !important;
+    }
+}
+
+/* SaaS Interactive Action Command Cards (Dashboard Middle Row) */
+.saas-action-card {
+    background: #FFFFFF !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(226, 232, 240, 0.85) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    padding: 20px 22px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    text-decoration: none !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    height: 100% !important;
+}
+
+.saas-action-card:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06) !important;
+    border-color: #CBD5E1 !important;
+}
+
+.saas-action-icon {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.2s ease !important;
+}
+
+.saas-action-card:hover .saas-action-icon {
+    transform: scale(1.06) !important;
+}
+
+.saas-action-text {
+    flex-grow: 1 !important;
+}
+
+.saas-action-title {
+    font-size: 0.96rem !important;
+    font-weight: 700 !important;
+    color: #0F172A !important;
+    margin-bottom: 3px !important;
+}
+
+.saas-action-desc {
+    font-size: 0.82rem !important;
+    color: #64748B !important;
+    margin: 0 !important;
+    line-height: 1.35 !important;
+}
+
+.saas-action-arrow {
+    color: #94A3B8 !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.2s ease, color 0.2s ease !important;
+}
+
+.saas-action-card:hover .saas-action-arrow {
+    transform: translateX(4px) !important;
+    color: #0F172A !important;
+}
+
+/* Department Progress Rows */
+.domain-row {
+    margin-bottom: 14px;
+}
+.domain-row:last-child {
+    margin-bottom: 0;
+}
+.domain-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.domain-progress {
+    height: 7px;
+    background: #F1F5F9;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+.domain-progress-bar {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+}
+
 
 

@@ -127,13 +127,13 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </p>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-lg-5 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold">
-                            <?php echo pika_icon('edit', 'me-1', 15); ?> Manage Signatories
+                        <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-saas-light">
+                            <?php echo pika_icon('edit', '', 15); ?> Manage Signatories
                         </a>
-                        <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
-                            <?php echo pika_icon('plus', 'me-1', 15); ?> Issue New Certificate
+                        <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-saas-dark">
+                            <?php echo pika_icon('plus', '', 15); ?> Issue New Certificate
                         </a>
                     </div>
                 </div>
@@ -212,11 +212,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary rounded-pill flex-fill fw-semibold">
-                        <?php echo pika_icon('filter', '', 15); ?> Apply
+                    <button type="submit" class="btn btn-saas-dark flex-fill">
+                        <?php echo pika_icon('filter', '', 15); ?>
+                        <span>Apply</span>
                     </button>
                     <?php if (!empty($search) || !empty($statusFilter)): ?>
-                    <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-outline-secondary rounded-pill" title="Reset Filters">
+                    <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-saas-light" title="Reset Filters">
                         <?php echo pika_icon('refresh', '', 15); ?>
                     </a>
                     <?php endif; ?>
@@ -237,11 +238,13 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </span>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                        <?php echo pika_icon('signature', 'me-1', 14); ?> Manage Signatories
+                    <a href="<?php echo url('admin/signatories'); ?>" class="btn btn-sm btn-saas-light">
+                        <?php echo pika_icon('signature', '', 14); ?>
+                        <span>Manage Signatories</span>
                     </a>
-                    <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-sm btn-primary rounded-pill px-3">
-                        <?php echo pika_icon('plus', 'me-1', 14); ?> Issue Certificate
+                    <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-sm btn-saas-dark">
+                        <?php echo pika_icon('plus', '', 14); ?>
+                        <span>Issue Certificate</span>
                     </a>
                 </div>
             </div>
@@ -267,8 +270,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <?php echo pika_icon('certificate', 'opacity-25 d-block mx-auto mb-3', 48); ?>
                                 <h6 class="fw-bold text-dark">No Certificates Issued Yet</h6>
                                 <p class="text-muted small mb-3">Generate completion certificates with official executive signature and QR authentication.</p>
-                                <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-primary rounded-pill px-4 btn-sm">
-                                    <?php echo pika_icon('plus', 'me-1', 14); ?> Issue First Certificate
+                                <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-saas-dark btn-sm">
+                                    <?php echo pika_icon('plus', '', 14); ?>
+                                    <span>Issue First Certificate</span>
                                 </a>
                             </td>
                         </tr>

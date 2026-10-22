@@ -262,7 +262,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         <!-- SaaS Hero Header -->
         <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-lg-8">
+                <div class="col-xl-6 col-lg-5">
                     <div class="saas-hero-content">
                         <h2 class="saas-hero-title">Workforce & Talent Directory</h2>
                         <p class="saas-hero-subtitle">
@@ -284,13 +284,15 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-xl-6 col-lg-7 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/domains'); ?>" class="btn btn-outline-light">
-                            <?php echo pika_icon('domains', 'me-1', 16); ?>Manage Domains
+                        <a href="<?php echo url('admin/domains'); ?>" class="btn btn-saas-light">
+                            <?php echo pika_icon('domains', '', 16); ?>
+                            <span>Manage Domains</span>
                         </a>
-                        <a href="<?php echo url('admin/employees'); ?>?action=add" class="btn btn-primary btn-glow">
-                            <?php echo pika_icon('user-plus', 'me-1', 16); ?>Add Employee
+                        <a href="<?php echo url('admin/employees'); ?>?action=add" class="btn btn-saas-dark">
+                            <?php echo pika_icon('user-plus', '', 16); ?>
+                            <span>Add Employee</span>
                         </a>
                     </div>
                 </div>
@@ -382,11 +384,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill">
-                        <?php echo pika_icon('filter', '', 15); ?> Apply
+                    <button type="submit" class="btn btn-saas-dark flex-fill">
+                        <?php echo pika_icon('filter', '', 15); ?>
+                        <span>Apply</span>
                     </button>
                     <?php if ($search || $statusFilter || $domainFilter): ?>
-                    <a href="<?php echo url('admin/employees'); ?>" class="btn btn-outline-secondary" title="Clear Filters">
+                    <a href="<?php echo url('admin/employees'); ?>" class="btn btn-saas-light" title="Clear Filters">
                         <?php echo pika_icon('refresh', '', 15); ?>
                     </a>
                     <?php endif; ?>
@@ -407,11 +410,13 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                     </span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-sm btn-outline-primary">
-                        <?php echo pika_icon('offer-letter', 'me-1', 14); ?> Issue Offer
+                    <a href="<?php echo url('admin/generate-offer'); ?>" class="btn btn-sm btn-saas-light">
+                        <?php echo pika_icon('offer-letter', '', 14); ?>
+                        <span>Issue Offer</span>
                     </a>
-                    <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-sm btn-outline-primary">
-                        <?php echo pika_icon('certificate', 'me-1', 14); ?> Issue Certificate
+                    <a href="<?php echo url('admin/generate-certificate'); ?>" class="btn btn-sm btn-saas-dark">
+                        <?php echo pika_icon('certificate', '', 14); ?>
+                        <span>Issue Certificate</span>
                     </a>
                 </div>
             </div>
@@ -699,11 +704,13 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             </div>
 
                             <div class="d-flex gap-2 mt-4 pt-2">
-                                <button type="submit" class="btn btn-primary btn-glow px-4">
-                                    <?php echo pika_icon('check', 'me-1', 16); ?>
-                                    <?php echo $action === 'add' ? 'Confirm & Create Employee' : 'Save Changes'; ?>
+                                <button type="submit" class="btn btn-saas-dark px-4">
+                                    <?php echo pika_icon('check', '', 16); ?>
+                                    <span><?php echo $action === 'add' ? 'Confirm & Create Employee' : 'Save Changes'; ?></span>
                                 </button>
-                                <a href="<?php echo url('admin/employees'); ?>" class="btn btn-outline-secondary px-3">Cancel</a>
+                                <a href="<?php echo url('admin/employees'); ?>" class="btn btn-saas-light px-3">
+                                    <span>Cancel</span>
+                                </a>
                             </div>
                         </form>
                         <?php endif; ?>

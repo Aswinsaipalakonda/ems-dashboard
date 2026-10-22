@@ -234,13 +234,13 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         </p>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-3 mt-lg-0 text-lg-end">
+                <div class="col-lg-5 mt-3 mt-lg-0 text-lg-end">
                     <div class="saas-hero-actions">
-                        <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold">
-                            <?php echo pika_icon('certificate', 'me-1', 15); ?> View Certificates
+                        <a href="<?php echo url('admin/certificates'); ?>" class="btn btn-saas-light">
+                            <?php echo pika_icon('certificate', '', 15); ?> View Certificates
                         </a>
-                        <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addSignatoryModal">
-                            <?php echo pika_icon('plus', 'me-1', 15); ?> Add Signatory
+                        <button type="button" class="btn btn-saas-dark" data-bs-toggle="modal" data-bs-target="#addSignatoryModal">
+                            <?php echo pika_icon('plus', '', 15); ?> Add Signatory
                         </button>
                     </div>
                 </div>
@@ -342,8 +342,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                         <h5 class="fw-bold text-dark mb-1"><?php echo htmlspecialchars($sig['name']); ?></h5>
                         <p class="text-muted small mb-4"><?php echo htmlspecialchars($sig['designation']); ?></p>
 
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#editSigModal<?php echo $sig['id']; ?>">
-                            <?php echo pika_icon('edit', 'me-1', 14); ?> Edit & Upload Signature
+                        <button type="button" class="btn btn-saas-light btn-sm w-100" data-bs-toggle="modal" data-bs-target="#editSigModal<?php echo $sig['id']; ?>">
+                            <?php echo pika_icon('edit', '', 14); ?>
+                            <span>Edit & Upload Signature</span>
                         </button>
                     </div>
                 </div>
@@ -380,9 +381,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 </div>
                             </div>
                             <div class="modal-footer bg-light border-0 px-4 py-3">
-                                <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary rounded-pill px-4">
-                                    <?php echo pika_icon('check', 'me-1', 14); ?> Save Changes
+                                <button type="button" class="btn btn-saas-light px-3" data-bs-dismiss="modal">
+                                    <span>Cancel</span>
+                                </button>
+                                <button type="submit" class="btn btn-saas-dark px-4">
+                                    <?php echo pika_icon('check', '', 14); ?>
+                                    <span>Save Changes</span>
                                 </button>
                             </div>
                         </form>
@@ -422,9 +426,12 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             </div>
                         </div>
                         <div class="modal-footer bg-light border-0 px-4 py-3">
-                            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4">
-                                <?php echo pika_icon('check', 'me-1', 14); ?> Add Officer
+                            <button type="button" class="btn btn-saas-light px-3" data-bs-dismiss="modal">
+                                <span>Cancel</span>
+                            </button>
+                            <button type="submit" class="btn btn-saas-dark px-4">
+                                <?php echo pika_icon('check', '', 14); ?>
+                                <span>Add Officer</span>
                             </button>
                         </div>
                     </form>

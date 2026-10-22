@@ -312,8 +312,9 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                 <p class="text-muted mb-0">Dynamic letterhead generation matching Clientura official template and terms.</p>
             </div>
             <div>
-                <a href="<?php echo url('admin/offer-letters'); ?>" class="btn btn-outline-primary">
-                    <i class="bi bi-arrow-left me-1"></i> Back to Offer Letters
+                <a href="<?php echo url('admin/offer-letters'); ?>" class="btn btn-saas-light">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    <span>Back to Offer Letters</span>
                 </a>
             </div>
         </div>
@@ -428,8 +429,9 @@ Follow development standards, documentation practices, and security guidelines e
 Submit a final report and presentation outlining your work, achievements, and learning outcomes at the end of the internship.</textarea>
                             </div>
 
-                            <button type="button" class="btn btn-primary w-100 py-3 font-weight-bold" id="btnIssueOffer">
-                                <i class="bi bi-file-earmark-pdf me-1"></i> Generate & Issue Official Offer Letter
+                            <button type="button" class="btn btn-saas-dark w-100 py-3" id="btnIssueOffer">
+                                <i class="bi bi-file-earmark-pdf me-1"></i>
+                                <span>Generate & Issue Official Offer Letter</span>
                             </button>
                         </form>
                     </div>
@@ -441,8 +443,9 @@ Submit a final report and presentation outlining your work, achievements, and le
                 <div class="card border-0 shadow-sm sticky-top" style="top: 90px;">
                     <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                         <span class="font-weight-bold text-dark">Live Document Preview</span>
-                        <button type="button" class="btn btn-sm btn-primary" onclick="openLivePreviewTab()" style="border-radius: 9999px; font-weight: 600; padding: 6px 18px;">
-                            <i class="bi bi-box-arrow-up-right me-1"></i> Live Preview
+                        <button type="button" class="btn btn-sm btn-saas-dark" onclick="openLivePreviewTab()">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>
+                            <span>Live Preview</span>
                         </button>
                     </div>
                     <div class="card-body p-3" style="background: #F1F5F9; border-radius: 0 0 20px 20px; overflow-y: auto; max-height: 800px;">
