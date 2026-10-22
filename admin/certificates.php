@@ -154,7 +154,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
         </div>
 
         <!-- Certificates Table -->
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm card-table">
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                 <span class="font-weight-bold text-dark">Issued Certificates Log</span>
                 <span class="text-muted small"><?php echo count($certificates); ?> records found</span>

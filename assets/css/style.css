@@ -139,9 +139,9 @@ a.btn,
     left: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    background: linear-gradient(180deg, #0A1138 0%, #070B24 100%) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 16px 8px !important;
+    background: #090E24 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    padding: 16px 10px !important;
     z-index: 1000;
     transition: all 0.3s ease;
     overflow-y: auto;
@@ -150,29 +150,55 @@ a.btn,
 }
 
 .sidebar-header {
-    padding: 4px 8px 16px !important;
+    padding: 4px 6px 18px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 14px !important;
 }
 
-.sidebar-logo {
+.sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    text-decoration: none;
+    gap: 12px;
+    text-decoration: none !important;
 }
 
-.sidebar-logo img {
-    height: 36px;
-    width: auto;
+.sidebar-brand-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-brand-icon img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
 }
 
-.sidebar-logo span {
-    font-size: 16.5px !important;
-    font-weight: 700;
+.sidebar-brand-text {
+    overflow: hidden;
+}
+
+.sidebar-brand-text .brand-title {
     color: #FFFFFF !important;
-    letter-spacing: -0.3px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.25;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+}
+
+.sidebar-brand-text .brand-subtitle {
+    color: #8F9BB3 !important;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
 }
 
 .sidebar-menu {
@@ -183,59 +209,87 @@ a.btn,
 }
 
 .sidebar-menu li {
-    margin-bottom: 2px !important;
+    margin-bottom: 3px !important;
     list-style: none !important;
 }
 
 .sidebar-menu a {
     display: flex;
     align-items: center;
-    padding: 9px 12px !important;
-    color: #94A3B8 !important;
-    text-decoration: none;
-    border-radius: var(--border-radius-pill) !important;
-    transition: all 0.2s ease;
+    padding: 10px 16px !important;
+    color: #8F9BB3 !important;
+    text-decoration: none !important;
+    border-radius: 9999px !important;
+    transition: all 0.18s ease-in-out;
     font-weight: 500;
-    font-size: 13px !important;
-    gap: 10px !important;
+    font-size: 13.5px !important;
+    gap: 12px !important;
 }
 
 .sidebar-menu a svg,
 .sidebar-menu a i {
-    font-size: 17px !important;
-    color: #94A3B8 !important;
-    transition: transform 0.2s ease;
+    font-size: 18px !important;
+    color: #8F9BB3 !important;
+    transition: color 0.18s ease;
+    flex-shrink: 0;
 }
 
 .sidebar-menu a:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
     color: #FFFFFF !important;
-    transform: translateX(3px);
 }
 
 .sidebar-menu a:hover svg,
 .sidebar-menu a:hover i {
     color: #FFFFFF !important;
-    transform: scale(1.08);
 }
 
+/* Image 2 Reference: Solid Pure White Pill for Selected Link */
 .sidebar-menu a.active {
-    background: linear-gradient(135deg, #1C2766 0%, #29388C 100%) !important;
-    color: #FFFFFF !important;
-    font-weight: 600;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
-    border-left: 3px solid #FFA500 !important;
+    background: #FFFFFF !important;
+    color: #0A1138 !important;
+    font-weight: 700 !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+    border-left: none !important;
 }
 
 .sidebar-menu a.active svg,
 .sidebar-menu a.active i {
-    color: #FFA500 !important;
+    color: #0A1138 !important;
+    stroke: #0A1138 !important;
 }
 
 .sidebar-divider {
     height: 1px !important;
     background: rgba(255, 255, 255, 0.08) !important;
-    margin: 10px 4px !important;
+    margin: 12px 6px !important;
+}
+
+/* Logout link styled in coral-red matching Image 2 */
+.sidebar-logout-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px !important;
+    color: #FF4D4D !important;
+    font-weight: 600;
+    font-size: 13.5px !important;
+    text-decoration: none !important;
+    border-radius: 9999px !important;
+    transition: all 0.18s ease;
+    margin-top: auto;
+}
+
+.sidebar-logout-link svg,
+.sidebar-logout-link i {
+    color: #FF4D4D !important;
+    font-size: 18px !important;
+}
+
+.sidebar-logout-link:hover {
+    background: rgba(255, 77, 77, 0.1) !important;
+    color: #FF6666 !important;
 }
 
 /* Remove category headings completely */
@@ -244,10 +298,72 @@ a.btn,
     display: none !important;
 }
 
-/* User Card in Sidebar Bottom */
+/* Table & Responsive Container Fixes (Image 5) */
+.card:has(.table),
+.card:has(.table-responsive),
+.card.card-table {
+    overflow: visible !important;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: visible !important;
+    min-height: 200px;
+}
+
+.table {
+    min-width: 960px;
+    width: 100%;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table > :not(caption) > * > * {
+    padding: 14px 18px !important;
+    vertical-align: middle;
+}
+
+.table thead th {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #64748B !important;
+    background-color: #F8FAFC !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    font-size: 13.5px;
+    color: var(--dark-color);
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+}
+
+.table-hover > tbody > tr:hover > * {
+    background-color: rgba(10, 17, 56, 0.02) !important;
+}
+
+.dropdown-menu {
+    z-index: 1065 !important;
+    box-shadow: 0 10px 30px rgba(10, 17, 56, 0.15) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.dropdown-item {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(10, 17, 56, 0.05);
+}
+
 .sidebar-user-card {
-    margin-top: auto !important;
-    padding: 10px 12px !important;
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: var(--border-radius-card);

@@ -20,9 +20,14 @@ $teamLeadCheckinRequired = fetchOne(
 <!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <a href="<?php echo url('teamlead/dashboard'); ?>" class="sidebar-logo">
-            <img src="<?php echo APP_URL; ?>/assets/img/clientura-logo.png" alt="<?php echo APP_NAME; ?>" style="height: 40px; object-fit: contain;">
-            <span><?php echo APP_NAME; ?></span>
+        <a href="<?php echo url('teamlead/dashboard'); ?>" class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <img src="<?php echo APP_URL; ?>/assets/img/clientura-logo.png" alt="<?php echo APP_NAME; ?>">
+            </div>
+            <div class="sidebar-brand-text">
+                <div class="brand-title">Clientura EMS</div>
+                <div class="brand-subtitle">Team Lead Portal</div>
+            </div>
         </a>
     </div>
     
@@ -104,19 +109,10 @@ $teamLeadCheckinRequired = fetchOne(
         <div class="sidebar-divider"></div>
         
         <li>
-            <a href="<?php echo url('logout'); ?>" class="text-danger">
+            <a href="<?php echo url('logout'); ?>" class="sidebar-logout-link">
                 <?php echo pika_icon('logout'); ?>
-                <span>Logout</span>
+                <span>Sign Out</span>
             </a>
         </li>
     </ul>
-
-    <!-- Bottom User Profile Card -->
-    <div class="sidebar-user-card">
-        <img src="<?php echo !empty($_SESSION['avatar']) ? url('uploads/avatars/' . $_SESSION['avatar']) : url('assets/img/default-avatar.png'); ?>" alt="Avatar" class="sidebar-user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'Lead'); ?>&background=0A1138&color=FFA500';">
-        <div class="sidebar-user-details">
-            <div class="sidebar-user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Team Lead'); ?></div>
-            <div class="sidebar-user-role">Team Lead</div>
-        </div>
-    </div>
 </aside>

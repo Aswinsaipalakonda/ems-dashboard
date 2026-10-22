@@ -61,14 +61,14 @@ To confirm your acceptance of this offer, please reply to this email. Upon recei
 
 We look forward to welcoming you to our team and supporting your professional growth as a {designation}."""
 
-    content_rect = fitz.Rect(32, 172, 563, 725)
-    page.insert_textbox(content_rect, body_text, fontsize=9.2, fontname="helv", lineheight=1.24)
+    content_rect = fitz.Rect(26, 188, 568, 725)
+    page.insert_textbox(content_rect, body_text, fontsize=10.6, fontname="helv", lineheight=1.38)
 
     # 3. Sign-offs
-    page.insert_text(fitz.Point(32, 735), "Warm regards,", fontsize=10, fontname="helv")
-    page.insert_text(fitz.Point(32, 748), "Clientura", fontsize=10, fontname="helv")
+    page.insert_text(fitz.Point(26, 735), "Warm regards,", fontsize=10.8, fontname="helv")
+    page.insert_text(fitz.Point(26, 748), "Clientura", fontsize=10.8, fontname="helv")
 
-    page.insert_text(fitz.Point(430, 775), "Signature of candidate", fontsize=10, fontname="helv")
+    page.insert_text(fitz.Point(438, 782), "Signature of candidate", fontsize=10.8, fontname="helv")
 
     out_file = data.get('output_path')
     os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)

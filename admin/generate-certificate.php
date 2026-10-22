@@ -312,6 +312,39 @@ function renderCertificate() {
     }
 }
 
+// Helper function to remove white/near-white background from uploaded signatures
+function getTransparentSignatureCanvas(img) {
+    if (!img || !img.complete || !img.naturalWidth) return img;
+    try {
+        const off = document.createElement('canvas');
+        off.width = img.naturalWidth;
+        off.height = img.naturalHeight;
+        const offCtx = off.getContext('2d');
+        offCtx.drawImage(img, 0, 0);
+
+        const imgData = offCtx.getImageData(0, 0, off.width, off.height);
+        const data = imgData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            // Remove white, off-white and light gray backgrounds
+            if (r > 205 && g > 205 && b > 205) {
+                data[i + 3] = 0; // Transparent
+            } else if (r > 180 && g > 180 && b > 180) {
+                // Feather edge alpha
+                const avg = (r + g + b) / 3;
+                data[i + 3] = Math.max(0, Math.floor(255 - ((avg - 180) / 25) * 255));
+            }
+        }
+        offCtx.putImageData(imgData, 0, 0);
+        return off;
+    } catch (e) {
+        return img;
+    }
+}
+
 function drawCanvasContent() {
     if (!templateImg.complete) return;
 
@@ -337,92 +370,97 @@ function drawCanvasContent() {
     const sigName = (sigOpt ? sigOpt.getAttribute('data-name') : 'MR. P. SOWSHEEL').toUpperCase();
     const sigTitle = (sigOpt ? sigOpt.getAttribute('data-title') : 'FOUNDER & CEO CLIENTURA').toUpperCase();
 
-    // 2. Headings (Using Inter font with calibrated reference baselines)
+    // 2. Headings (Using Inter font with prominent, readable sizing matching Image 4)
     ctx.textAlign = 'center';
     
     // "CERTIFICATE"
-    ctx.font = '800 68px "Inter", sans-serif';
+    ctx.font = '800 84px "Inter", sans-serif';
     ctx.fillStyle = '#0A1138';
-    ctx.fillText('CERTIFICATE', 1000, 450);
+    ctx.fillText('CERTIFICATE', 1000, 430);
 
     // "OF COMPLETION"
-    ctx.font = '600 34px "Inter", sans-serif';
-    ctx.letterSpacing = '7px';
-    ctx.fillText('OF COMPLETION', 1000, 525);
+    ctx.font = '600 42px "Inter", sans-serif';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('OF COMPLETION', 1000, 505);
     ctx.letterSpacing = '0px';
 
     // "THIS CERTIFICATE IS PRESENTED TO"
-    ctx.font = '700 24px "Inter", sans-serif';
-    ctx.letterSpacing = '2.5px';
-    ctx.fillText('THIS CERTIFICATE IS PRESENTED TO', 1000, 615);
+    ctx.font = '700 30px "Inter", sans-serif';
+    ctx.letterSpacing = '3px';
+    ctx.fillText('THIS CERTIFICATE IS PRESENTED TO', 1000, 595);
     ctx.letterSpacing = '0px';
 
-    // 3. Recipient Name (Golden / Amber Serif)
-    ctx.font = '700 70px "Playfair Display", "Times New Roman", "Inter", serif';
+    // 3. Recipient Name (Golden / Amber Serif - Large & Prominent)
+    ctx.font = '700 84px "Playfair Display", "Times New Roman", "Inter", serif';
     ctx.fillStyle = rawName ? '#DF9E1D' : 'rgba(223, 158, 29, 0.45)';
-    ctx.fillText(name, 1000, 750);
+    ctx.fillText(name, 1000, 730);
 
-    // 4. Recognition Paragraph
-    ctx.font = '400 26px "Inter", sans-serif';
+    // 4. Recognition Paragraph (Large, Readable 34px Font)
+    ctx.font = '400 34px "Inter", sans-serif';
     ctx.fillStyle = '#334155';
     const p1 = 'In recognition of her efforts and achievement in completing the';
-    ctx.fillText(p1, 1000, 875);
+    ctx.fillText(p1, 1000, 845);
 
     // Line 2: "{Duration} internship program as {Role}." perfectly centered
     const p2Prefix = duration + ' internship program as ';
     const p2Role = role + '.';
     
-    ctx.font = '400 26px "Inter", sans-serif';
+    ctx.font = '400 34px "Inter", sans-serif';
     const prefixW = ctx.measureText(p2Prefix).width;
-    ctx.font = '700 26px "Inter", sans-serif';
+    ctx.font = '700 34px "Inter", sans-serif';
     const roleW = ctx.measureText(p2Role).width;
     const totalW = prefixW + roleW;
     const startX = 1000 - (totalW / 2);
 
     ctx.textAlign = 'left';
-    ctx.font = '400 26px "Inter", sans-serif';
+    ctx.font = '400 34px "Inter", sans-serif';
     ctx.fillStyle = '#334155';
-    ctx.fillText(p2Prefix, startX, 925);
+    ctx.fillText(p2Prefix, startX, 905);
 
-    ctx.font = '700 26px "Inter", sans-serif';
+    ctx.font = '700 34px "Inter", sans-serif';
     ctx.fillStyle = '#0A1138';
-    ctx.fillText(p2Role, startX + prefixW, 925);
+    ctx.fillText(p2Role, startX + prefixW, 905);
 
     // Line 3: "Conducted From START DATE - END DATE"
     ctx.textAlign = 'center';
-    ctx.font = '700 26px "Inter", sans-serif';
+    ctx.font = '700 34px "Inter", sans-serif';
     ctx.fillStyle = '#0A1138';
-    ctx.fillText('Conducted From ' + sDate + ' - ' + eDate, 1000, 990);
+    ctx.fillText('Conducted From ' + sDate + ' - ' + eDate, 1000, 980);
 
-    // 5. Bottom Left: Date of Issue & Certificate ID
+    // 5. Bottom Left: Date of Issue & Certificate ID (Prominent 30px / 34px)
     ctx.textAlign = 'left';
     ctx.fillStyle = '#0A1138';
-    ctx.font = '500 25px "Inter", sans-serif';
-    ctx.fillText('Date of Issue: ' + iDate, 180, 1210);
-    ctx.font = '700 28px "Inter", sans-serif';
-    ctx.fillText('ID: ' + certId, 180, 1255);
+    ctx.font = '500 30px "Inter", sans-serif';
+    ctx.fillText('Date of Issue: ' + iDate, 160, 1205);
+    ctx.font = '700 34px "Inter", sans-serif';
+    ctx.fillText('ID: ' + certId, 160, 1255);
 
-    // Draw QR Code on Bottom Left next to ID
+    // 6. Center: QR Code (As requested and marked in Image 4!)
     if (qrImageElement) {
         try {
-            ctx.drawImage(qrImageElement, 540, 1145, 115, 115);
+            const qrSize = 140;
+            const qrX = 1000 - (qrSize / 2); // Perfectly centered at 1000
+            const qrY = 1130;
+            ctx.drawImage(qrImageElement, qrX, qrY, qrSize, qrSize);
         } catch (err) {
-            // In case image hasn't loaded yet
+            // QR element not ready yet
         }
     }
 
-    // 6. Bottom Right: Signature, Line, Name, and Title
+    // 7. Bottom Right: Large Signature with Transparent BG, Line, Name, and Title
     ctx.textAlign = 'center';
-    const sigCenterX = 1520;
+    const sigCenterX = 1550;
 
-    // Signature image if available
+    // Signature image with background removed
     if (signatureImg && signatureImg.complete && signatureImg.naturalWidth > 0) {
-        const sigW = 200;
+        const transSig = getTransparentSignatureCanvas(signatureImg);
+        const sigW = 320;
         const sigH = (signatureImg.naturalHeight / signatureImg.naturalWidth) * sigW;
-        ctx.drawImage(signatureImg, sigCenterX - (sigW / 2), 1140 - sigH, sigW, Math.min(sigH, 90));
+        const drawH = Math.min(sigH, 130);
+        ctx.drawImage(transSig, sigCenterX - (sigW / 2), 1145 - drawH, sigW, drawH);
     } else {
         // Cursive script placeholder
-        ctx.font = 'italic 34px "Brush Script MT", cursive, serif';
+        ctx.font = 'italic 46px "Brush Script MT", cursive, serif';
         ctx.fillStyle = '#0A1138';
         ctx.fillText(sigName, sigCenterX, 1130);
     }
@@ -436,13 +474,13 @@ function drawCanvasContent() {
     ctx.stroke();
 
     // Signatory Name & Title
-    ctx.font = '800 26px "Inter", sans-serif';
+    ctx.font = '800 30px "Inter", sans-serif';
     ctx.fillStyle = '#0A1138';
-    ctx.fillText(sigName, sigCenterX, 1195);
+    ctx.fillText(sigName, sigCenterX, 1200);
 
-    ctx.font = '600 20px "Inter", sans-serif';
+    ctx.font = '600 22px "Inter", sans-serif';
     ctx.letterSpacing = '1px';
-    ctx.fillText(sigTitle, sigCenterX, 1235);
+    ctx.fillText(sigTitle, sigCenterX, 1242);
     ctx.letterSpacing = '0px';
 }
 

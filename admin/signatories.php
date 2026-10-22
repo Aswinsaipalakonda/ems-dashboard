@@ -35,10 +35,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 
                 $allowed = ['png', 'webp', 'jpg', 'jpeg'];
                 if (in_array($fileExt, $allowed)) {
-                    $newFileName = 'sig_' . $signatoryId . '_' . time() . '.' . $fileExt;
+                    $newFileName = 'sig_' . $signatoryId . '_' . time() . '.png';
                     $destPath = UPLOAD_PATH . 'signatures/' . $newFileName;
-                    if (move_uploaded_file($fileTmp, $destPath)) {
-                        $signaturePath = 'uploads/signatures/' . $newFileName;
+                    
+                    // Auto-remove background using GD
+                    $bgHandled = false;
+                    if (function_exists('imagecreatefromstring')) {
+                        $rawImg = @imagecreatefromstring(file_get_contents($fileTmp));
+                        if ($rawImg) {
+                            $w = imagesx($rawImg);
+                            $h = imagesy($rawImg);
+                            $transImg = imagecreatetruecolor($w, $h);
+                            imagealphablending($transImg, false);
+                            imagesavealpha($transImg, true);
+                            $transparent = imagecolorallocatealpha($transImg, 0, 0, 0, 127);
+                            imagefilledrectangle($transImg, 0, 0, $w, $h, $transparent);
+                            
+                            for ($x = 0; $x < $w; $x++) {
+                                for ($y = 0; $y < $h; $y++) {
+                                    $rgba = imagecolorat($rawImg, $x, $y);
+                                    $r = ($rgba >> 16) & 0xFF;
+                                    $g = ($rgba >> 8) & 0xFF;
+                                    $b = $rgba & 0xFF;
+                                    if ($r > 205 && $g > 205 && $b > 205) {
+                                        imagesetpixel($transImg, $x, $y, $transparent);
+                                    } else {
+                                        $pixelColor = imagecolorallocatealpha($transImg, $r, $g, $b, 0);
+                                        imagesetpixel($transImg, $x, $y, $pixelColor);
+                                    }
+                                }
+                            }
+                            imagepng($transImg, $destPath);
+                            imagedestroy($transImg);
+                            imagedestroy($rawImg);
+                            $bgHandled = true;
+                            $signaturePath = 'uploads/signatures/' . $newFileName;
+                        }
+                    }
+                    if (!$bgHandled) {
+                        if (move_uploaded_file($fileTmp, $destPath)) {
+                            $signaturePath = 'uploads/signatures/' . $newFileName;
+                        }
                     }
                 } else {
                     $errorMsg = 'Only PNG, WebP or JPG signature images allowed.';

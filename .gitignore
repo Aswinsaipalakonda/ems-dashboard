@@ -24,4 +24,6 @@
 /build/
 .playwright-mcp/
 assets/references/
-
+scratch/
+__pycache__/
+*.pyc

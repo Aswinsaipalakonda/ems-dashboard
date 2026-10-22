@@ -78,9 +78,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #E2E8F0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
         .offer-page {
             width: 210mm;
-            min-height: 297mm;
+            height: 297mm;
             margin: 20px auto;
             position: relative;
             background-color: #FFFFFF;
@@ -88,14 +104,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 135px 36px 70px 36px;
+            padding: 130px 42px 45px 42px;
             color: #000000;
-            font-size: 11.2px;
-            line-height: 1.48;
+            font-size: 12.8px;
+            line-height: 1.55;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
         .offer-title {
             text-align: center;
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 800;
             margin: 0 0 20px 0;
             color: #000000;
@@ -103,37 +122,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
         .meta-line {
             font-weight: 700;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
         .bold-text {
             font-weight: 700;
         }
         p {
-            margin: 6px 0;
+            margin: 8px 0;
         }
         ul {
-            margin: 4px 0 8px 18px;
+            margin: 4px 0 10px 22px;
             padding: 0;
             list-style-type: disc;
         }
         li {
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         .section-title {
             font-weight: 700;
-            margin-top: 10px;
-            margin-bottom: 3px;
+            margin-top: 14px;
+            margin-bottom: 4px;
         }
         .sign-row {
-            margin-top: 24px;
+            margin-top: auto;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-right: 15px;
+            padding-bottom: 22px;
+            padding-right: 10px;
         }
         .cand-sign {
             font-weight: 700;
-            font-size: 11.5px;
+            font-size: 12.5px;
         }
         @media print {
             body {
@@ -167,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <div class="meta-line">Date: <?php echo $issueDateFormatted; ?></div>
         <div class="meta-line">Subject: Offer Letter for <?php echo htmlspecialchars($designation); ?></div>
 
-        <p style="margin-top: 12px;"><span class="bold-text">Dear <?php echo htmlspecialchars($candidateName); ?>,</span></p>
+        <p style="margin-top: 10px;"><span class="bold-text">Dear <?php echo htmlspecialchars($candidateName); ?>,</span></p>
 
         <p>
             We are pleased to offer you the position of <span class="bold-text"><?php echo htmlspecialchars($designation); ?></span> at Clientura, for a duration of <span class="bold-text"><?php echo htmlspecialchars($durationText); ?></span>, starting from <span class="bold-text"><?php echo $startDateFormatted; ?></span> to <span class="bold-text"><?php echo $endDateFormatted; ?></span>. This <?php echo htmlspecialchars($empType); ?> is part of our commitment to nurturing talented individuals and providing practical exposure to modern software engineering practices.
@@ -192,7 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <p style="margin: 2px 0;"><span class="bold-text">Start Date:</span> <?php echo $startDateFormatted; ?></p>
         <p style="margin: 2px 0;"><span class="bold-text">End Date:</span> <?php echo $endDateFormatted; ?></p>
 
-        <div class="section-title" style="margin-top: 10px;">Terms & Conditions:</div>
+        <div class="section-title" style="margin-top: 12px;">Terms & Conditions:</div>
         <ul>
             <?php foreach ($termsItems as $term): ?>
                 <li><?php echo htmlspecialchars($term); ?></li>
@@ -427,25 +447,25 @@ Submit a final report and presentation outlining your work, achievements, and le
                     </div>
                     <div class="card-body p-3" style="background: #F1F5F9; border-radius: 0 0 20px 20px; overflow-y: auto; max-height: 800px;">
                         <!-- Interactive Letter Paper with Authentic Letterhead -->
-                        <div id="offerLetterPreview" style="background-color: #FFFFFF; background-image: url('<?php echo asset('assets/img/offer-letterhead-template.png'); ?>'); background-size: 100% 100%; background-repeat: no-repeat; width: 100%; max-width: 650px; min-height: 920px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.12); border-radius: 4px; padding: 120px 30px 50px 30px; position: relative; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10.2px; line-height: 1.48; color: #000000;">
+                        <div id="offerLetterPreview" style="background-color: #FFFFFF; background-image: url('<?php echo asset('assets/img/offer-letterhead-template.png'); ?>'); background-size: 100% 100%; background-repeat: no-repeat; width: 100%; max-width: 650px; min-height: 920px; aspect-ratio: 210 / 297; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.12); border-radius: 4px; padding: 110px 32px 36px 32px; position: relative; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10.8px; line-height: 1.54; color: #000000; display: flex; flex-direction: column; justify-content: flex-start;">
                             
-                            <h3 id="prevTitle" style="text-align: center; font-size: 15px; font-weight: 800; color: #000000; margin: 0 0 14px; letter-spacing: -0.2px; font-family: 'Inter', sans-serif;">
+                            <h3 id="prevTitle" style="text-align: center; font-size: 16px; font-weight: 800; color: #000000; margin: 0 0 16px; letter-spacing: -0.2px; font-family: 'Inter', sans-serif;">
                                 Internship Offer Letter - SDE
                             </h3>
 
-                            <div style="font-weight: 700; margin-bottom: 2px;" id="prevDate">Date: <?php echo date('d-m-Y'); ?></div>
-                            <div style="font-weight: 700; margin-bottom: 8px;" id="prevSubject">Subject: Offer Letter for Software Development Engineer (SDE) Intern</div>
+                            <div style="font-weight: 700; margin-bottom: 3px;" id="prevDate">Date: <?php echo date('d-m-Y'); ?></div>
+                            <div style="font-weight: 700; margin-bottom: 10px;" id="prevSubject">Subject: Offer Letter for Software Development Engineer (SDE) Intern</div>
 
-                            <p style="margin-bottom: 5px;"><strong>Dear <span id="prevName">[Candidate Name]</span>,</strong></p>
+                            <p style="margin-bottom: 7px;"><strong>Dear <span id="prevName">[Candidate Name]</span>,</strong></p>
 
-                            <p style="margin-bottom: 6px;">
+                            <p style="margin-bottom: 8px;">
                                 We are pleased to offer you the position of <strong id="prevPosInline">[Position Title]</strong> at Clientura, for a duration of <strong id="prevDurationInline">45 days</strong>, starting from <strong id="prevDatesInline">[Start Date] to [End Date]</strong>. This <span id="prevEmpTypeInline">internship</span> is part of our commitment to nurturing talented individuals and providing practical exposure to modern software engineering practices.
                             </p>
 
-                            <p style="font-weight: 700; margin-bottom: 3px;">
+                            <p style="font-weight: 700; margin-bottom: 4px; margin-top: 8px;">
                                 During your <span id="prevEmpTypeInline2">internship</span>, you will work closely with our Engineering Team on real-world software development projects involving:
                             </p>
-                            <ul id="prevRespList" style="margin: 2px 0 6px 16px; padding: 0;">
+                            <ul id="prevRespList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5;">
                                 <li>Software Design and Development</li>
                                 <li>Data Structures and Algorithms Implementation</li>
                                 <li>Backend Development and API Integration</li>
@@ -454,37 +474,37 @@ Submit a final report and presentation outlining your work, achievements, and le
                                 <li>Version Control and Collaborative Development</li>
                             </ul>
 
-                            <p style="margin-bottom: 6px;">
+                            <p style="margin-bottom: 8px;">
                                 You are expected to maintain a high level of professionalism, meet project deadlines, actively collaborate with team members, and contribute to the successful delivery of software solutions.
                             </p>
 
-                            <div style="font-weight: 700; margin-top: 6px;"><span id="prevDetailsTitle">Internship</span> Details:</div>
+                            <div style="font-weight: 700; margin-top: 10px; margin-bottom: 2px;"><span id="prevDetailsTitle">Internship</span> Details:</div>
                             <p style="margin: 1px 0;"><strong>Position:</strong> <span id="prevPosBlock">[Position Title]</span></p>
                             <p style="margin: 1px 0;"><strong>Location:</strong> <span id="prevLoc">Hybrid</span></p>
                             <p style="margin: 1px 0;"><strong>Start Date:</strong> <span id="prevStart">--</span></p>
                             <p style="margin: 1px 0;"><strong>End Date:</strong> <span id="prevEnd">--</span></p>
 
-                            <div style="font-weight: 700; margin-top: 6px;">Terms & Conditions:</div>
-                            <ul id="prevTermsList" style="margin: 2px 0 6px 16px; padding: 0;">
+                            <div style="font-weight: 700; margin-top: 10px; margin-bottom: 2px;">Terms & Conditions:</div>
+                            <ul id="prevTermsList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5;">
                                 <li>Maintain confidentiality of all company code, software architectures, project information, and business data.</li>
                                 <li>Follow development standards, documentation practices, and security guidelines established by the organization.</li>
                                 <li>Submit a final report and presentation outlining your work, achievements, and learning outcomes at the end of the internship.</li>
                             </ul>
 
-                            <p style="margin-bottom: 5px;">
+                            <p style="margin-bottom: 7px; margin-top: 8px;">
                                 To confirm your acceptance of this offer, please reply to this letter or sign and return. Upon receiving your confirmation, we will proceed with the onboarding process and provide further details regarding your project assignments.
                             </p>
 
-                            <p style="margin-bottom: 14px;">
+                            <p style="margin-bottom: 10px;">
                                 We look forward to welcoming you to our team and supporting your professional growth as a <span id="prevRoleClosing">[Position Title]</span>.
                             </p>
 
-                            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; padding-right: 10px;">
+                            <div id="prevSignRow" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-bottom: 18px; padding-right: 10px;">
                                 <div>
                                     <p style="margin-bottom: 2px;"><strong>Warm regards,</strong></p>
                                     <p style="font-weight: 700; margin: 0;">Clientura</p>
                                 </div>
-                                <div style="font-weight: 700; font-size: 10.2px;">
+                                <div style="font-weight: 700; font-size: 11px;">
                                     Signature of candidate
                                 </div>
                             </div>
@@ -691,17 +711,36 @@ function openLivePreviewTab() {
         }
         .offer-page {
             width: 210mm;
-            min-height: 297mm;
+            height: 297mm;
+            box-sizing: border-box;
             background-color: #FFFFFF;
             background-image: url('${bgUrl}');
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            padding: 135px 38px 70px 38px;
+            padding: 130px 42px 42px 42px;
             font-family: 'Inter', sans-serif;
-            font-size: 11.2px;
-            line-height: 1.48;
+            font-size: 12.8px;
+            line-height: 1.55;
             color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .offer-page h3 {
+            font-size: 19px !important;
+            margin: 0 0 20px 0 !important;
+        }
+        .offer-page p {
+            margin: 8px 0 !important;
+        }
+        .offer-page ul {
+            margin: 4px 0 10px 22px !important;
+            line-height: 1.5 !important;
+        }
+        .offer-page #prevSignRow {
+            margin-top: auto !important;
+            padding-bottom: 22px !important;
         }
         @media print {
             body { background: transparent; }
