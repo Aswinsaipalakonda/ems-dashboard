@@ -262,7 +262,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             <th>Signatory</th>
                             <th>Status</th>
                             <th>QR Verify Link</th>
-                            <th class="text-end">Actions</th>
+                            <th class="text-center" style="width: 130px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -310,46 +310,54 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 </td>
                                 <td>
                                     <a href="<?php echo url('verify-certificate/' . urlencode($cert['certificate_id'])); ?>" target="_blank" class="saas-tag sky text-decoration-none">
-                                        <?php echo pika_icon('qr-code', '', 12); ?> Live Verification <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 10px;"></i>
+                                        <?php echo pika_icon('qr-code', '', 12); ?> Live Verify <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 10px;"></i>
                                     </a>
                                 </td>
-                                <td class="text-end">
-                                    <div class="dropdown d-inline-block">
-                                        <button class="btn btn-sm btn-light border-0 rounded-circle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;">
-                                            <?php echo pika_icon('more-vertical', 'text-secondary', 16); ?>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2" style="border-radius: 14px; min-width: 200px; z-index: 99999;">
-                                            <li>
-                                                <a class="dropdown-item py-2" href="<?php echo url($cert['file_path']); ?>" target="_blank">
-                                                    <?php echo pika_icon('eye', 'me-2 text-primary', 15); ?> View Document
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item py-2" href="<?php echo url($cert['file_path']); ?>" download>
-                                                    <?php echo pika_icon('download', 'me-2 text-success', 15); ?> Download PDF
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item py-2" href="<?php echo url('verify-certificate/' . urlencode($cert['certificate_id'])); ?>" target="_blank">
-                                                    <?php echo pika_icon('qr-code', 'me-2 text-info', 15); ?> Verify Online
-                                                </a>
-                                            </li>
-                                            <li><hr class="dropdown-divider my-1"></li>
-                                            <?php if ($cert['status'] === 'active'): ?>
-                                            <li>
-                                                <a class="dropdown-item py-2 text-warning" href="<?php echo url('admin/certificates?action=revoke&id=' . $cert['id']); ?>" 
-                                                   onclick="return confirm('Revoke credentials for <?php echo addslashes($cert['recipient_name']); ?>?');">
-                                                    <?php echo pika_icon('x', 'me-2 text-warning', 15); ?> Revoke Credential
-                                                </a>
-                                            </li>
-                                            <?php endif; ?>
-                                            <li>
-                                                <a class="dropdown-item py-2 text-danger" href="<?php echo url('admin/certificates?action=delete&id=' . $cert['id']); ?>" 
-                                                   onclick="return confirm('Are you sure you want to permanently DELETE certificate <?php echo addslashes($cert['certificate_id']); ?> for <?php echo addslashes($cert['recipient_name']); ?>? This action cannot be undone.');">
-                                                    <?php echo pika_icon('trash', 'me-2 text-danger', 15); ?> Delete Certificate
-                                                </a>
-                                            </li>
-                                        </ul>
+                                <td class="text-center">
+                                    <div class="d-inline-flex align-items-center gap-1">
+                                        <a href="<?php echo url($cert['file_path']); ?>" target="_blank" class="saas-action-btn" title="View Document">
+                                            <?php echo pika_icon('eye', '', 15); ?>
+                                        </a>
+                                        <a href="<?php echo url($cert['file_path']); ?>" download class="saas-action-btn success" title="Download Document">
+                                            <?php echo pika_icon('download', '', 15); ?>
+                                        </a>
+                                        <div class="dropdown d-inline-block">
+                                            <button class="saas-action-btn dropdown-toggle-no-caret" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" title="More Options" style="border: 1px solid #E2E8F0; background: #FFFFFF;">
+                                                <?php echo pika_icon('more-vertical', 'text-dark', 15); ?>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2" style="border-radius: 14px; min-width: 210px; z-index: 99999;">
+                                                <li>
+                                                    <a class="dropdown-item py-2" href="<?php echo url($cert['file_path']); ?>" target="_blank">
+                                                        <?php echo pika_icon('eye', 'me-2 text-primary', 15); ?> View Document
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item py-2" href="<?php echo url($cert['file_path']); ?>" download>
+                                                        <?php echo pika_icon('download', 'me-2 text-success', 15); ?> Download PDF
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item py-2" href="<?php echo url('verify-certificate/' . urlencode($cert['certificate_id'])); ?>" target="_blank">
+                                                        <?php echo pika_icon('qr-code', 'me-2 text-info', 15); ?> Verify Online
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider my-1"></li>
+                                                <?php if ($cert['status'] === 'active'): ?>
+                                                <li>
+                                                    <a class="dropdown-item py-2 text-warning" href="<?php echo url('admin/certificates?action=revoke&id=' . $cert['id']); ?>" 
+                                                       onclick="return confirm('Revoke credentials for <?php echo addslashes($cert['recipient_name']); ?>?');">
+                                                        <?php echo pika_icon('x', 'me-2 text-warning', 15); ?> Revoke Credential
+                                                    </a>
+                                                </li>
+                                                <?php endif; ?>
+                                                <li>
+                                                    <a class="dropdown-item py-2 text-danger" href="<?php echo url('admin/certificates?action=delete&id=' . $cert['id']); ?>" 
+                                                       onclick="return confirm('Are you sure you want to permanently DELETE certificate <?php echo addslashes($cert['certificate_id']); ?> for <?php echo addslashes($cert['recipient_name']); ?>? This action cannot be undone.');">
+                                                        <?php echo pika_icon('trash', 'me-2 text-danger', 15); ?> Delete Certificate
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

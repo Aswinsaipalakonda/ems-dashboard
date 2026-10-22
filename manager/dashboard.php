@@ -124,141 +124,172 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
 
     <!-- Dashboard Content -->
     <div class="content-wrapper">
-        <!-- Welcome Banner -->
-        <div class="welcome-banner mb-4">
+        <!-- SaaS Hero -->
+        <div class="saas-hero">
             <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2 class="mb-2">
-                        <span class="welcome-wave">👋</span> 
-                        Good <?php echo date('H') < 12 ? 'Morning' : (date('H') < 17 ? 'Afternoon' : 'Evening'); ?>, <?php echo $_SESSION['user_name']; ?>!
-                    </h2>
-                    <p class="mb-0 opacity-75">
-                        You have <strong><?php echo $totalEmployees; ?></strong> employees and <strong><?php echo $pendingApprovals; ?></strong> pending approvals to review.
-                    </p>
+                <div class="col-xl-8 col-lg-7">
+                    <div class="saas-hero-content">
+                        <div class="saas-hero-pills">
+                            <span class="saas-pill">
+                                <?php echo pika_icon('sparkles', '', 14); ?>
+                                Management Hub &bull; <?php echo htmlspecialchars($roleName); ?>
+                            </span>
+                        </div>
+                        <h2 class="saas-hero-title">
+                            Good <?php echo date('H') < 12 ? 'Morning' : (date('H') < 17 ? 'Afternoon' : 'Evening'); ?>, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                        </h2>
+                        <p class="saas-hero-subtitle">
+                            Monitor organizational operations, review daily check-in approvals, and oversee workforce activity across domains.
+                        </p>
+                    </div>
                 </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <p class="mb-0 text-white-50"><?php echo date('l, F j, Y'); ?></p>
+                <div class="col-xl-4 col-lg-5 mt-3 mt-lg-0 text-lg-end">
+                    <div class="d-flex align-items-center justify-content-lg-end gap-2 flex-wrap">
+                        <a href="<?php echo url('manager/approvals'); ?>" class="btn btn-saas-light">
+                            <?php echo pika_icon('check-circle', '', 15); ?>
+                            <span>Approvals (<?php echo $pendingApprovals; ?>)</span>
+                        </a>
+                        <a href="<?php echo url('manager/tasks'); ?>" class="btn btn-saas-dark">
+                            <?php echo pika_icon('tasks', '', 15); ?>
+                            <span>Assign Tasks</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
         <?php if ($requiresCheckin): ?>
-        <!-- My Status Card -->
-        <div class="attendance-status-card mb-4">
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                    <div class="status-icon <?php echo $myAttendance ? ($myAttendance['check_out_time'] ? 'completed' : 'working') : 'pending'; ?>">
-                        <i class="bi bi-<?php echo $myAttendance ? ($myAttendance['check_out_time'] ? 'check-circle-fill' : 'clock-fill') : 'box-arrow-in-right'; ?>"></i>
+        <!-- My Check-in Status Card -->
+        <div class="saas-card mb-4">
+            <div class="p-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="metric-icon-badge <?php echo $myAttendance ? ($myAttendance['check_out_time'] ? 'green' : 'blue') : 'amber'; ?>" style="width: 44px; height: 44px;">
+                        <?php echo pika_icon($myAttendance ? ($myAttendance['check_out_time'] ? 'check-circle' : 'clock') : 'login', '', 20); ?>
                     </div>
-                    <div class="ms-3">
+                    <div>
                         <?php if (!$myAttendance): ?>
-                            <h6 class="mb-0">You haven't checked in today</h6>
-                            <small class="text-muted">Click the button to check in</small>
+                            <h6 class="fw-bold text-dark mb-0">Daily Check-In Pending</h6>
+                            <small class="text-muted">You haven't logged your geofenced check-in for today yet.</small>
                         <?php elseif (!$myAttendance['check_out_time']): ?>
-                            <h6 class="mb-0">Working since <?php echo formatTime($myAttendance['check_in_time']); ?></h6>
-                            <small class="text-muted">Don't forget to check out!</small>
+                            <h6 class="fw-bold text-dark mb-0">Active Shift Logged</h6>
+                            <small class="text-muted">Working since <?php echo formatTime($myAttendance['check_in_time']); ?> &bull; Remember to check out before shift end.</small>
                         <?php else: ?>
-                            <h6 class="mb-0 text-success">Day Complete!</h6>
-                            <small class="text-muted">Checked out at <?php echo formatTime($myAttendance['check_out_time']); ?></small>
+                            <h6 class="fw-bold text-success mb-0">Shift Completed Today</h6>
+                            <small class="text-muted">Logged out at <?php echo formatTime($myAttendance['check_out_time']); ?>.</small>
                         <?php endif; ?>
                     </div>
                 </div>
-                <a href="<?php echo url('manager/checkin'); ?>" class="btn btn-gradient btn-sm">
-                    <i class="bi bi-camera-video me-1"></i>
-                    <?php echo !$myAttendance ? 'Check In' : (!$myAttendance['check_out_time'] ? 'Check Out' : 'View'); ?>
+                <a href="<?php echo url('manager/checkin'); ?>" class="btn btn-saas-dark btn-sm">
+                    <?php echo pika_icon('camera', '', 14); ?>
+                    <span><?php echo !$myAttendance ? 'Check In Now' : (!$myAttendance['check_out_time'] ? 'Check Out' : 'View Shift Log'); ?></span>
                 </a>
             </div>
         </div>
         <?php endif; ?>
 
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="stats-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <div class="stats-info">
-                            <h3><?php echo $totalEmployees; ?></h3>
-                            <p>Total Employees</p>
+        <!-- 4 Metric Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">TOTAL STAFF</span>
+                        <div class="metric-icon-badge blue">
+                            <?php echo pika_icon('users', '', 20); ?>
                         </div>
                     </div>
+                    <div class="metric-value"><?php echo $totalEmployees; ?></div>
+                    <div class="metric-label">Active Team Members</div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="stats-icon bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-person-check"></i>
-                        </div>
-                        <div class="stats-info">
-                            <h3><?php echo $todayPresent; ?></h3>
-                            <p>Present Today</p>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">PRESENT TODAY</span>
+                        <div class="metric-icon-badge green">
+                            <?php echo pika_icon('check-circle', '', 20); ?>
                         </div>
                     </div>
+                    <div class="metric-value"><?php echo $todayPresent; ?></div>
+                    <div class="metric-label">Checked-In Workforce</div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="stats-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-clock-history"></i>
-                        </div>
-                        <div class="stats-info">
-                            <h3><?php echo $pendingApprovals; ?></h3>
-                            <p>Pending Approvals</p>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">PENDING REVIEWS</span>
+                        <div class="metric-icon-badge amber">
+                            <?php echo pika_icon('clock', '', 20); ?>
                         </div>
                     </div>
+                    <div class="metric-value"><?php echo $pendingApprovals; ?></div>
+                    <div class="metric-label">Check-Ins Requiring Review</div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card stats-card">
-                    <div class="card-body">
-                        <div class="stats-icon bg-info bg-opacity-10 text-info">
-                            <i class="bi bi-list-task"></i>
-                        </div>
-                        <div class="stats-info">
-                            <h3><?php echo $activeTasks; ?></h3>
-                            <p>Active Tasks</p>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-card-top">
+                        <span class="metric-tiled-title">ACTIVE TASKS</span>
+                        <div class="metric-icon-badge purple">
+                            <?php echo pika_icon('tasks', '', 20); ?>
                         </div>
                     </div>
+                    <div class="metric-value"><?php echo $activeTasks; ?></div>
+                    <div class="metric-label">In-Progress Assignments</div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row g-4 mb-4">
             <!-- Pending Approvals -->
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Pending Approvals</h5>
-                        <a href="<?php echo url('manager/approvals'); ?>" class="btn btn-sm btn-outline-primary">View All</a>
+            <div class="col-lg-6">
+                <div class="saas-card h-100">
+                    <div class="saas-card-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="saas-card-title">
+                                <?php echo pika_icon('clock', 'text-warning', 18); ?>
+                                Pending Check-In Approvals
+                            </h5>
+                            <?php if ($pendingApprovals > 0): ?>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 small">
+                                <?php echo $pendingApprovals; ?> pending
+                            </span>
+                            <?php endif; ?>
+                        </div>
+                        <a href="<?php echo url('manager/approvals'); ?>" class="btn btn-sm btn-saas-light">
+                            <span>Review All</span>
+                            <?php echo pika_icon('arrow-right', '', 12); ?>
+                        </a>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="p-0">
                         <?php if (count($pendingList) > 0): ?>
-                        <div class="list-group list-group-flush">
+                        <div class="list-group list-group-flush border-0">
                             <?php foreach ($pendingList as $pending): ?>
-                            <div class="list-group-item">
-                                <div class="d-flex align-items-center">
-                                    <img src="<?php echo getAvatar($pending['avatar']); ?>" class="avatar avatar-sm me-3" alt="">
-                                    <div class="flex-grow-1">
-                                        <div class="fw-semibold"><?php echo $pending['name']; ?></div>
-                                        <small class="text-muted">
-                                            <?php echo formatDate($pending['date']); ?> at <?php echo formatTime($pending['check_in_time']); ?>
+                            <div class="list-group-item p-3 px-4 d-flex align-items-center justify-content-between border-bottom">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="<?php echo getAvatar($pending['avatar'] ?? ''); ?>" class="saas-user-avatar" alt="">
+                                    <div>
+                                        <div class="fw-bold text-dark"><?php echo htmlspecialchars($pending['name']); ?></div>
+                                        <small class="text-muted d-flex align-items-center gap-2">
+                                            <span class="saas-id-badge" style="font-size: 0.68rem; padding: 2px 8px;"><?php echo htmlspecialchars($pending['emp_id']); ?></span>
+                                            <span><?php echo formatDate($pending['date']); ?> at <?php echo formatTime($pending['check_in_time']); ?></span>
                                         </small>
                                     </div>
-                                    <a href="<?php echo url('manager/approvals'); ?>?action=view&id=<?php echo $pending['id']; ?>" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
                                 </div>
+                                <a href="<?php echo url('manager/approvals'); ?>?action=view&id=<?php echo $pending['id']; ?>" class="btn btn-sm btn-saas-dark">
+                                    <?php echo pika_icon('eye', '', 14); ?>
+                                    <span>Review</span>
+                                </a>
                             </div>
                             <?php endforeach; ?>
                         </div>
                         <?php else: ?>
                         <div class="text-center py-5 text-muted">
-                            <i class="bi bi-check-circle display-4"></i>
-                            <p class="mt-2">No pending approvals</p>
+                            <?php echo pika_icon('check-circle', 'opacity-25 d-block mx-auto mb-2 text-success', 40); ?>
+                            <p class="mb-0 fw-semibold text-dark">All Caught Up!</p>
+                            <small class="text-muted">No pending employee check-ins currently awaiting review.</small>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -266,70 +297,93 @@ require_once __DIR__ . '/../includes/manager-sidebar.php';
             </div>
 
             <!-- Attendance Chart -->
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Attendance Trend (Last 7 Days)</h5>
+            <div class="col-lg-6">
+                <div class="saas-card h-100">
+                    <div class="saas-card-header">
+                        <h5 class="saas-card-title">
+                            <?php echo pika_icon('chart', 'text-primary', 18); ?>
+                            Workforce Attendance Trend
+                        </h5>
+                        <span class="text-muted small">Last 7 Days</span>
                     </div>
-                    <div class="card-body">
-                        <canvas id="attendanceChart" height="200"></canvas>
+                    <div class="saas-card-body">
+                        <div style="height: 240px; position: relative;">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Employees -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Recent Employees</h5>
-                        <a href="<?php echo url('manager/employees'); ?>" class="btn btn-sm btn-outline-primary">View All</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <?php if (count($recentEmployees) > 0): ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Employee</th>
-                                        <th>Domain</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($recentEmployees as $emp): ?>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="<?php echo getAvatar($emp['avatar']); ?>" class="avatar avatar-sm me-2" alt="">
-                                                <div>
-                                                    <div class="fw-semibold"><?php echo $emp['name']; ?></div>
-                                                    <small class="text-muted"><?php echo $emp['email']; ?></small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><?php echo $emp['domain_name'] ?? 'N/A'; ?></td>
-                                        <td><span class="badge bg-light text-dark"><?php echo $emp['role_name'] ?? 'Employee'; ?></span></td>
-                                        <td>
-                                            <span class="badge badge-<?php echo $emp['status']; ?>">
-                                                <?php echo ucfirst($emp['status']); ?>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <?php else: ?>
-                        <div class="text-center py-5 text-muted">
-                            <i class="bi bi-people display-4"></i>
-                            <p class="mt-2">No employees found</p>
-                        </div>
-                        <?php endif; ?>
-                    </div>
+        <!-- Recent Employees Table -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="saas-card-title">
+                        <?php echo pika_icon('users', 'text-primary', 18); ?>
+                        Recent Workforce Joiners
+                    </h5>
+                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill small">
+                        <?php echo count($recentEmployees); ?> records
+                    </span>
                 </div>
+                <a href="<?php echo url('manager/employees'); ?>" class="btn btn-sm btn-saas-light">
+                    <span>Directory</span>
+                    <?php echo pika_icon('arrow-right', '', 12); ?>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="saas-table">
+                    <thead>
+                        <tr>
+                            <th>Team Member</th>
+                            <th>Employee ID</th>
+                            <th>Domain / Dept</th>
+                            <th>Designation</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($recentEmployees) > 0): ?>
+                            <?php foreach ($recentEmployees as $emp): ?>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="<?php echo getAvatar($emp['avatar'] ?? ''); ?>" class="saas-user-avatar" alt="">
+                                        <div>
+                                            <div class="fw-bold text-dark"><?php echo htmlspecialchars($emp['name']); ?></div>
+                                            <small class="text-muted"><?php echo htmlspecialchars($emp['email']); ?></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="saas-id-badge"><?php echo htmlspecialchars($emp['employee_id']); ?></span>
+                                </td>
+                                <td>
+                                    <span class="saas-tag primary">
+                                        <?php echo htmlspecialchars($emp['domain_name'] ?? 'General'); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-dark fw-semibold small"><?php echo htmlspecialchars($emp['designation'] ?? $emp['role_name'] ?? 'Employee'); ?></span>
+                                </td>
+                                <td>
+                                    <span class="saas-tag <?php echo $emp['status'] === 'active' ? 'emerald' : 'rose'; ?>">
+                                        <?php echo ucfirst($emp['status']); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <?php echo pika_icon('users', 'opacity-25 d-block mx-auto mb-2', 40); ?>
+                                    <p class="mb-0">No employees registered yet.</p>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

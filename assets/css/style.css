@@ -2247,13 +2247,9 @@ a.btn,
 }
 
 .table-responsive {
-    overflow: visible !important;
-}
-
-@media (max-width: 991px) {
-    .table-responsive {
-        overflow-x: auto !important;
-    }
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
 }
 
 .dropdown-menu {
