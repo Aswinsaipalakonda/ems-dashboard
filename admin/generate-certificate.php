@@ -129,6 +129,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             </div>
 
                             <input type="hidden" id="selectedEmpId" name="employee_id" value="">
+                            <input type="hidden" id="durationText" name="duration_text" value="Six months">
 
                             <!-- Recipient Name & Emp ID Row -->
                             <div class="row g-2 mb-3">
@@ -368,27 +369,38 @@ function getTransparentSignatureCanvas(img) {
 function drawCanvasContent() {
     if (!templateImg.complete) return;
 
-    // 1. Draw base template (2000 x 1414)
-    ctx.drawImage(templateImg, 0, 0, 2000, 1414);
+    try {
+        // 1. Draw base template (2000 x 1414)
+        ctx.drawImage(templateImg, 0, 0, 2000, 1414);
 
-    // Dynamic Values
-    const rawName = document.getElementById('recipientName').value.trim();
-    const name = (rawName || '[RECIPIENT NAME]').toUpperCase();
-    const rawRole = document.getElementById('programName').value.trim();
-    const role = rawRole || '[Program / Role]';
-    const rawDuration = document.getElementById('durationText').value.trim();
-    const duration = rawDuration || 'Six months';
-    const sDateRaw = document.getElementById('startDate').value;
-    const eDateRaw = document.getElementById('endDate').value;
-    const sDate = sDateRaw ? formatDate(sDateRaw) : '[Start Date]';
-    const eDate = eDateRaw ? formatDate(eDateRaw) : '[End Date]';
-    const iDate = formatDate(document.getElementById('issueDate').value) || formatDate(new Date().toISOString().split('T')[0]);
-    const certId = document.getElementById('certificateId').value.trim() || 'CL-CERT-000';
+        // Dynamic Values
+        const nameEl = document.getElementById('recipientName');
+        const rawName = nameEl ? nameEl.value.trim() : '';
+        const name = (rawName || '[RECIPIENT NAME]').toUpperCase();
 
-    const sigSelect = document.getElementById('signatorySelect');
-    const sigOpt = sigSelect.options[sigSelect.selectedIndex];
-    const sigName = (sigOpt ? sigOpt.getAttribute('data-name') : 'MR. P. SOWSHEEL').toUpperCase();
-    const sigTitle = (sigOpt ? sigOpt.getAttribute('data-title') : 'FOUNDER & CEO CLIENTURA').toUpperCase();
+        const progEl = document.getElementById('programName');
+        const rawRole = progEl ? progEl.value.trim() : '';
+        const role = rawRole || '[Program / Role]';
+
+        const durEl = document.getElementById('durationText');
+        const rawDuration = durEl ? durEl.value.trim() : 'Six months';
+        const duration = rawDuration || 'Six months';
+
+        const sDateRaw = document.getElementById('startDate') ? document.getElementById('startDate').value : '';
+        const eDateRaw = document.getElementById('endDate') ? document.getElementById('endDate').value : '';
+        const sDate = sDateRaw ? formatDate(sDateRaw) : '[Start Date]';
+        const eDate = eDateRaw ? formatDate(eDateRaw) : '[End Date]';
+
+        const issueEl = document.getElementById('issueDate');
+        const iDate = (issueEl && issueEl.value) ? formatDate(issueEl.value) : formatDate(new Date().toISOString().split('T')[0]);
+
+        const certIdEl = document.getElementById('certificateId');
+        const certId = (certIdEl && certIdEl.value.trim()) ? certIdEl.value.trim() : 'CL-CERT-000';
+
+        const sigSelect = document.getElementById('signatorySelect');
+        const sigOpt = (sigSelect && sigSelect.selectedIndex >= 0) ? sigSelect.options[sigSelect.selectedIndex] : null;
+        const sigName = (sigOpt && sigOpt.getAttribute('data-name') ? sigOpt.getAttribute('data-name') : 'MR. P. SOWSHEEL').toUpperCase();
+        const sigTitle = (sigOpt && sigOpt.getAttribute('data-title') ? sigOpt.getAttribute('data-title') : 'FOUNDER & CEO CLIENTURA').toUpperCase();
 
     // 2. Headings (Using Inter font with prominent, readable sizing matching Image 4)
     ctx.textAlign = 'center';
@@ -527,6 +539,9 @@ function drawCanvasContent() {
     ctx.letterSpacing = '1px';
     ctx.fillText(sigTitle, sigCenterX, 1242);
     ctx.letterSpacing = '0px';
+    } catch (err) {
+        console.error('Error drawing certificate canvas:', err);
+    }
 }
 
 function formatDate(dateStr) {

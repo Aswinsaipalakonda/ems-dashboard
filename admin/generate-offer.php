@@ -80,8 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
         .offer-page {
             width: 210mm;
-            height: 297mm;
-            max-height: 297mm;
+            height: 296mm;
+            max-height: 296mm;
             margin: 20px auto;
             position: relative;
             background-color: #FFFFFF;
@@ -89,47 +89,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 105px 36px 20px 36px;
+            padding: 38mm 14mm 16mm 14mm;
             color: #000000;
-            font-size: 10.8px;
-            line-height: 1.40;
+            font-size: 10px;
+            line-height: 1.38;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             overflow: hidden;
-            page-break-after: avoid;
-            page-break-inside: avoid;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
         }
         .offer-title {
             text-align: center;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 800;
-            margin: 0 0 12px 0;
+            margin: 0 0 8mm 0;
             color: #000000;
             letter-spacing: -0.2px;
         }
         .meta-line {
             font-weight: 700;
-            margin-bottom: 3px;
+            margin-bottom: 2.5px;
         }
         .bold-text {
             font-weight: 700;
         }
         p {
-            margin: 5px 0;
+            margin: 4px 0;
         }
         ul {
-            margin: 2px 0 6px 18px;
+            margin: 2px 0 5px 16px;
             padding: 0;
             list-style-type: disc;
-            line-height: 1.38;
+            line-height: 1.36;
         }
         li {
             margin-bottom: 2px;
         }
         .section-title {
             font-weight: 700;
-            margin-top: 8px;
+            margin-top: 6px;
             margin-bottom: 2px;
         }
         .sign-row {
@@ -137,8 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-bottom: 16px;
-            padding-right: 10px;
+            padding-bottom: 6mm;
+            padding-right: 8px;
         }
         .cand-sign {
             font-weight: 700;
@@ -149,6 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 background: transparent;
                 margin: 0 !important;
                 padding: 0 !important;
+                height: 296mm !important;
+                max-height: 296mm !important;
                 overflow: hidden !important;
             }
             .no-print {
@@ -158,8 +160,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 margin: 0 !important;
                 box-shadow: none !important;
                 width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
+                height: 296mm !important;
+                max-height: 296mm !important;
+                padding: 38mm 14mm 16mm 14mm !important;
                 overflow: hidden !important;
                 page-break-after: avoid !important;
                 page-break-inside: avoid !important;
@@ -716,39 +719,46 @@ function openLivePreviewTab() {
         }
         .offer-page {
             width: 210mm;
-            height: 297mm;
-            max-height: 297mm;
+            height: 296mm;
+            max-height: 296mm;
             box-sizing: border-box;
             background-color: #FFFFFF;
             background-image: url('${bgUrl}');
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            padding: 105px 36px 20px 36px;
+            padding: 38mm 14mm 16mm 14mm;
             font-family: 'Inter', sans-serif;
-            font-size: 10.8px;
-            line-height: 1.40;
+            font-size: 10px;
+            line-height: 1.38;
             color: #000000;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             overflow: hidden;
-            page-break-after: avoid;
-            page-break-inside: avoid;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
         }
         .offer-page h3 {
-            font-size: 17px !important;
-            margin: 0 0 12px 0 !important;
+            font-size: 16px !important;
+            margin: 0 0 8mm 0 !important;
             letter-spacing: -0.2px;
             text-align: center !important;
             font-weight: 800 !important;
+            color: #000000 !important;
+        }
+        .offer-page #prevDate {
+            margin-bottom: 2.5px !important;
+        }
+        .offer-page #prevSubject {
+            margin-bottom: 6px !important;
         }
         .offer-page p {
-            margin: 5px 0 !important;
+            margin: 4px 0 !important;
         }
         .offer-page ul {
-            margin: 2px 0 6px 18px !important;
-            line-height: 1.38 !important;
+            margin: 2px 0 5px 16px !important;
+            line-height: 1.36 !important;
             padding: 0 !important;
         }
         .offer-page li {
@@ -756,14 +766,19 @@ function openLivePreviewTab() {
         }
         .offer-page #prevSignRow {
             margin-top: auto !important;
-            padding-bottom: 16px !important;
-            padding-right: 10px !important;
+            padding-bottom: 6mm !important;
+            padding-right: 8px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-end !important;
         }
         @media print {
             html, body {
                 background: transparent;
                 margin: 0 !important;
                 padding: 0 !important;
+                height: 296mm !important;
+                max-height: 296mm !important;
                 overflow: hidden !important;
             }
             .preview-toolbar { display: none !important; }
@@ -772,8 +787,9 @@ function openLivePreviewTab() {
                 box-shadow: none !important;
                 margin: 0 !important;
                 width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
+                height: 296mm !important;
+                max-height: 296mm !important;
+                padding: 38mm 14mm 16mm 14mm !important;
                 overflow: hidden !important;
                 page-break-after: avoid !important;
                 page-break-inside: avoid !important;
@@ -814,8 +830,9 @@ function openLivePreviewTab() {
                 margin: 0,
                 filename: 'Clientura_Offer_Letter.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: 'avoid-all' }
             };
             html2pdf().set(opt).from(element).save().then(() => {
                 btn.disabled = false;
