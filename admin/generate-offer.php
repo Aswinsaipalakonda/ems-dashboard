@@ -81,7 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
         .offer-page {
             width: 210mm;
-            height: 297mm;
+            height: 296mm;
+            max-height: 296mm;
             margin: 20px auto;
             position: relative;
             background-color: #FFFFFF;
@@ -89,13 +90,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 130px 42px 45px 42px;
+            padding: 130px 42px 35px 42px;
             color: #000000;
             font-size: 12.8px;
             line-height: 1.55;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            box-sizing: border-box;
+            overflow: hidden;
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
         }
         .offer-title {
             text-align: center;
@@ -137,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-bottom: 22px;
+            padding-bottom: 8px;
             padding-right: 10px;
         }
         .cand-sign {
@@ -152,10 +157,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 display: none !important;
             }
             .offer-page {
-                margin: 0;
-                box-shadow: none;
-                width: 210mm;
-                height: 297mm;
+                margin: 0 !important;
+                box-shadow: none !important;
+                width: 210mm !important;
+                height: 296mm !important;
+                max-height: 296mm !important;
+                overflow: hidden !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
             }
         }
     </style>
@@ -243,20 +252,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             filename: '<?php echo preg_replace('/[^a-zA-Z0-9_-]/', '_', $candidateName); ?>_Offer_Letter.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
-        html2pdf().set(opt).from(element).save().then(() => {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = 'Download PDF';
-            }
-        }).catch(err => {
-            console.error(err);
-            if (btn) {
-                btn.disabled = false;
-                btn.innerText = 'Download PDF';
-            }
-            window.print();
+        html2pdf()
+            .set(opt)
+            .from(element)
+            .toPdf()
+            .get('pdf')
+            .then(function(pdf) {
+                const totalPages = pdf.internal.getNumberOfPages();
+                if (totalPages > 1) {
+                    for (let i = totalPages; i > 1; i--) {
+                        pdf.deletePage(i);
+                    }
+                }
+            })
+            .save()
+            .then(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Download PDF';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Download PDF';
+                }
+                window.print();
+            });
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('download') === '1') {
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(downloadOfferLetterPDF, 400);
         });
     }
     </script>
@@ -271,12 +303,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         mkdir($saveDir, 0755, true);
     }
     
-    // Save HTML version as web backup
+    // Save HTML version as the authentic web document
     $htmlFilePath = $saveDir . $safeBaseName . '.html';
     file_put_contents($htmlFilePath, $htmlContent);
     $relFilePath = 'uploads/offers/' . $safeBaseName . '.html';
 
-    // Generate genuine vector PDF directly on branded letterhead using FPDF
+    // Generate matching 1-page PDF
     require_once __DIR__ . '/../includes/offer-pdf-builder.php';
     $pdfFullPath = $saveDir . $safeBaseName . '.pdf';
     $pdfData = [
@@ -293,10 +325,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         'terms'           => array_values($termsItems)
     ];
     buildOfferLetterPDF($pdfData, $pdfFullPath, 'F');
-
-    if (file_exists($pdfFullPath) && filesize($pdfFullPath) > 1000) {
-        $relFilePath = 'uploads/offers/' . $safeBaseName . '.pdf';
-    }
 
     // Save record to database
     $offerDbId = insert(
@@ -738,7 +766,8 @@ function openLivePreviewTab() {
       }
       .offer-page {
         width: 210mm;
-        height: 297mm;
+        height: 296mm;
+        max-height: 296mm;
         margin: 20px auto;
         position: relative;
         background-color: #ffffff;
@@ -746,13 +775,17 @@ function openLivePreviewTab() {
         background-size: 100% 100%;
         background-repeat: no-repeat;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        padding: 130px 42px 45px 42px;
+        padding: 130px 42px 35px 42px;
         color: #000000;
         font-size: 12.8px;
         line-height: 1.55;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        box-sizing: border-box;
+        overflow: hidden;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
       }
       .offer-title {
         text-align: center;
@@ -794,7 +827,7 @@ function openLivePreviewTab() {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        padding-bottom: 22px;
+        padding-bottom: 8px;
         padding-right: 10px;
       }
       .cand-sign {
@@ -809,10 +842,14 @@ function openLivePreviewTab() {
           display: none !important;
         }
         .offer-page {
-          margin: 0;
-          box-shadow: none;
-          width: 210mm;
-          height: 297mm;
+          margin: 0 !important;
+          box-shadow: none !important;
+          width: 210mm !important;
+          height: 296mm !important;
+          max-height: 296mm !important;
+          overflow: hidden !important;
+          page-break-inside: avoid !important;
+          page-break-after: avoid !important;
         }
       }
     </style>
@@ -972,11 +1009,22 @@ function openLivePreviewTab() {
           filename: '${cleanFilename}',
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
         html2pdf()
           .set(opt)
           .from(element)
+          .toPdf()
+          .get('pdf')
+          .then(function(pdf) {
+            const totalPages = pdf.internal.getNumberOfPages();
+            if (totalPages > 1) {
+              for (let i = totalPages; i > 1; i--) {
+                pdf.deletePage(i);
+              }
+            }
+          })
           .save()
           .then(() => {
             if (btn) {

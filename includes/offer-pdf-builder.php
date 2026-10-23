@@ -13,6 +13,33 @@ class OfferPDFBuilder extends FPDF {
     }
 }
 
+function generateOfferLetterPDFFromHtml(string $htmlFilePath, string $pdfFilePath): bool {
+    $browserCandidates = [
+        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+        'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        '/usr/bin/google-chrome',
+        '/usr/bin/chromium-browser',
+        '/usr/bin/chromium'
+    ];
+    $browserExe = null;
+    foreach ($browserCandidates as $b) {
+        if (file_exists($b)) {
+            $browserExe = $b;
+            break;
+        }
+    }
+    if ($browserExe) {
+        $cmd = '"' . $browserExe . '" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf="' . $pdfFilePath . '" "' . $htmlFilePath . '"';
+        @exec($cmd, $out, $ret);
+        if ($ret === 0 && file_exists($pdfFilePath) && filesize($pdfFilePath) > 1000) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * Generate official Offer Letter PDF file
  * 
@@ -22,6 +49,30 @@ class OfferPDFBuilder extends FPDF {
  * @return string|bool File path or true on output
  */
 function buildOfferLetterPDF(array $data, ?string $outputPath = null, string $dest = 'F') {
+    // If output path has a matching HTML file, use pixel-perfect headless browser generation
+    if ($outputPath) {
+        $htmlPath = preg_replace('/\.pdf$/', '.html', $outputPath);
+        if (file_exists($htmlPath)) {
+            if (!file_exists($outputPath) || filesize($outputPath) < 1000) {
+                generateOfferLetterPDFFromHtml($htmlPath, $outputPath);
+            }
+            if (file_exists($outputPath) && filesize($outputPath) > 1000) {
+                if ($dest === 'F') {
+                    return $outputPath;
+                }
+                $cleanFilename = basename($outputPath);
+                header('Content-Type: application/pdf');
+                $disposition = ($dest === 'D') ? 'attachment' : 'inline';
+                header('Content-Disposition: ' . $disposition . '; filename="' . $cleanFilename . '"');
+                header('Content-Length: ' . filesize($outputPath));
+                header('Cache-Control: private, max-age=0, must-revalidate');
+                header('Pragma: public');
+                readfile($outputPath);
+                exit;
+            }
+        }
+    }
+
     $empType = strtolower($data['employment_type'] ?? 'internship');
     $candName = trim($data['candidate_name'] ?? 'Candidate');
     $designation = trim($data['designation'] ?? 'Software Development Engineer');

@@ -48,42 +48,29 @@ if (isset($_GET['action']) && $_GET['action'] === 'download' && isset($_GET['id'
     $offer = fetchOne("SELECT * FROM offer_letters WHERE id = ?", "i", [$offerId]);
     if ($offer) {
         require_once __DIR__ . '/../includes/offer-pdf-builder.php';
-        $safeBaseName = 'offer_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['offer_id']) . '_' . time();
-        $newPdfPath = UPLOAD_PATH . 'offers/' . $safeBaseName . '.pdf';
+        $filePath = $offer['file_path'];
+        $htmlRelPath = preg_replace('/\.pdf$/', '.html', $filePath);
+        $pdfRelPath = preg_replace('/\.html$/', '.pdf', $filePath);
         
-        $roleCode = '';
-        if (preg_match('/\(([^)]+)\)/', $offer['designation'], $m)) {
-            $roleCode = trim($m[1]);
+        $htmlAbsPath = __DIR__ . '/../' . $htmlRelPath;
+        $pdfAbsPath = __DIR__ . '/../' . $pdfRelPath;
+        
+        // If PDF doesn't exist but HTML does, generate exact 1-page PDF
+        if ((!file_exists($pdfAbsPath) || filesize($pdfAbsPath) < 1000) && file_exists($htmlAbsPath)) {
+            generateOfferLetterPDFFromHtml($htmlAbsPath, $pdfAbsPath);
         }
         
-        $pdfData = [
-            'employment_type' => $offer['employment_type'],
-            'candidate_name'  => $offer['candidate_name'],
-            'designation'     => $offer['designation'],
-            'role_code'       => $roleCode,
-            'duration_text'   => $offer['duration_text'],
-            'start_date'      => date('d-m-Y', strtotime($offer['start_date'])),
-            'end_date'        => date('d-m-Y', strtotime($offer['end_date'])),
-            'issue_date'      => date('d-m-Y', strtotime($offer['created_at'] ?? 'now')),
-            'location'        => $offer['location'],
-            'responsibilities'=> $offer['responsibilities'] ?? '',
-            'terms'           => $offer['terms_conditions'] ?? ''
-        ];
-        buildOfferLetterPDF($pdfData, $newPdfPath, 'F');
-        if (file_exists($newPdfPath)) {
-            $pdfPath = $newPdfPath;
-            $relPdf = 'uploads/offers/' . $safeBaseName . '.pdf';
-            executeQuery("UPDATE offer_letters SET file_path = ? WHERE id = ?", "si", [$relPdf, $offer['id']]);
-        }
-
-        if ($pdfPath && file_exists($pdfPath)) {
+        if (file_exists($pdfAbsPath) && filesize($pdfAbsPath) > 1000) {
             $cleanFilename = 'Offer_Letter_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['candidate_name']) . '.pdf';
             header('Content-Type: application/pdf');
             header('Content-Disposition: attachment; filename="' . $cleanFilename . '"');
-            header('Content-Length: ' . filesize($pdfPath));
+            header('Content-Length: ' . filesize($pdfAbsPath));
             header('Cache-Control: private, max-age=0, must-revalidate');
             header('Pragma: public');
-            readfile($pdfPath);
+            readfile($pdfAbsPath);
+            exit;
+        } else if (file_exists($htmlAbsPath)) {
+            header("Location: " . url($htmlRelPath . '?download=1'));
             exit;
         }
     }
@@ -371,7 +358,14 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 </td>
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-1">
-                                        <a href="<?php echo url($offer['file_path']); ?>" target="_blank" class="saas-action-btn" title="View Document">
+                                        <?php
+                                            $viewPath = $offer['file_path'];
+                                            $htmlCandidate = preg_replace('/\.pdf$/', '.html', $viewPath);
+                                            if (file_exists(__DIR__ . '/../' . $htmlCandidate)) {
+                                                $viewPath = $htmlCandidate;
+                                            }
+                                        ?>
+                                        <a href="<?php echo url($viewPath); ?>" target="_blank" class="saas-action-btn" title="View Document">
                                             <?php echo pika_icon('eye', '', 15); ?>
                                         </a>
                                         <a href="<?php echo url('admin/offer-letters?action=download&id=' . $offer['id']); ?>" class="saas-action-btn success" title="Download PDF Document">

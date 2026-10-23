@@ -16,8 +16,8 @@ $pageTitle = 'My Official Documents';
 $userId = (int)$_SESSION['user_id'];
 $userEmail = $_SESSION['user_email'] ?? '';
 
-// Handle Direct Offer Letter PDF View / Download for Employee
-if (isset($_GET['action']) && $_GET['action'] === 'view_offer_pdf' && isset($_GET['id'])) {
+// Handle Direct Offer Letter View / Download for Employee
+if (isset($_GET['action']) && in_array($_GET['action'], ['view_offer_pdf', 'download_offer']) && isset($_GET['id'])) {
     $offerId = (int)$_GET['id'];
     $offer = fetchOne(
         "SELECT * FROM offer_letters WHERE id = ? AND (employee_id = ? OR candidate_email = ? OR candidate_name LIKE ?)",
@@ -26,38 +26,33 @@ if (isset($_GET['action']) && $_GET['action'] === 'view_offer_pdf' && isset($_GE
     );
     if ($offer) {
         require_once __DIR__ . '/../includes/offer-pdf-builder.php';
-        $safeBaseName = 'offer_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['offer_id']);
-        $pdfPath = UPLOAD_PATH . 'offers/' . $safeBaseName . '.pdf';
+        $filePath = $offer['file_path'];
+        $htmlRelPath = preg_replace('/\.pdf$/', '.html', $filePath);
+        $pdfRelPath = preg_replace('/\.html$/', '.pdf', $filePath);
+        
+        $htmlAbsPath = __DIR__ . '/../' . $htmlRelPath;
+        $pdfAbsPath = __DIR__ . '/../' . $pdfRelPath;
 
-        if (!file_exists($pdfPath) || filesize($pdfPath) < 1000) {
-            $roleCode = '';
-            if (preg_match('/\(([^)]+)\)/', $offer['designation'], $m)) {
-                $roleCode = trim($m[1]);
-            }
-            $pdfData = [
-                'employment_type' => $offer['employment_type'],
-                'candidate_name'  => $offer['candidate_name'],
-                'designation'     => $offer['designation'],
-                'role_code'       => $roleCode,
-                'duration_text'   => $offer['duration_text'],
-                'start_date'      => date('d-m-Y', strtotime($offer['start_date'])),
-                'end_date'        => date('d-m-Y', strtotime($offer['end_date'])),
-                'issue_date'      => date('d-m-Y', strtotime($offer['created_at'] ?? 'now')),
-                'location'        => $offer['location'],
-                'responsibilities'=> $offer['responsibilities'] ?? '',
-                'terms'           => $offer['terms_conditions'] ?? ''
-            ];
-            buildOfferLetterPDF($pdfData, $pdfPath, 'F');
+        // If PDF doesn't exist but HTML does, generate exact 1-page PDF
+        if ((!file_exists($pdfAbsPath) || filesize($pdfAbsPath) < 1000) && file_exists($htmlAbsPath)) {
+            generateOfferLetterPDFFromHtml($htmlAbsPath, $pdfAbsPath);
         }
 
-        if (file_exists($pdfPath)) {
+        $isDownload = ($_GET['action'] === 'download_offer');
+
+        if (file_exists($pdfAbsPath) && filesize($pdfAbsPath) > 1000) {
             $cleanFilename = 'Offer_Letter_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $offer['candidate_name']) . '.pdf';
             header('Content-Type: application/pdf');
-            header('Content-Disposition: inline; filename="' . $cleanFilename . '"');
-            header('Content-Length: ' . filesize($pdfPath));
+            $disposition = $isDownload ? 'attachment' : 'inline';
+            header('Content-Disposition: ' . $disposition . '; filename="' . $cleanFilename . '"');
+            header('Content-Length: ' . filesize($pdfAbsPath));
             header('Cache-Control: private, max-age=0, must-revalidate');
             header('Pragma: public');
-            readfile($pdfPath);
+            readfile($pdfAbsPath);
+            exit;
+        } else if (file_exists($htmlAbsPath)) {
+            $suffix = $isDownload ? '?download=1' : '';
+            header("Location: " . url($htmlRelPath . $suffix));
             exit;
         }
     }
@@ -216,9 +211,21 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                             <span class="badge bg-success-subtle text-success"><?php echo ucfirst($offer['status']); ?></span>
                                         </td>
                                         <td class="text-end">
-                                            <a href="<?php echo url('employee/my-documents?action=view_offer_pdf&id=' . $offer['id']); ?>" target="_blank" class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-file-earmark-pdf me-1"></i> View Offer Letter (PDF)
-                                            </a>
+                                            <?php
+                                                $viewPath = $offer['file_path'];
+                                                $htmlCandidate = preg_replace('/\.pdf$/', '.html', $viewPath);
+                                                if (file_exists(__DIR__ . '/../' . $htmlCandidate)) {
+                                                    $viewPath = $htmlCandidate;
+                                                }
+                                            ?>
+                                            <div class="d-inline-flex gap-2">
+                                                <a href="<?php echo url($viewPath); ?>" target="_blank" class="btn btn-outline-primary btn-sm">
+                                                    <i class="bi bi-eye me-1"></i> View Offer Letter
+                                                </a>
+                                                <a href="<?php echo url('employee/my-documents?action=download_offer&id=' . $offer['id']); ?>" class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-download me-1"></i> Download PDF
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
