@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-bottom: 8px;
+            padding-bottom: 22px;
             padding-right: 10px;
         }
         .cand-sign {
@@ -244,45 +244,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         const btn = document.getElementById('btnDownloadOfferPDF');
         if (btn) {
             btn.disabled = true;
-            btn.innerText = 'Generating PDF...';
+            btn.innerText = 'Downloading PDF...';
         }
-        const element = document.querySelector('.offer-page');
-        const opt = {
-            margin: 0,
-            filename: '<?php echo preg_replace('/[^a-zA-Z0-9_-]/', '_', $candidateName); ?>_Offer_Letter.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-        html2pdf()
-            .set(opt)
-            .from(element)
-            .toPdf()
-            .get('pdf')
-            .then(function(pdf) {
-                const totalPages = pdf.internal.getNumberOfPages();
-                if (totalPages > 1) {
-                    for (let i = totalPages; i > 1; i--) {
-                        pdf.deletePage(i);
+
+        const currentPath = window.location.pathname;
+        if (currentPath.endsWith('.html')) {
+            const directPdfUrl = currentPath.replace(/\.html$/, '.pdf');
+            if (window.location.protocol === 'file:') {
+                const a = document.createElement('a');
+                a.href = directPdfUrl;
+                a.download = directPdfUrl.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Download PDF';
+                }
+                return;
+            }
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                fetch(directPdfUrl, { method: 'HEAD' })
+                    .then(res => {
+                        if (res.ok) {
+                            const a = document.createElement('a');
+                            a.href = directPdfUrl;
+                            a.download = directPdfUrl.split('/').pop();
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            if (btn) {
+                                btn.disabled = false;
+                                btn.innerText = 'Download PDF';
+                            }
+                        } else {
+                            renderClientPDF();
+                        }
+                    })
+                    .catch(() => {
+                        renderClientPDF();
+                    });
+                return;
+            }
+        }
+
+        renderClientPDF();
+
+        function renderClientPDF() {
+            if (btn) btn.innerText = 'Generating PDF...';
+            const element = document.querySelector('.offer-page');
+            const opt = {
+                margin: 0,
+                filename: '<?php echo preg_replace('/[^a-zA-Z0-9_-]/', '_', $candidateName); ?>_Offer_Letter.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+                jsPDF: { unit: 'mm', format: [210, 297.5], orientation: 'portrait' }
+            };
+            html2pdf()
+                .set(opt)
+                .from(element)
+                .save()
+                .then(() => {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = 'Download PDF';
                     }
-                }
-            })
-            .save()
-            .then(() => {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = 'Download PDF';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = 'Download PDF';
-                }
-                window.print();
-            });
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = 'Download PDF';
+                    }
+                    window.print();
+                });
+        }
     }
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -548,7 +584,7 @@ Submit a final report and presentation outlining your work, achievements, and le
                                 We look forward to welcoming you to our team and supporting your professional growth as a <span id="prevRoleClosing">[Position Title]</span>.
                             </p>
 
-                            <div id="prevSignRow" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-bottom: 18px; padding-right: 10px;">
+                            <div id="prevSignRow" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-bottom: 22px; padding-right: 10px;">
                                 <div>
                                     <p style="margin-bottom: 2px;"><strong>Warm regards,</strong></p>
                                     <p style="font-weight: 700; margin: 0;">Clientura</p>
@@ -827,7 +863,7 @@ function openLivePreviewTab() {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        padding-bottom: 8px;
+        padding-bottom: 22px;
         padding-right: 10px;
       }
       .cand-sign {
@@ -1009,22 +1045,11 @@ function openLivePreviewTab() {
           filename: '${cleanFilename}',
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+          jsPDF: { unit: 'mm', format: [210, 297.5], orientation: 'portrait' }
         };
         html2pdf()
           .set(opt)
           .from(element)
-          .toPdf()
-          .get('pdf')
-          .then(function(pdf) {
-            const totalPages = pdf.internal.getNumberOfPages();
-            if (totalPages > 1) {
-              for (let i = totalPages; i > 1; i--) {
-                pdf.deletePage(i);
-              }
-            }
-          })
           .save()
           .then(() => {
             if (btn) {
