@@ -172,13 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <body>
     <div class="no-print" style="background: #0A1138; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999;">
         <div style="font-weight: 600;">Clientura Official Offer Letter</div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <button id="btnDownloadOfferPDF" onclick="downloadOfferLetterPDF()" style="background: #2563EB; color: #FFFFFF; border: none; padding: 8px 22px; font-weight: 700; border-radius: 9999px; cursor: pointer; transition: all 0.2s;">
-                Download PDF
-            </button>
-            <button onclick="window.print()" style="background: #FFA500; color: #0A1138; border: none; padding: 8px 22px; font-weight: 700; border-radius: 9999px; cursor: pointer;">
-                Print / Save as PDF
-            </button>
+        <div>
+            <button onclick="window.close()" style="background: #E2E8F0; color: #0F172A; border: none; padding: 8px 24px; font-weight: 700; border-radius: 9999px; cursor: pointer; font-size: 13px; transition: all 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">Close</button>
         </div>
     </div>
 
@@ -239,97 +234,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </div>
 
-    <script>
-    function downloadOfferLetterPDF() {
-        const btn = document.getElementById('btnDownloadOfferPDF');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerText = 'Downloading PDF...';
-        }
-
-        const currentPath = window.location.pathname;
-        if (currentPath.endsWith('.html')) {
-            const directPdfUrl = currentPath.replace(/\.html$/, '.pdf');
-            if (window.location.protocol === 'file:') {
-                const a = document.createElement('a');
-                a.href = directPdfUrl;
-                a.download = directPdfUrl.split('/').pop();
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = 'Download PDF';
-                }
-                return;
-            }
-            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-                fetch(directPdfUrl, { method: 'HEAD' })
-                    .then(res => {
-                        if (res.ok) {
-                            const a = document.createElement('a');
-                            a.href = directPdfUrl;
-                            a.download = directPdfUrl.split('/').pop();
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            if (btn) {
-                                btn.disabled = false;
-                                btn.innerText = 'Download PDF';
-                            }
-                        } else {
-                            renderClientPDF();
-                        }
-                    })
-                    .catch(() => {
-                        renderClientPDF();
-                    });
-                return;
-            }
-        }
-
-        renderClientPDF();
-
-        function renderClientPDF() {
-            if (btn) btn.innerText = 'Generating PDF...';
-            const element = document.querySelector('.offer-page');
-            const opt = {
-                margin: 0,
-                filename: '<?php echo preg_replace('/[^a-zA-Z0-9_-]/', '_', $candidateName); ?>_Offer_Letter.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                pagebreak: { mode: [] },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            const worker = html2pdf().set(opt).from(element);
-            worker.toContainer().then(function() {
-                Array.from(this.prop.container.children).forEach(c => {
-                    c.style.margin = '0';
-                    c.style.boxShadow = 'none';
-                });
-            }).save().then(() => {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = 'Download PDF';
-                }
-            }).catch(err => {
-                console.error(err);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = 'Download PDF';
-                }
-                window.print();
-            });
-        }
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('download') === '1') {
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(downloadOfferLetterPDF, 400);
-        });
-    }
-    </script>
 </body>
 </html>
     <?php
@@ -908,48 +812,22 @@ function openLivePreviewTab() {
       "
     >
       <div style="font-weight: 600">Clientura Official Offer Letter</div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <button
-          id="btnDownloadOfferPDF"
-          onclick="downloadOfferLetterPDF()"
-          style="
-            background: #2563eb;
-            color: #ffffff;
-            border: none;
-            padding: 8px 22px;
-            font-weight: 700;
-            border-radius: 9999px;
-            cursor: pointer;
-            transition: all 0.2s;
-          "
-        >
-          Download PDF
-        </button>
-        <button
-          onclick="window.print()"
-          style="
-            background: #ffa500;
-            color: #0a1138;
-            border: none;
-            padding: 8px 22px;
-            font-weight: 700;
-            border-radius: 9999px;
-            cursor: pointer;
-          "
-        >
-          Print / Save as PDF
-        </button>
+      <div>
         <button
           onclick="window.close()"
           style="
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
+            background: #e2e8f0;
+            color: #0f172a;
             border: none;
-            padding: 8px 18px;
+            padding: 8px 24px;
             font-weight: 700;
             border-radius: 9999px;
             cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
           "
+          onmouseover="this.style.background='#cbd5e1'"
+          onmouseout="this.style.background='#e2e8f0'"
         >
           Close
         </button>
@@ -1034,43 +912,6 @@ function openLivePreviewTab() {
       </div>
     </div>
 
-    <script>
-      function downloadOfferLetterPDF() {
-        const btn = document.getElementById('btnDownloadOfferPDF');
-        if (btn) {
-          btn.disabled = true;
-          btn.innerText = 'Generating PDF...';
-        }
-        const element = document.querySelector('.offer-page');
-        const opt = {
-          margin: 0,
-          filename: '${cleanFilename}',
-          image: { type: 'jpeg', quality: 0.98 },
-          pagebreak: { mode: [] },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        const worker = html2pdf().set(opt).from(element);
-        worker.toContainer().then(function() {
-          Array.from(this.prop.container.children).forEach(c => {
-            c.style.margin = '0';
-            c.style.boxShadow = 'none';
-          });
-        }).save().then(() => {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerText = 'Download PDF';
-          }
-        }).catch((err) => {
-          console.error(err);
-          if (btn) {
-            btn.disabled = false;
-            btn.innerText = 'Download PDF';
-          }
-          window.print();
-        });
-      }
-    <\/script>
   </body>
 </html>`);
 }
