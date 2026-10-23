@@ -62,15 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <title><?php echo htmlspecialchars($candidateName); ?> - Offer Letter | Clientura</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="<?php echo asset('assets/js/html2pdf.bundle.min.js'); ?>"></script>
     <style>
         @page {
             size: A4 portrait;
-            margin: 0 !important;
+            margin: 0;
         }
         * {
             box-sizing: border-box;
         }
-        html, body {
+        body {
             margin: 0;
             padding: 0;
             background: #E2E8F0;
@@ -80,8 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
         .offer-page {
             width: 210mm;
-            height: 296mm;
-            max-height: 296mm;
+            height: 297mm;
             margin: 20px auto;
             position: relative;
             background-color: #FFFFFF;
@@ -89,91 +89,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             background-size: 100% 100%;
             background-repeat: no-repeat;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 38mm 14mm 16mm 14mm;
+            padding: 130px 42px 45px 42px;
             color: #000000;
-            font-size: 10px;
-            line-height: 1.38;
+            font-size: 12.8px;
+            line-height: 1.55;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            overflow: hidden;
-            page-break-after: avoid !important;
-            page-break-inside: avoid !important;
         }
         .offer-title {
             text-align: center;
-            font-size: 16px;
+            font-size: 19px;
             font-weight: 800;
-            margin: 0 0 8mm 0;
+            margin: 0 0 20px 0;
             color: #000000;
             letter-spacing: -0.2px;
         }
         .meta-line {
             font-weight: 700;
-            margin-bottom: 2.5px;
+            margin-bottom: 4px;
         }
         .bold-text {
             font-weight: 700;
         }
         p {
-            margin: 4px 0;
+            margin: 8px 0;
+            text-align: justify;
+            text-justify: inter-word;
         }
         ul {
-            margin: 2px 0 5px 16px;
+            margin: 4px 0 10px 22px;
             padding: 0;
             list-style-type: disc;
-            line-height: 1.36;
+            text-align: justify;
+            text-justify: inter-word;
         }
         li {
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         .section-title {
             font-weight: 700;
-            margin-top: 6px;
-            margin-bottom: 2px;
+            margin-top: 14px;
+            margin-bottom: 4px;
         }
         .sign-row {
             margin-top: auto;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding-bottom: 6mm;
-            padding-right: 8px;
+            padding-bottom: 22px;
+            padding-right: 10px;
         }
         .cand-sign {
             font-weight: 700;
-            font-size: 11px;
+            font-size: 12.5px;
         }
         @media print {
-            html, body {
+            body {
                 background: transparent;
-                margin: 0 !important;
-                padding: 0 !important;
-                height: 296mm !important;
-                max-height: 296mm !important;
-                overflow: hidden !important;
             }
             .no-print {
                 display: none !important;
             }
             .offer-page {
-                margin: 0 !important;
-                box-shadow: none !important;
-                width: 210mm !important;
-                height: 296mm !important;
-                max-height: 296mm !important;
-                padding: 38mm 14mm 16mm 14mm !important;
-                overflow: hidden !important;
-                page-break-after: avoid !important;
-                page-break-inside: avoid !important;
+                margin: 0;
+                box-shadow: none;
+                width: 210mm;
+                height: 297mm;
             }
         }
     </style>
 </head>
 <body>
-    <div class="no-print" style="background: #0A1138; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;">
+    <div class="no-print" style="background: #0A1138; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999;">
         <div style="font-weight: 600;">Clientura Official Offer Letter</div>
-        <div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="btnDownloadOfferPDF" onclick="downloadOfferLetterPDF()" style="background: #2563EB; color: #FFFFFF; border: none; padding: 8px 22px; font-weight: 700; border-radius: 9999px; cursor: pointer; transition: all 0.2s;">
+                Download PDF
+            </button>
             <button onclick="window.print()" style="background: #FFA500; color: #0A1138; border: none; padding: 8px 22px; font-weight: 700; border-radius: 9999px; cursor: pointer;">
                 Print / Save as PDF
             </button>
@@ -186,13 +179,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <div class="meta-line">Date: <?php echo $issueDateFormatted; ?></div>
         <div class="meta-line">Subject: Offer Letter for <?php echo htmlspecialchars($designation); ?></div>
 
-        <p style="margin-top: 8px;"><span class="bold-text">Dear <?php echo htmlspecialchars($candidateName); ?>,</span></p>
+        <p style="margin-top: 10px;"><span class="bold-text">Dear <?php echo htmlspecialchars($candidateName); ?>,</span></p>
 
         <p>
             We are pleased to offer you the position of <span class="bold-text"><?php echo htmlspecialchars($designation); ?></span> at Clientura, for a duration of <span class="bold-text"><?php echo htmlspecialchars($durationText); ?></span>, starting from <span class="bold-text"><?php echo $startDateFormatted; ?></span> to <span class="bold-text"><?php echo $endDateFormatted; ?></span>. This <?php echo htmlspecialchars($empType); ?> is part of our commitment to nurturing talented individuals and providing practical exposure to modern software engineering practices.
         </p>
 
-        <p class="bold-text" style="margin-top: 8px;">
+        <p class="bold-text" style="margin-top: 10px;">
             During your <?php echo htmlspecialchars($empType); ?>, you will work closely with our Engineering Team on real-world software development projects involving:
         </p>
         <ul>
@@ -211,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <p style="margin: 2px 0;"><span class="bold-text">Start Date:</span> <?php echo $startDateFormatted; ?></p>
         <p style="margin: 2px 0;"><span class="bold-text">End Date:</span> <?php echo $endDateFormatted; ?></p>
 
-        <div class="section-title" style="margin-top: 8px;">Terms & Conditions:</div>
+        <div class="section-title" style="margin-top: 12px;">Terms & Conditions:</div>
         <ul>
             <?php foreach ($termsItems as $term): ?>
                 <li><?php echo htmlspecialchars($term); ?></li>
@@ -236,6 +229,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         </div>
     </div>
+
+    <script>
+    function downloadOfferLetterPDF() {
+        const btn = document.getElementById('btnDownloadOfferPDF');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = 'Generating PDF...';
+        }
+        const element = document.querySelector('.offer-page');
+        const opt = {
+            margin: 0,
+            filename: '<?php echo preg_replace('/[^a-zA-Z0-9_-]/', '_', $candidateName); ?>_Offer_Letter.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save().then(() => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = 'Download PDF';
+            }
+        }).catch(err => {
+            console.error(err);
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = 'Download PDF';
+            }
+            window.print();
+        });
+    }
+    </script>
 </body>
 </html>
     <?php
@@ -455,14 +479,14 @@ Submit a final report and presentation outlining your work, achievements, and le
 
                             <p style="margin-bottom: 7px;"><strong>Dear <span id="prevName">[Candidate Name]</span>,</strong></p>
 
-                            <p style="margin-bottom: 8px;">
+                            <p style="margin-bottom: 8px; text-align: justify; text-justify: inter-word;">
                                 We are pleased to offer you the position of <strong id="prevPosInline">[Position Title]</strong> at Clientura, for a duration of <strong id="prevDurationInline">45 days</strong>, starting from <strong id="prevDatesInline">[Start Date] to [End Date]</strong>. This <span id="prevEmpTypeInline">internship</span> is part of our commitment to nurturing talented individuals and providing practical exposure to modern software engineering practices.
                             </p>
 
-                            <p style="font-weight: 700; margin-bottom: 4px; margin-top: 8px;">
+                            <p style="font-weight: 700; margin-bottom: 4px; margin-top: 8px; text-align: justify; text-justify: inter-word;">
                                 During your <span id="prevEmpTypeInline2">internship</span>, you will work closely with our Engineering Team on real-world software development projects involving:
                             </p>
-                            <ul id="prevRespList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5;">
+                            <ul id="prevRespList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5; text-align: justify; text-justify: inter-word;">
                                 <li>Software Design and Development</li>
                                 <li>Data Structures and Algorithms Implementation</li>
                                 <li>Backend Development and API Integration</li>
@@ -471,7 +495,7 @@ Submit a final report and presentation outlining your work, achievements, and le
                                 <li>Version Control and Collaborative Development</li>
                             </ul>
 
-                            <p style="margin-bottom: 8px;">
+                            <p style="margin-bottom: 8px; text-align: justify; text-justify: inter-word;">
                                 You are expected to maintain a high level of professionalism, meet project deadlines, actively collaborate with team members, and contribute to the successful delivery of software solutions.
                             </p>
 
@@ -482,17 +506,17 @@ Submit a final report and presentation outlining your work, achievements, and le
                             <p style="margin: 1px 0;"><strong>End Date:</strong> <span id="prevEnd">--</span></p>
 
                             <div style="font-weight: 700; margin-top: 10px; margin-bottom: 2px;">Terms & Conditions:</div>
-                            <ul id="prevTermsList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5;">
+                            <ul id="prevTermsList" style="margin: 2px 0 8px 18px; padding: 0; line-height: 1.5; text-align: justify; text-justify: inter-word;">
                                 <li>Maintain confidentiality of all company code, software architectures, project information, and business data.</li>
                                 <li>Follow development standards, documentation practices, and security guidelines established by the organization.</li>
                                 <li>Submit a final report and presentation outlining your work, achievements, and learning outcomes at the end of the internship.</li>
                             </ul>
 
-                            <p style="margin-bottom: 7px; margin-top: 8px;">
+                            <p style="margin-bottom: 7px; margin-top: 8px; text-align: justify; text-justify: inter-word;">
                                 To confirm your acceptance of this offer, please reply to this letter or sign and return. Upon receiving your confirmation, we will proceed with the onboarding process and provide further details regarding your project assignments.
                             </p>
 
-                            <p style="margin-bottom: 10px;">
+                            <p style="margin-bottom: 10px; text-align: justify; text-justify: inter-word;">
                                 We look forward to welcoming you to our team and supporting your professional growth as a <span id="prevRoleClosing">[Position Title]</span>.
                             </p>
 
@@ -583,6 +607,16 @@ function formatDate(d) {
     return d;
 }
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Attach listeners
 ['candName', 'posTitle', 'roleCode', 'empType', 'durationText', 'startDate', 'endDate', 'loc', 'respArea', 'termsArea'].forEach(id => {
     document.getElementById(id).addEventListener('input', syncPreview);
@@ -638,7 +672,7 @@ document.getElementById('empSelector').addEventListener('change', function() {
 // Initial sync
 syncPreview();
 
-// Live Preview Function - Opens authentic full A4 letterhead document
+// Live Preview Function - Opens authentic full A4 letterhead document matching offer_CL-OFR-2026-597_1792688627.html
 function openLivePreviewTab() {
     const previewWindow = window.open('', '_blank');
     if (!previewWindow) {
@@ -646,206 +680,321 @@ function openLivePreviewTab() {
         return;
     }
 
-    const previewClone = document.getElementById('offerLetterPreview').cloneNode(true);
+    const rawName = document.getElementById('candName').value.trim() || 'Candidate Name';
+    const rawPos = document.getElementById('posTitle').value.trim() || 'Software Engineer';
+    const rawCode = document.getElementById('roleCode').value.trim();
+    const type = document.getElementById('empType').value || 'internship';
+    const dur = document.getElementById('durationText').value.trim() || '45 days';
+    const sDateRaw = document.getElementById('startDate').value;
+    const eDateRaw = document.getElementById('endDate').value;
+    const sDate = sDateRaw ? formatDate(sDateRaw) : '<?php echo date('d-m-Y'); ?>';
+    const eDate = eDateRaw ? formatDate(eDateRaw) : '<?php echo date('d-m-Y', strtotime('+45 days')); ?>';
+    const loc = document.getElementById('loc').value.trim() || 'Hybrid';
+    const issueDate = '<?php echo date('d-m-Y'); ?>';
+
+    const capType = type.charAt(0).toUpperCase() + type.slice(1);
+    const cleanCode = rawCode.trim();
+    const codeSuffix = cleanCode ? ' - ' + escapeHtml(cleanCode) : '';
+    const offerTitle = capType + ' Offer Letter' + codeSuffix;
+
+    const respLines = document.getElementById('respArea').value.split('\n').filter(l => l.trim() !== '');
+    const termLines = document.getElementById('termsArea').value.split('\n').filter(l => l.trim() !== '');
+
+    const respHtml = respLines.map(l => `<li>${escapeHtml(l)}</li>`).join('\n        ');
+    const termsHtml = termLines.map(l => `<li>${escapeHtml(l)}</li>`).join('\n        ');
+    const cleanFilename = rawName.replace(/[^a-zA-Z0-9_-]/g, '_') + '_Offer_Letter.pdf';
     const bgUrl = '<?php echo asset("assets/img/offer-letterhead-template.png"); ?>';
 
-    previewWindow.document.write(`<!DOCTYPE html>
+    previewWindow.document.write(`<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Live Preview - Clientura Offer Letter</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <title>${escapeHtml(rawName)} - Offer Letter | Clientura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <script src="<?php echo asset('assets/js/html2pdf.bundle.min.js'); ?>"><\/script>
     <style>
-        @page { size: A4 portrait; margin: 0; }
-        * { box-sizing: border-box; }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #e2e8f0;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .offer-page {
+        width: 210mm;
+        height: 297mm;
+        margin: 20px auto;
+        position: relative;
+        background-color: #ffffff;
+        background-image: url('${bgUrl}');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 130px 42px 45px 42px;
+        color: #000000;
+        font-size: 12.8px;
+        line-height: 1.55;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+      .offer-title {
+        text-align: center;
+        font-size: 19px;
+        font-weight: 800;
+        margin: 0 0 20px 0;
+        color: #000000;
+        letter-spacing: -0.2px;
+      }
+      .meta-line {
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .bold-text {
+        font-weight: 700;
+      }
+      p {
+        margin: 8px 0;
+        text-align: justify;
+        text-justify: inter-word;
+      }
+      ul {
+        margin: 4px 0 10px 22px;
+        padding: 0;
+        list-style-type: disc;
+        text-align: justify;
+        text-justify: inter-word;
+      }
+      li {
+        margin-bottom: 3px;
+      }
+      .section-title {
+        font-weight: 700;
+        margin-top: 14px;
+        margin-bottom: 4px;
+      }
+      .sign-row {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-bottom: 22px;
+        padding-right: 10px;
+      }
+      .cand-sign {
+        font-weight: 700;
+        font-size: 12.5px;
+      }
+      @media print {
         body {
-            margin: 0;
-            padding: 0;
-            background: #0F172A;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #000000;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+          background: transparent;
         }
-        .preview-toolbar {
-            position: sticky;
-            top: 0;
-            z-index: 999;
-            background: #0A1138;
-            color: #FFFFFF;
-            padding: 12px 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .btn-tb {
-            border: none;
-            cursor: pointer;
-            padding: 8px 20px;
-            font-weight: 700;
-            border-radius: 9999px;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-        .btn-dl {
-            background: #2563EB;
-            color: #FFFFFF;
-        }
-        .btn-dl:hover {
-            background: #1D4ED8;
-            transform: translateY(-1px);
-        }
-        .btn-print {
-            background: #FFA500;
-            color: #0A1138;
-        }
-        .btn-print:hover {
-            background: #FFB733;
-            transform: translateY(-1px);
-        }
-        .btn-close-win {
-            background: rgba(255,255,255,0.15);
-            color: #FFFFFF;
-            margin-left: 8px;
-        }
-        .offer-wrapper {
-            padding: 30px 15px;
-            display: flex;
-            justify-content: center;
-            min-height: calc(100vh - 55px);
+        .no-print {
+          display: none !important;
         }
         .offer-page {
-            width: 210mm;
-            height: 296mm;
-            max-height: 296mm;
-            box-sizing: border-box;
-            background-color: #FFFFFF;
-            background-image: url('${bgUrl}');
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            padding: 38mm 14mm 16mm 14mm;
-            font-family: 'Inter', sans-serif;
-            font-size: 10px;
-            line-height: 1.38;
-            color: #000000;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            overflow: hidden;
-            page-break-after: avoid !important;
-            page-break-inside: avoid !important;
+          margin: 0;
+          box-shadow: none;
+          width: 210mm;
+          height: 297mm;
         }
-        .offer-page h3 {
-            font-size: 16px !important;
-            margin: 0 0 8mm 0 !important;
-            letter-spacing: -0.2px;
-            text-align: center !important;
-            font-weight: 800 !important;
-            color: #000000 !important;
-        }
-        .offer-page #prevDate {
-            margin-bottom: 2.5px !important;
-        }
-        .offer-page #prevSubject {
-            margin-bottom: 6px !important;
-        }
-        .offer-page p {
-            margin: 4px 0 !important;
-        }
-        .offer-page ul {
-            margin: 2px 0 5px 16px !important;
-            line-height: 1.36 !important;
-            padding: 0 !important;
-        }
-        .offer-page li {
-            margin-bottom: 2px !important;
-        }
-        .offer-page #prevSignRow {
-            margin-top: auto !important;
-            padding-bottom: 6mm !important;
-            padding-right: 8px !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: flex-end !important;
-        }
-        @media print {
-            html, body {
-                background: transparent;
-                margin: 0 !important;
-                padding: 0 !important;
-                height: 296mm !important;
-                max-height: 296mm !important;
-                overflow: hidden !important;
-            }
-            .preview-toolbar { display: none !important; }
-            .offer-wrapper { padding: 0 !important; margin: 0 !important; }
-            .offer-page {
-                box-shadow: none !important;
-                margin: 0 !important;
-                width: 210mm !important;
-                height: 296mm !important;
-                max-height: 296mm !important;
-                padding: 38mm 14mm 16mm 14mm !important;
-                overflow: hidden !important;
-                page-break-after: avoid !important;
-                page-break-inside: avoid !important;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-    <div class="preview-toolbar">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">Clientura Official Offer Letter</span>
-            <span style="background: rgba(255,255,255,0.15); font-size: 11.5px; padding: 2px 10px; border-radius: 9999px;">A4 Format</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="btn-tb btn-dl" id="btnDownloadPDF" onclick="downloadPDF()">
-                Download PDF
-            </button>
-            <button class="btn-tb btn-print" onclick="window.print()">
-                Print / Save PDF
-            </button>
-            <button class="btn-tb btn-close-win" onclick="window.close()">
-                Close
-            </button>
-        </div>
+  </head>
+  <body>
+    <div
+      class="no-print"
+      style="
+        background: #0a1138;
+        color: white;
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      "
+    >
+      <div style="font-weight: 600">Clientura Official Offer Letter</div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button
+          id="btnDownloadOfferPDF"
+          onclick="downloadOfferLetterPDF()"
+          style="
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 22px;
+            font-weight: 700;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s;
+          "
+        >
+          Download PDF
+        </button>
+        <button
+          onclick="window.print()"
+          style="
+            background: #ffa500;
+            color: #0a1138;
+            border: none;
+            padding: 8px 22px;
+            font-weight: 700;
+            border-radius: 9999px;
+            cursor: pointer;
+          "
+        >
+          Print / Save as PDF
+        </button>
+        <button
+          onclick="window.close()"
+          style="
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            font-weight: 700;
+            border-radius: 9999px;
+            cursor: pointer;
+          "
+        >
+          Close
+        </button>
+      </div>
     </div>
-    <div class="offer-wrapper">
-        <div class="offer-page" id="printDoc">
-            ${previewClone.innerHTML}
+
+    <div class="offer-page">
+      <div class="offer-title">${offerTitle}</div>
+
+      <div class="meta-line">Date: ${escapeHtml(issueDate)}</div>
+      <div class="meta-line">Subject: Offer Letter for ${escapeHtml(rawPos)}</div>
+
+      <p style="margin-top: 10px">
+        <span class="bold-text">Dear ${escapeHtml(rawName)},</span>
+      </p>
+
+      <p>
+        We are pleased to offer you the position of
+        <span class="bold-text">${escapeHtml(rawPos)}</span> at Clientura, for a
+        duration of <span class="bold-text">${escapeHtml(dur)}</span>, starting from
+        <span class="bold-text">${escapeHtml(sDate)}</span> to
+        <span class="bold-text">${escapeHtml(eDate)}</span>. This ${escapeHtml(type)} is part of
+        our commitment to nurturing talented individuals and providing practical
+        exposure to modern software engineering practices.
+      </p>
+
+      <p class="bold-text" style="margin-top: 10px">
+        During your ${escapeHtml(type)}, you will work closely with our Engineering Team
+        on real-world software development projects involving:
+      </p>
+      <ul>
+        ${respHtml}
+      </ul>
+
+      <p>
+        You are expected to maintain a high level of professionalism, meet
+        project deadlines, actively collaborate with team members, and
+        contribute to the successful delivery of software solutions.
+      </p>
+
+      <div class="section-title">${escapeHtml(capType)} Details:</div>
+      <p style="margin: 2px 0">
+        <span class="bold-text">Position:</span> ${escapeHtml(rawPos)}
+      </p>
+      <p style="margin: 2px 0">
+        <span class="bold-text">Location:</span> ${escapeHtml(loc)}
+      </p>
+      <p style="margin: 2px 0">
+        <span class="bold-text">Start Date:</span> ${escapeHtml(sDate)}
+      </p>
+      <p style="margin: 2px 0">
+        <span class="bold-text">End Date:</span> ${escapeHtml(eDate)}
+      </p>
+
+      <div class="section-title" style="margin-top: 12px">
+        Terms & Conditions:
+      </div>
+      <ul>
+        ${termsHtml}
+      </ul>
+
+      <p>
+        To confirm your acceptance of this offer, please reply to this email.
+        Upon receiving your confirmation, we will proceed with the onboarding
+        process and provide further details regarding your ${escapeHtml(type)}
+        responsibilities and project assignments.
+      </p>
+
+      <p>
+        We look forward to welcoming you to our team and supporting your
+        professional growth as a ${escapeHtml(rawPos)}.
+      </p>
+
+      <div class="sign-row">
+        <div>
+          <p style="margin-bottom: 2px">
+            <span class="bold-text">Warm regards,</span>
+          </p>
+          <p style="margin-top: 0"><span class="bold-text">Clientura</span></p>
         </div>
+        <div class="cand-sign">Signature of candidate</div>
+      </div>
     </div>
+
     <script>
-        function downloadPDF() {
-            const btn = document.getElementById('btnDownloadPDF');
-            btn.disabled = true;
-            btn.innerText = 'Generating PDF...';
-            const element = document.getElementById('printDoc');
-            const opt = {
-                margin: 0,
-                filename: 'Clientura_Offer_Letter.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: 'avoid-all' }
-            };
-            html2pdf().set(opt).from(element).save().then(() => {
-                btn.disabled = false;
-                btn.innerText = 'Download PDF';
-            }).catch(err => {
-                console.error(err);
-                btn.disabled = false;
-                btn.innerText = 'Download PDF';
-                window.print();
-            });
+      function downloadOfferLetterPDF() {
+        const btn = document.getElementById('btnDownloadOfferPDF');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = 'Generating PDF...';
         }
+        const element = document.querySelector('.offer-page');
+        const opt = {
+          margin: 0,
+          filename: '${cleanFilename}',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf()
+          .set(opt)
+          .from(element)
+          .save()
+          .then(() => {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = 'Download PDF';
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = 'Download PDF';
+            }
+            window.print();
+          });
+      }
     <\/script>
-</body>
+  </body>
 </html>`);
 }
 
