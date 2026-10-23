@@ -297,27 +297,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 margin: 0,
                 filename: '<?php echo preg_replace('/[^a-zA-Z0-9_-]/', '_', $candidateName); ?>_Offer_Letter.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-                jsPDF: { unit: 'mm', format: [210, 297.5], orientation: 'portrait' }
+                pagebreak: { mode: [] },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf()
-                .set(opt)
-                .from(element)
-                .save()
-                .then(() => {
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerText = 'Download PDF';
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerText = 'Download PDF';
-                    }
-                    window.print();
+            const worker = html2pdf().set(opt).from(element);
+            worker.toContainer().then(function() {
+                Array.from(this.prop.container.children).forEach(c => {
+                    c.style.margin = '0';
+                    c.style.boxShadow = 'none';
                 });
+            }).save().then(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Download PDF';
+                }
+            }).catch(err => {
+                console.error(err);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Download PDF';
+                }
+                window.print();
+            });
         }
     }
 
@@ -1044,27 +1046,29 @@ function openLivePreviewTab() {
           margin: 0,
           filename: '${cleanFilename}',
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-          jsPDF: { unit: 'mm', format: [210, 297.5], orientation: 'portrait' }
+          pagebreak: { mode: [] },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-        html2pdf()
-          .set(opt)
-          .from(element)
-          .save()
-          .then(() => {
-            if (btn) {
-              btn.disabled = false;
-              btn.innerText = 'Download PDF';
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            if (btn) {
-              btn.disabled = false;
-              btn.innerText = 'Download PDF';
-            }
-            window.print();
+        const worker = html2pdf().set(opt).from(element);
+        worker.toContainer().then(function() {
+          Array.from(this.prop.container.children).forEach(c => {
+            c.style.margin = '0';
+            c.style.boxShadow = 'none';
           });
+        }).save().then(() => {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = 'Download PDF';
+          }
+        }).catch((err) => {
+          console.error(err);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = 'Download PDF';
+          }
+          window.print();
+        });
       }
     <\/script>
   </body>
