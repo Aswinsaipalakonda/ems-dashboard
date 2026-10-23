@@ -15,6 +15,7 @@
 
 # Logs, OS, and editor files
 *.log
+*.zip
 .DS_Store
 .idea/
 .vscode/
