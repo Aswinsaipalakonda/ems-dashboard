@@ -30,6 +30,13 @@ if (!$employee) {
     exit;
 }
 
+// Unread notifications count for header
+$unreadCount = fetchOne(
+    "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND user_type = 'employee' AND is_read = 0",
+    "i",
+    [$userId]
+)['count'] ?? 0;
+
 // Check existing submission
 $existingFeedback = fetchOne(
     "SELECT * FROM exit_feedbacks WHERE employee_id = ?",
@@ -118,23 +125,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             if ($insertId) {
                 // Log activity
-                logActivity('exit_feedback_submitted', "Submitted exit feedback for employee #{$employee['employee_id']} ({$employee['name']})");
+                logActivity(
+                    $userId,
+                    'employee',
+                    'exit_feedback_submitted',
+                    "Employee {$employee['name']} ({$employee['employee_id']}) submitted exit experience feedback."
+                );
 
                 // Notify Admin
-                $adminUsers = fetchAll("SELECT id FROM admin");
-                foreach ($adminUsers as $adm) {
+                $admins = fetchAll("SELECT id FROM admin WHERE status = 'active'");
+                foreach ($admins as $adm) {
                     insert(
-                        "INSERT INTO notifications (user_id, user_type, title, message, type, link) VALUES (?, 'admin', 'Exit Feedback Submitted', ?, 'info', ?)",
-                        "iss",
-                        [$adm['id'], "{$employee['name']} ({$employee['employee_id']}) submitted exit feedback.", url('admin/exit-feedbacks')]
+                        "INSERT INTO notifications (user_id, user_type, title, message, type, link) VALUES (?, 'admin', ?, ?, 'info', ?)",
+                        "isss",
+                        [
+                            $adm['id'],
+                            'New Exit Feedback Submitted',
+                            "{$employee['name']} submitted their tenure exit survey.",
+                            'admin/exit-feedbacks'
+                        ]
                     );
                 }
 
-                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) || isset($_POST['ajax'])) {
+                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                     echo json_encode(['success' => true, 'message' => 'Thank you! Your exit feedback has been submitted successfully.']);
                     exit;
                 }
-
                 $message = 'Thank you! Your exit feedback has been submitted successfully.';
                 $messageType = 'success';
                 // Reload existing feedback
@@ -155,16 +171,128 @@ require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/employee-sidebar.php';
 ?>
 
+<style>
+/* Exit Feedback Responsive Specific Styles */
+@media (min-width: 992px) {
+    .exit-feedback-sticky {
+        position: sticky;
+        top: 85px;
+        z-index: 10;
+    }
+}
+@media (max-width: 991.98px) {
+    .exit-feedback-sticky {
+        position: static !important;
+    }
+}
+.star-rating-group .star-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease;
+}
+.star-rating-group .star-btn:active {
+    transform: scale(1.2);
+}
+.nps-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.nps-pill-btn {
+    flex: 1 1 calc(10% - 6px);
+    min-width: 32px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+@media (max-width: 575.98px) {
+    .nps-pill-btn {
+        flex: 1 1 calc(20% - 6px);
+        height: 36px;
+        font-size: 12px;
+    }
+}
+.nps-pill-btn.active, .nps-pill-btn:hover {
+    background: #0A1138;
+    color: #ffffff;
+    border-color: #0A1138;
+}
+</style>
+
+<!-- Main Content -->
 <div class="main-content">
+    <!-- Top Header Bar with Mobile Sidebar Toggle -->
+    <header class="main-header">
+        <div class="header-left">
+            <button class="sidebar-toggle" type="button" aria-label="Toggle Navigation">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1 class="page-title">Exit Feedback</h1>
+        </div>
+        <div class="header-right">
+            <div class="dropdown">
+                <button class="header-icon-btn" data-bs-toggle="dropdown" aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <?php if ($unreadCount > 0): ?>
+                    <span class="notification-badge"><?php echo $unreadCount; ?></span>
+                    <?php endif; ?>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end notifications-dropdown">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Notifications</h6>
+                        <?php if ($unreadCount > 0): ?>
+                        <span class="badge bg-primary"><?php echo $unreadCount; ?> new</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="p-2 text-center border-top">
+                        <a href="<?php echo url('employee/notifications'); ?>" class="text-primary small">View All Notifications</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dropdown">
+                <div class="user-dropdown" data-bs-toggle="dropdown" role="button">
+                    <img src="<?php echo getAvatar($_SESSION['avatar'] ?? ''); ?>" alt="Avatar" class="user-avatar">
+                    <div class="user-info">
+                        <div class="user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Employee'); ?></div>
+                        <div class="user-role">Employee</div>
+                    </div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="<?php echo url('employee/profile'); ?>"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="<?php echo url('logout'); ?>"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
     <div class="content-wrapper">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Breadcrumb / Header Action Row -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
             <div>
                 <h1 class="h3 font-weight-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Exit & Experience Feedback</h1>
-                <p class="text-muted mb-0">Help us elevate Clientura by sharing honest insights about your tenure, learning, and team mentorship.</p>
+                <p class="text-muted mb-0 small">Help us elevate Clientura by sharing honest insights about your tenure, learning, and team mentorship.</p>
             </div>
-            <div>
-                <a href="<?php echo url('employee/dashboard'); ?>" class="btn btn-saas-light">
+            <div class="w-100 w-sm-auto text-start text-sm-end">
+                <a href="<?php echo url('employee/dashboard'); ?>" class="btn btn-saas-light w-100 w-sm-auto">
                     <i class="bi bi-arrow-left me-1"></i>
                     <span>Back to Dashboard</span>
                 </a>
@@ -182,25 +310,25 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
         <?php if ($existingFeedback): ?>
             <!-- Already Submitted Summary Card -->
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                <div class="p-4 bg-primary text-white" style="background: linear-gradient(135deg, #0A1138 0%, #1a276b 100%) !important;">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="p-3 p-sm-4 text-white" style="background: linear-gradient(135deg, #0A1138 0%, #1a276b 100%) !important;">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-white bg-opacity-20 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; font-size: 26px;">
+                            <div class="rounded-circle bg-white bg-opacity-20 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 50px; height: 50px; font-size: 24px;">
                                 <i class="bi bi-check-circle-fill text-success"></i>
                             </div>
                             <div>
-                                <h4 class="mb-1 font-weight-bold" style="font-family: 'Outfit', sans-serif;">Feedback Recorded Successfully</h4>
+                                <h4 class="mb-1 font-weight-bold fs-5" style="font-family: 'Outfit', sans-serif;">Feedback Recorded Successfully</h4>
                                 <p class="mb-0 text-white-50 small">Submitted on <?php echo date('d F Y, h:i A', strtotime($existingFeedback['created_at'])); ?></p>
                             </div>
                         </div>
-                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill font-weight-bold">
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill font-weight-bold small">
                             <i class="bi bi-shield-check me-1"></i> Recorded & Archived
                         </span>
                     </div>
                 </div>
 
-                <div class="card-body p-4 p-md-5">
-                    <p class="text-muted mb-4 fs-6">
+                <div class="card-body p-3 p-sm-4 p-md-5">
+                    <p class="text-muted mb-4 small fs-6">
                         Thank you for taking the time to share your feedback, <strong><?php echo htmlspecialchars($employee['name']); ?></strong>! 
                         Your review has been securely transmitted to the management team. Below is a copy of your submitted evaluation:
                     </p>
@@ -208,7 +336,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                     <!-- Ratings Overview -->
                     <h6 class="font-weight-bold text-dark text-uppercase small tracking-wider mb-3">Your Tenure Ratings</h6>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-12 col-sm-6 col-md-4">
                             <div class="p-3 rounded-4 bg-light border border-light-subtle h-100">
                                 <span class="text-muted small d-block mb-1">Overall Experience</span>
                                 <div class="text-warning fs-5">
@@ -219,7 +347,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-12 col-sm-6 col-md-4">
                             <div class="p-3 rounded-4 bg-light border border-light-subtle h-100">
                                 <span class="text-muted small d-block mb-1">Mentorship & Guidance</span>
                                 <div class="text-warning fs-5">
@@ -230,7 +358,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-12 col-sm-6 col-md-4">
                             <div class="p-3 rounded-4 bg-light border border-light-subtle h-100">
                                 <span class="text-muted small d-block mb-1">Work Culture & Inclusivity</span>
                                 <div class="text-warning fs-5">
@@ -241,7 +369,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-12 col-sm-6 col-md-4">
                             <div class="p-3 rounded-4 bg-light border border-light-subtle h-100">
                                 <span class="text-muted small d-block mb-1">Learning & Growth</span>
                                 <div class="text-warning fs-5">
@@ -252,9 +380,9 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-12 col-sm-6 col-md-4">
                             <div class="p-3 rounded-4 bg-light border border-light-subtle h-100">
-                                <span class="text-muted small d-block mb-1">Team Leadership & Management</span>
+                                <span class="text-muted small d-block mb-1">Management Support</span>
                                 <div class="text-warning fs-5">
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
                                         <i class="bi bi-star<?php echo $i <= $existingFeedback['management_rating'] ? '-fill' : ''; ?>"></i>
@@ -263,43 +391,67 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-12 col-sm-6 col-md-4">
                             <div class="p-3 rounded-4 bg-light border border-light-subtle h-100">
-                                <span class="text-muted small d-block mb-1">Recommendation Score (NPS)</span>
-                                <div class="fs-5 fw-bold text-primary">
-                                    <i class="bi bi-hand-thumbs-up me-1"></i> <?php echo $existingFeedback['recommend_score']; ?> / 10
+                                <span class="text-muted small d-block mb-1">Peer Recommendation</span>
+                                <div class="text-primary fw-bold fs-5">
+                                    <i class="bi bi-hand-thumbs-up-fill me-1"></i>
+                                    <span><?php echo $existingFeedback['recommend_score']; ?> / 10</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Qualitative Responses -->
-                    <div class="mb-4">
-                        <h6 class="font-weight-bold text-dark text-uppercase small tracking-wider mb-2">Key Learnings & Project Highlights</h6>
-                        <div class="p-3 bg-light rounded-3 text-dark"><?php echo nl2br(htmlspecialchars($existingFeedback['key_learnings'])); ?></div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 p-sm-4 rounded-4 bg-light border border-light-subtle h-100">
+                                <h6 class="font-weight-bold text-dark mb-2 small text-uppercase">Key Practical Learnings</h6>
+                                <p class="text-secondary mb-0 small" style="white-space: pre-line;"><?php echo htmlspecialchars($existingFeedback['key_learnings']); ?></p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 p-sm-4 rounded-4 bg-light border border-light-subtle h-100">
+                                <h6 class="font-weight-bold text-dark mb-2 small text-uppercase">What You Enjoyed Most</h6>
+                                <p class="text-secondary mb-0 small" style="white-space: pre-line;"><?php echo htmlspecialchars($existingFeedback['positive_highlights']); ?></p>
+                            </div>
+                        </div>
+                        <?php if (!empty($existingFeedback['improvement_suggestions'])): ?>
+                        <div class="col-12">
+                            <div class="p-3 p-sm-4 rounded-4 bg-light border border-light-subtle">
+                                <h6 class="font-weight-bold text-dark mb-2 small text-uppercase">Constructive Improvement Suggestions</h6>
+                                <p class="text-secondary mb-0 small" style="white-space: pre-line;"><?php echo htmlspecialchars($existingFeedback['improvement_suggestions']); ?></p>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="mb-4">
-                        <h6 class="font-weight-bold text-dark text-uppercase small tracking-wider mb-2">What You Liked Most</h6>
-                        <div class="p-3 bg-light rounded-3 text-dark"><?php echo nl2br(htmlspecialchars($existingFeedback['positive_highlights'])); ?></div>
+                    <!-- Alumni Contact Card -->
+                    <div class="p-3 p-sm-4 rounded-4 border bg-white mb-4">
+                        <h6 class="font-weight-bold text-dark mb-3 small text-uppercase">Archived Alumni Contact Details</h6>
+                        <div class="row g-2 small text-secondary">
+                            <div class="col-12 col-sm-4">
+                                <i class="bi bi-envelope me-1 text-primary"></i> <strong>Email:</strong> <span class="text-break"><?php echo htmlspecialchars($existingFeedback['personal_email']); ?></span>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <i class="bi bi-telephone me-1 text-primary"></i> <strong>Mobile:</strong> <?php echo htmlspecialchars($existingFeedback['personal_phone']); ?>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <i class="bi bi-linkedin me-1 text-primary"></i> <strong>LinkedIn:</strong> 
+                                <?php if (!empty($existingFeedback['linkedin_profile'])): ?>
+                                    <a href="<?php echo htmlspecialchars($existingFeedback['linkedin_profile']); ?>" target="_blank" rel="noopener" class="text-primary text-break">View Profile</a>
+                                <?php else: ?>
+                                    <span class="text-muted">Not provided</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </div>
 
-                    <?php if (!empty($existingFeedback['improvement_suggestions'])): ?>
-                    <div class="mb-4">
-                        <h6 class="font-weight-bold text-dark text-uppercase small tracking-wider mb-2">Suggestions for Improvement</h6>
-                        <div class="p-3 bg-light rounded-3 text-dark"><?php echo nl2br(htmlspecialchars($existingFeedback['improvement_suggestions'])); ?></div>
-                    </div>
-                    <?php endif; ?>
-
-                    <div class="p-3 rounded-3 border bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
-                        <span class="text-muted small">Stay connected via Alumni Network</span>
-                        <div class="d-flex gap-2">
-                            <?php if (!empty($existingFeedback['linkedin_profile'])): ?>
-                                <a href="<?php echo htmlspecialchars($existingFeedback['linkedin_profile']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-linkedin me-1"></i> LinkedIn
-                                </a>
-                            <?php endif; ?>
-                            <a href="<?php echo url('employee/my-documents'); ?>" class="btn btn-sm btn-saas-dark">
+                    <!-- Next Step Actions -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-3 border-top">
+                        <span class="text-muted small text-center text-sm-start">Your tenure records are archived and accessible via your employee dashboard.</span>
+                        <div class="d-flex flex-wrap gap-2 w-100 w-sm-auto justify-content-center justify-content-sm-end">
+                            <a href="<?php echo url('employee/my-documents'); ?>" class="btn btn-sm btn-saas-dark w-100 w-sm-auto">
                                 <i class="bi bi-file-earmark-check me-1"></i> View Certificates & Documents
                             </a>
                         </div>
@@ -311,39 +463,39 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
 
             <!-- Exit Feedback Submission Form -->
             <div class="row g-4 align-items-start">
-                <!-- Left Sidebar: Employee Context Card (Sticky) -->
-                <div class="col-lg-4" style="position: sticky; top: 85px; z-index: 10;">
+                <!-- Left Sidebar: Employee Context Card (Sticky on desktop, stacked on mobile) -->
+                <div class="col-12 col-lg-4 exit-feedback-sticky">
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header bg-transparent py-3">
                             <span class="font-weight-bold text-dark">Employee Information</span>
                         </div>
-                        <div class="card-body p-4">
+                        <div class="card-body p-3 p-sm-4">
                             <div class="d-flex align-items-center gap-3 mb-4">
-                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center font-weight-bold fs-4" style="width: 54px; height: 54px;">
+                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center font-weight-bold fs-4 flex-shrink-0" style="width: 52px; height: 52px;">
                                     <?php echo strtoupper(substr($employee['name'], 0, 1)); ?>
                                 </div>
-                                <div>
-                                    <h5 class="font-weight-bold text-dark mb-0"><?php echo htmlspecialchars($employee['name']); ?></h5>
+                                <div class="overflow-hidden">
+                                    <h5 class="font-weight-bold text-dark mb-0 text-truncate"><?php echo htmlspecialchars($employee['name']); ?></h5>
                                     <span class="badge bg-secondary-subtle text-dark font-monospace"><?php echo htmlspecialchars($employee['employee_id']); ?></span>
                                 </div>
                             </div>
 
                             <ul class="list-unstyled mb-4 small">
-                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Domain</span>
-                                    <span class="fw-semibold text-dark"><?php echo htmlspecialchars($employee['domain_name'] ?? 'General'); ?></span>
+                                    <span class="fw-semibold text-dark text-end ms-2"><?php echo htmlspecialchars($employee['domain_name'] ?? 'General'); ?></span>
                                 </li>
-                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Designation</span>
-                                    <span class="fw-semibold text-dark"><?php echo htmlspecialchars($employee['designation'] ?? 'Intern'); ?></span>
+                                    <span class="fw-semibold text-dark text-end ms-2"><?php echo htmlspecialchars($employee['designation'] ?? 'Intern'); ?></span>
                                 </li>
-                                <li class="d-flex justify-content-between py-2 border-bottom">
+                                <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Date of Joining</span>
-                                    <span class="fw-semibold text-dark"><?php echo $employee['date_of_joining'] ? date('d M Y', strtotime($employee['date_of_joining'])) : 'N/A'; ?></span>
+                                    <span class="fw-semibold text-dark text-end ms-2"><?php echo $employee['date_of_joining'] ? date('d M Y', strtotime($employee['date_of_joining'])) : 'N/A'; ?></span>
                                 </li>
-                                <li class="d-flex justify-content-between py-2">
+                                <li class="d-flex justify-content-between align-items-center py-2">
                                     <span class="text-muted">Work Email</span>
-                                    <span class="fw-semibold text-dark"><?php echo htmlspecialchars($employee['email']); ?></span>
+                                    <span class="fw-semibold text-dark text-end text-break ms-2" style="max-width: 60%;"><?php echo htmlspecialchars($employee['email']); ?></span>
                                 </li>
                             </ul>
 
@@ -356,7 +508,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                 </div>
 
                 <!-- Right Column: Interactive Form -->
-                <div class="col-lg-8">
+                <div class="col-12 col-lg-8">
                     <form id="exitFeedbackForm" method="POST" action="<?php echo url('employee/exit-feedback'); ?>">
                         <input type="hidden" name="action" value="submit_exit_feedback">
 
@@ -366,7 +518,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 <span class="font-weight-bold text-dark">1. Program & Experience Evaluation</span>
                                 <small class="text-muted d-block">Select ratings on a 1 (Needs Improvement) to 5 (Outstanding) scale.</small>
                             </div>
-                            <div class="card-body p-4">
+                            <div class="card-body p-3 p-sm-4">
                                 <?php
                                 $ratingCategories = [
                                     'overall_rating' => [
@@ -394,17 +546,17 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                 foreach ($ratingCategories as $field => $meta):
                                 ?>
                                 <div class="mb-4 pb-3 border-bottom">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label class="form-label font-weight-bold text-dark mb-0"><?php echo $meta['label']; ?> <span class="text-danger">*</span></label>
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
+                                        <label class="form-label font-weight-bold text-dark mb-0 small fs-6"><?php echo $meta['label']; ?> <span class="text-danger">*</span></label>
                                         <span class="badge bg-light text-muted border rating-label-text" id="label_<?php echo $field; ?>">Click to rate</span>
                                     </div>
                                     <p class="text-muted small mb-2"><?php echo $meta['desc']; ?></p>
                                     
-                                    <div class="star-rating-group d-flex gap-2" data-target="<?php echo $field; ?>">
+                                    <div class="star-rating-group d-flex flex-wrap gap-2 gap-sm-3 align-items-center" data-target="<?php echo $field; ?>">
                                         <input type="hidden" name="<?php echo $field; ?>" id="input_<?php echo $field; ?>" value="" required>
                                         <?php for ($star = 1; $star <= 5; $star++): ?>
-                                            <button type="button" class="btn btn-sm star-btn text-warning border-0 p-0 fs-3" data-val="<?php echo $star; ?>" aria-label="Rate <?php echo $star; ?> stars">
-                                                <i class="bi bi-star"></i>
+                                            <button type="button" class="star-btn text-warning" data-val="<?php echo $star; ?>" aria-label="Rate <?php echo $star; ?> stars">
+                                                <i class="bi bi-star fs-3"></i>
                                             </button>
                                         <?php endfor; ?>
                                     </div>
@@ -413,11 +565,21 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
 
                                 <!-- NPS Recommend Score -->
                                 <div>
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label class="form-label font-weight-bold text-dark mb-0">How likely are you to recommend Clientura to friends or peers? <span class="text-danger">*</span></label>
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
+                                        <label class="form-label font-weight-bold text-dark mb-0 small fs-6">How likely are you to recommend Clientura to friends or peers? <span class="text-danger">*</span></label>
                                         <span class="badge bg-primary text-white" id="npsDisplay">10 / 10 (Extremely Likely)</span>
                                     </div>
                                     <p class="text-muted small mb-3">Scale from 1 (Not at all likely) to 10 (Extremely likely).</p>
+                                    
+                                    <!-- Interactive 1-10 Pill Selector for Mobile -->
+                                    <div class="nps-btn-group mb-3">
+                                        <?php for ($n = 1; $n <= 10; $n++): ?>
+                                            <button type="button" class="nps-pill-btn <?php echo $n === 10 ? 'active' : ''; ?>" data-score="<?php echo $n; ?>">
+                                                <?php echo $n; ?>
+                                            </button>
+                                        <?php endfor; ?>
+                                    </div>
+
                                     <input type="range" class="form-range" min="1" max="10" step="1" value="10" id="recommendScore" name="recommend_score">
                                     <div class="d-flex justify-content-between text-muted small" style="font-size: 11px;">
                                         <span>1 - Not Likely</span>
@@ -433,10 +595,10 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                             <div class="card-header bg-transparent py-3">
                                 <span class="font-weight-bold text-dark">2. Qualitative Insights & Feedback</span>
                             </div>
-                            <div class="card-body p-4">
+                            <div class="card-body p-3 p-sm-4">
                                 <div class="mb-3">
                                     <label class="form-label font-weight-bold text-dark small">Reason for Exit / Tenure Status <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="reason_for_leaving" required style="border-radius: 12px;">
+                                    <select class="form-select" name="reason_for_leaving" required style="border-radius: 12px; font-size: 15px;">
                                         <option value="Completed Scheduled Internship Tenure" selected>Completed Scheduled Internship Tenure</option>
                                         <option value="Resuming College / Academic Exams">Resuming College / Academic Semester</option>
                                         <option value="Transitioning to Full-Time Role">Transitioning to Full-Time Role</option>
@@ -447,17 +609,17 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
 
                                 <div class="mb-3">
                                     <label class="form-label font-weight-bold text-dark small">Key Skills & Practical Learnings <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" name="key_learnings" rows="3" required placeholder="What programming languages, frameworks, tools, or domain workflows did you master during your tenure?" style="border-radius: 12px;"></textarea>
+                                    <textarea class="form-control" name="key_learnings" rows="3" required placeholder="What programming languages, frameworks, tools, or domain workflows did you master during your tenure?" style="border-radius: 12px; font-size: 15px;"></textarea>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label font-weight-bold text-dark small">What did you enjoy most at Clientura? <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" name="positive_highlights" rows="3" required placeholder="Share the projects, mentorship moments, or cultural highlights you appreciated most." style="border-radius: 12px;"></textarea>
+                                    <textarea class="form-control" name="positive_highlights" rows="3" required placeholder="Share the projects, mentorship moments, or cultural highlights you appreciated most." style="border-radius: 12px; font-size: 15px;"></textarea>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label font-weight-bold text-dark small">Constructive Suggestions for Clientura (Optional)</label>
-                                    <textarea class="form-control" name="improvement_suggestions" rows="3" placeholder="Where can we improve our processes, tools, training sessions, or communication?" style="border-radius: 12px;"></textarea>
+                                    <textarea class="form-control" name="improvement_suggestions" rows="3" placeholder="Where can we improve our processes, tools, training sessions, or communication?" style="border-radius: 12px; font-size: 15px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -467,19 +629,19 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                             <div class="card-header bg-transparent py-3">
                                 <span class="font-weight-bold text-dark">3. Alumni Network & Staying Connected</span>
                             </div>
-                            <div class="card-body p-4">
+                            <div class="card-body p-3 p-sm-4">
                                 <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <label class="form-label font-weight-bold text-dark small">Personal Email (Non-Work) <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" name="personal_email" placeholder="Enter your email address" value="" required style="border-radius: 12px;">
+                                        <input type="email" class="form-control" name="personal_email" placeholder="Enter your personal email" value="" required style="border-radius: 12px; font-size: 15px;">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <label class="form-label font-weight-bold text-dark small">Personal Mobile Number (10 Digits) <span class="text-danger">*</span></label>
-                                        <input type="tel" class="form-control" name="personal_phone" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" value="" required style="border-radius: 12px;">
+                                        <input type="tel" class="form-control" name="personal_phone" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" value="" required style="border-radius: 12px; font-size: 15px;">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label font-weight-bold text-dark small">LinkedIn Profile URL</label>
-                                        <input type="url" class="form-control" name="linkedin_profile" placeholder="Enter your LinkedIn profile URL" style="border-radius: 12px;">
+                                        <input type="url" class="form-control" name="linkedin_profile" placeholder="https://linkedin.com/in/username" style="border-radius: 12px; font-size: 15px;">
                                     </div>
                                 </div>
 
@@ -493,7 +655,7 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="btn btn-saas-dark w-100 py-3 shadow-sm rounded-4" id="btnSubmitFeedback">
+                        <button type="submit" class="btn btn-saas-dark w-100 py-3 shadow-sm rounded-4 fs-6 fw-semibold" id="btnSubmitFeedback">
                             <i class="bi bi-send-check me-1"></i>
                             <span>Submit Exit Feedback</span>
                         </button>
@@ -536,9 +698,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const bVal = parseInt(btn.getAttribute('data-val'), 10);
                 const icon = btn.querySelector('i');
                 if (val > 0 && bVal <= val) {
-                    icon.className = 'bi bi-star-fill';
+                    icon.className = 'bi bi-star-fill fs-3';
                 } else {
-                    icon.className = 'bi bi-star';
+                    icon.className = 'bi bi-star fs-3';
                 }
             });
         }
@@ -554,7 +716,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const hoverVal = parseInt(this.getAttribute('data-val'), 10);
                 buttons.forEach(b => {
                     const bVal = parseInt(b.getAttribute('data-val'), 10);
-                    b.querySelector('i').className = bVal <= hoverVal ? 'bi bi-star-fill' : 'bi bi-star';
+                    b.querySelector('i').className = bVal <= hoverVal ? 'bi bi-star-fill fs-3' : 'bi bi-star fs-3';
                 });
                 if (labelText) {
                     labelText.className = 'badge bg-warning-subtle text-dark border rating-label-text';
@@ -569,19 +731,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // NPS Range
+    // NPS Range & Pill Buttons
     const nps = document.getElementById('recommendScore');
     const npsDisplay = document.getElementById('npsDisplay');
-    if (nps && npsDisplay) {
-        nps.addEventListener('input', function() {
-            const v = parseInt(this.value, 10);
-            let desc = 'Extremely Likely';
-            if (v <= 4) desc = 'Not Likely';
-            else if (v <= 7) desc = 'Somewhat Likely';
-            else if (v <= 8) desc = 'Likely';
-            npsDisplay.innerText = v + ' / 10 (' + desc + ')';
+    const npsPills = document.querySelectorAll('.nps-pill-btn');
+
+    function updateNps(v) {
+        if (!npsDisplay) return;
+        let desc = 'Extremely Likely';
+        if (v <= 4) desc = 'Not Likely';
+        else if (v <= 7) desc = 'Somewhat Likely';
+        else if (v <= 8) desc = 'Likely';
+        npsDisplay.innerText = v + ' / 10 (' + desc + ')';
+
+        npsPills.forEach(pill => {
+            const score = parseInt(pill.getAttribute('data-score'), 10);
+            if (score === v) {
+                pill.classList.add('active');
+            } else {
+                pill.classList.remove('active');
+            }
         });
     }
+
+    if (nps) {
+        nps.addEventListener('input', function() {
+            const v = parseInt(this.value, 10);
+            updateNps(v);
+        });
+    }
+
+    npsPills.forEach(pill => {
+        pill.addEventListener('click', function() {
+            const score = parseInt(this.getAttribute('data-score'), 10);
+            if (nps) {
+                nps.value = score;
+            }
+            updateNps(score);
+        });
+    });
 
     // Submit Feedback Form via AJAX
     const form = document.getElementById('exitFeedbackForm');
@@ -648,4 +836,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
