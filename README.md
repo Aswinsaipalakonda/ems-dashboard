@@ -86,6 +86,28 @@ A comprehensive, role-based Employee Management and Human Resource Management Sy
 - User activity logs
 - Database management
 
+#### 11. **Public Intern Registration & Conversion Portal**
+- Public-facing internship application portal (`intern-registration.php`)
+- Standardized track selection plus dynamic custom track input ("Other" domain specification)
+- Direct PDF resume uploads with automatic mime-type and size security checks
+- Unique application tracking IDs (`REG-YYYY-XXXX`)
+- Administrative review desk (`admin/intern-registrations.php`) with 1-click employee account conversion
+
+#### 12. **Exit & Experience Feedback System**
+- Structured exit survey for graduating interns and departing employees (`employee/exit-feedback.php`)
+- Multi-dimensional rating scales (Overall Experience, Mentorship, Culture, Learning & Growth, Management)
+- Interactive Net Promoter Score (NPS) with touch pill selector (1 to 10)
+- Qualitative retrospectives and constructive recommendations
+- Alumni directory opt-in for future full-time talent acquisition
+- Dedicated HR/Admin review dashboard (`admin/exit-feedbacks.php`)
+- Fully mobile responsive layout with off-canvas sidebar toggle integration
+
+#### 13. **Certificate Generation & Verification**
+- Instant automated generation of digitally signed completion certificates
+- Dynamic tenure calculation based on actual start and end dates
+- Public QR code cryptographic authenticity verification (`verify-certificate.php`)
+- Employee self-service document vault (`employee/my-documents.php`)
+
 ### UI/UX Features
 
 - **Modern, Responsive Design**: Works on desktop, tablet, and mobile devices
@@ -363,6 +385,6 @@ Built with:
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: December 13, 2025  
+**Version**: 1.2.0  
+**Last Updated**: November 1, 2026  
 **Status**: Production Ready
