@@ -497,6 +497,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+    
+        .intern-register-card {
+            margin-top: 24px;
+            padding: 12px 18px;
+            background: #F8FAFC;
+            border: 1px dashed #CBD5E1;
+            border-radius: 9999px;
+            text-align: center;
+            font-size: 0.88rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            transition: all 0.2s ease;
+        }
+        
+        .intern-register-card:hover {
+            background: #F1F5F9;
+            border-color: #94a3b8;
+        }
+        
+        .intern-register-card a {
+            color: #0A1138;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s ease;
+        }
+        
+        .intern-register-card a:hover {
+            color: #DF9E1D;
+        }
     </style>
 </head>
 <body>
@@ -588,6 +624,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Sign In
                 </button>
             </form>
+
+            <div class="intern-register-card">
+                <span>Applying for an internship?</span>
+                <a href="<?php echo url('intern-registration'); ?>">
+                    <span>Register Here</span> <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            
             
             <p class="footer-text">
                 © <?php echo date('Y'); ?> <?php echo APP_NAME; ?>. All rights reserved.

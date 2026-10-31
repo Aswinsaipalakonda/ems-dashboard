@@ -39,6 +39,20 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
         <li>
+            <a href="<?php echo url('admin/intern-registrations'); ?>" class="<?php echo $currentPage === 'intern-registrations.php' ? 'active' : ''; ?>">
+                <i class="bi bi-person-lines-fill me-2" style="font-size: 17px;"></i>
+                <span>Intern Registrations</span>
+                <?php
+                $pendingInterns = fetchOne("SELECT COUNT(*) as count FROM intern_registrations WHERE status = 'pending'")['count'] ?? 0;
+                if ($pendingInterns > 0):
+                ?>
+                <span class="badge bg-primary ms-auto"><?php echo $pendingInterns; ?></span>
+                <?php endif; ?>
+            </a>
+        </li>
+            </a>
+        </li>
+        <li>
             <a href="<?php echo url('admin/domains'); ?>" class="<?php echo $currentPage === 'domains.php' ? 'active' : ''; ?>">
                 <?php echo pika_icon('domains'); ?>
                 <span>Domains</span>
@@ -90,6 +104,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <a href="<?php echo url('admin/reports'); ?>" class="<?php echo $currentPage === 'reports.php' ? 'active' : ''; ?>">
                 <?php echo pika_icon('reports'); ?>
                 <span>Reports</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo url('admin/exit-feedbacks'); ?>" class="<?php echo $currentPage === 'exit-feedbacks.php' ? 'active' : ''; ?>">
+                <i class="bi bi-chat-square-heart me-2" style="font-size: 17px;"></i>
+                <span>Exit Feedbacks</span>
+            </a>
+        </li>
             </a>
         </li>
         <li>

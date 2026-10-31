@@ -30,7 +30,8 @@ $designationCodes = [
  * Format: [DOMAIN_CODE]-[DESIGNATION_CODE]-[NUMBER]
  * Example: WD-INT-001
  */
-function generateEmployeeId($domainId, $designation) {
+if (!function_exists('generateEmployeeId')) {
+    function generateEmployeeId($domainId, $designation) {
     global $designationCodes;
     
     // Get domain code
@@ -55,6 +56,7 @@ function generateEmployeeId($domainId, $designation) {
     }
     
     return $domainCode . '-' . $desigCode . '-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+    }
 }
 
 // Handle form submissions

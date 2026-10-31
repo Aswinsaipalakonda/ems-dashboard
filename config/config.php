@@ -250,6 +250,69 @@ function requireLogin() {
 /**
  * Redirect if not admin
  */
+/**
+ * Calculate human-readable duration between two dates
+ */
+if (!function_exists('formatDurationBetween')) {
+    function formatDurationBetween($startDate, $endDate, $fallback = '') {
+        if (empty($startDate) || empty($endDate)) return $fallback;
+        try {
+            $d1 = new DateTime($startDate);
+            $d2 = new DateTime($endDate);
+            if ($d2 < $d1) return $fallback;
+            $diff = $d1->diff($d2);
+            $totalDays = $diff->days;
+            $months = (int)round($totalDays / 30.44);
+            if ($months >= 1) {
+                return $months . ' ' . ($months === 1 ? 'Month' : 'Months');
+            } elseif ($totalDays > 0) {
+                return $totalDays . ' ' . ($totalDays === 1 ? 'Day' : 'Days');
+            }
+        } catch (Exception $e) {}
+        return $fallback;
+    }
+}
+
+/**
+ * Generate Employee ID based on domain and designation
+ * Format: [DOMAIN_CODE]-[DESIGNATION_CODE]-[NUMBER]
+ * Example: WD-INT-001
+ */
+if (!function_exists('generateEmployeeId')) {
+    function generateEmployeeId($domainId, $designation) {
+        $designationCodes = [
+            'Intern' => 'INT',
+            'Trainee' => 'TRN',
+            'Junior' => 'JR',
+            'Senior' => 'SR',
+            'Team Lead' => 'TL',
+            'Manager' => 'MGR',
+            'Director' => 'DIR',
+            'Employee' => 'EMP'
+        ];
+        
+        $domain = fetchOne("SELECT code FROM domains WHERE id = ?", "i", [$domainId]);
+        $domainCode = $domain ? $domain['code'] : 'GEN';
+        
+        $desigCode = 'EMP';
+        foreach ($designationCodes as $key => $code) {
+            if (stripos($designation, $key) !== false) {
+                $desigCode = $code;
+                break;
+            }
+        }
+        
+        $lastEmp = fetchOne("SELECT employee_id FROM employees ORDER BY id DESC LIMIT 1");
+        if ($lastEmp && preg_match('/(\d+)$/', $lastEmp['employee_id'], $matches)) {
+            $nextNum = intval($matches[1]) + 1;
+        } else {
+            $nextNum = 1;
+        }
+        
+        return $domainCode . '-' . $desigCode . '-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+    }
+}
+
 function requireAdmin() {
     requireLogin();
     if (!isAdmin()) {

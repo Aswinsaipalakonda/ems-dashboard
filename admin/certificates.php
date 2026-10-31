@@ -258,7 +258,7 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             <th>Certificate ID</th>
                             <th>Recipient Name</th>
                             <th>Program / Role</th>
-                            <th>Duration & Dates</th>
+                            <th>Program Dates & Duration</th>
                             <th>Signatory</th>
                             <th>Status</th>
                             <th>QR Verify Link</th>
@@ -296,8 +296,25 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold text-dark small"><?php echo htmlspecialchars($cert['duration_text']); ?></div>
-                                    <small class="text-muted"><?php echo date('d M Y', strtotime($cert['start_date'])); ?> - <?php echo date('d M Y', strtotime($cert['end_date'])); ?></small>
+                                    <div class="fw-semibold text-dark small"><?php echo date('d M Y', strtotime($cert['start_date'])); ?> - <?php echo date('d M Y', strtotime($cert['end_date'])); ?></div>
+                                    <?php
+                                    $dur = trim($cert['duration_text'] ?? '');
+                                    if (empty($dur) || strcasecmp($dur, 'Six months') === 0) {
+                                        try {
+                                            $d1 = new DateTime($cert['start_date']);
+                                            $d2 = new DateTime($cert['end_date']);
+                                            $diff = $d1->diff($d2);
+                                            $m = $diff->m + ($diff->y * 12);
+                                            if ($diff->d >= 20) $m++;
+                                            $dur = $m >= 1 ? ($m . ($m === 1 ? ' Month' : ' Months')) : ($diff->days . ' Days');
+                                        } catch (Exception $e) {
+                                            $dur = '';
+                                        }
+                                    }
+                                    if (!empty($dur)):
+                                    ?>
+                                    <small class="text-muted"><i class="bi bi-clock-history me-1"></i><?php echo htmlspecialchars($dur); ?></small>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="fw-semibold text-dark small"><?php echo htmlspecialchars($cert['signatory_name'] ?? 'Authorized Signatory'); ?></div>

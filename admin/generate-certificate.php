@@ -25,7 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $empId = !empty($_POST['employee_id']) ? (int)$_POST['employee_id'] : null;
     $recipientName = trim($_POST['recipient_name'] ?? '');
     $programName = trim($_POST['program_name'] ?? '');
-    $durationText = trim($_POST['duration_text'] ?? 'Six months');
+    $durationText = trim($_POST['duration_text'] ?? '');
+    if (empty($durationText) && !empty($_POST['start_date']) && !empty($_POST['end_date'])) {
+        $d1 = new DateTime($_POST['start_date']);
+        $d2 = new DateTime($_POST['end_date']);
+        $diff = $d1->diff($d2);
+        $m = $diff->m + ($diff->y * 12);
+        if ($diff->d >= 20) $m++;
+        $durationText = $m >= 1 ? ($m . ($m === 1 ? ' Month' : ' Months')) : ($diff->days . ' Days');
+    }
     $startDate = $_POST['start_date'] ?? date('Y-m-d');
     $endDate = $_POST['end_date'] ?? date('Y-m-d');
     $issueDate = $_POST['issue_date'] ?? date('Y-m-d');
@@ -129,7 +137,6 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                             </div>
 
                             <input type="hidden" id="selectedEmpId" name="employee_id" value="">
-                            <input type="hidden" id="durationText" name="duration_text" value="Six months">
 
                             <!-- Recipient Name & Emp ID Row -->
                             <div class="row g-2 mb-3">
@@ -166,15 +173,19 @@ require_once __DIR__ . '/../includes/admin-sidebar.php';
                                 <small class="text-muted" style="font-size: 11px;">Customizes dynamically based on role (e.g. digital marketing, UI/UX, software development).</small>
                             </div>
 
-                            <!-- Dates Row -->
+                            <!-- Dates & Duration Row -->
                             <div class="row g-2 mb-3">
-                                <div class="col-6">
+                                <div class="col-4">
                                     <label class="form-label font-weight-bold text-dark small">Start Date</label>
                                     <input type="date" class="form-control" id="startDate" name="start_date" value="" style="border-radius: 12px;">
                                 </div>
-                                <div class="col-6">
+                                <div class="col-4">
                                     <label class="form-label font-weight-bold text-dark small">End Date</label>
                                     <input type="date" class="form-control" id="endDate" name="end_date" value="" style="border-radius: 12px;">
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label font-weight-bold text-dark small">Duration</label>
+                                    <input type="text" class="form-control" id="durationText" name="duration_text" placeholder="e.g. 4 Months" value="" style="border-radius: 12px; font-weight: 600;">
                                 </div>
                             </div>
 
@@ -383,8 +394,8 @@ function drawCanvasContent() {
         const role = rawRole || '[Program / Role]';
 
         const durEl = document.getElementById('durationText');
-        const rawDuration = durEl ? durEl.value.trim() : 'Six months';
-        const duration = rawDuration || 'Six months';
+        const rawDuration = durEl ? durEl.value.trim() : '';
+        const duration = rawDuration;
 
         const sDateRaw = document.getElementById('startDate') ? document.getElementById('startDate').value : '';
         const eDateRaw = document.getElementById('endDate') ? document.getElementById('endDate').value : '';
@@ -574,6 +585,34 @@ function inferDomainFromRole(roleName) {
     }
 }
 
+function calculateDurationText() {
+    const sVal = document.getElementById('startDate').value;
+    const eVal = document.getElementById('endDate').value;
+    const durInput = document.getElementById('durationText');
+    if (!sVal || !eVal || !durInput) return;
+    
+    const d1 = new Date(sVal);
+    const d2 = new Date(eVal);
+    if (isNaN(d1) || isNaN(d2) || d2 < d1) return;
+    
+    const diffDays = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+    let months = Math.round(diffDays / 30.44);
+    if (months < 1) {
+        durInput.value = diffDays + (diffDays === 1 ? ' Day' : ' Days');
+    } else {
+        durInput.value = months + (months === 1 ? ' Month' : ' Months');
+    }
+}
+
+// Auto-calculate duration when dates change
+['startDate', 'endDate'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('change', calculateDurationText);
+        el.addEventListener('input', calculateDurationText);
+    }
+});
+
 // Event Listeners for live form changes
 ['recipientName', 'empCodeInput', 'programName', 'pronounSelect', 'contributionsDomain', 'durationText', 'startDate', 'endDate', 'issueDate', 'certificateId'].forEach(id => {
     const el = document.getElementById(id);
@@ -615,10 +654,10 @@ document.getElementById('empSelector').addEventListener('change', function() {
         }
 
         const joining = selected.getAttribute('data-joining');
-        const start = joining ? new Date(joining) : new Date(Date.now() - 180*24*60*60*1000);
+        const start = joining ? new Date(joining) : new Date();
         document.getElementById('startDate').value = start.toISOString().split('T')[0];
         document.getElementById('endDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('durationText').value = 'Six months';
+        calculateDurationText();
         
         // Populate Emp ID code separately without overriding the distinct unique Certificate ID
         const empCode = selected.getAttribute('data-code');

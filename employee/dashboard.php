@@ -81,6 +81,8 @@ $unreadCount = fetchOne(
     [$userId]
 )['count'] ?? 0;
 
+$hasExitFeedback = fetchOne("SELECT id, created_at FROM exit_feedbacks WHERE employee_id = ?", "i", [$userId]);
+
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/employee-sidebar.php';
 ?>
@@ -190,6 +192,43 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
             </div>
         </div>
         
+        <!-- Exit Feedback Callout Banner -->
+        <?php if ($hasExitFeedback): ?>
+        <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);">
+            <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                        <i class="bi bi-check-circle-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold text-dark">Exit Feedback Recorded</h6>
+                        <small class="text-muted">Thank you for sharing your experience. Your evaluation is stored in your employee record.</small>
+                    </div>
+                </div>
+                <a href="<?php echo url('employee/exit-feedback'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <i class="bi bi-eye me-1"></i> View Submission
+                </a>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: linear-gradient(135deg, #0A1138 0%, #1e295d 100%); color: #fff;">
+            <div class="card-body p-3 p-md-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-white bg-opacity-20 text-warning d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 22px;">
+                        <i class="bi bi-chat-square-heart-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-bold text-white" style="font-family: 'Outfit', sans-serif;">Concluding your tenure or internship?</h5>
+                        <p class="mb-0 text-white-50 small">Submit your Exit & Experience Feedback to help us grow and stay connected via the Clientura Alumni Network.</p>
+                    </div>
+                </div>
+                <a href="<?php echo url('employee/exit-feedback'); ?>" class="btn btn-warning font-weight-bold text-dark rounded-pill px-4 py-2 shadow-sm">
+                    <i class="bi bi-pencil-square me-1"></i> Submit Exit Feedback
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <div class="row g-4 mb-4">
             <?php if ($requiresCheckin): ?>
             <!-- Check-in Action Card -->

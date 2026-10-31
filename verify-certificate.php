@@ -161,7 +161,7 @@ $pageTitle = 'Certificate Verification';
                                 <?php echo htmlspecialchars($certificate['recipient_name']); ?>
                             </h2>
                             <p class="text-muted mb-4 fs-6">
-                                Successfully completed the <strong class="text-dark"><?php echo htmlspecialchars($certificate['duration_text']); ?></strong> internship program as <strong class="text-primary"><?php echo htmlspecialchars($certificate['program_name']); ?></strong>.
+                                Successfully completed the internship program as <strong class="text-primary"><?php echo htmlspecialchars($certificate['program_name']); ?></strong>.
                             </p>
 
                             <div class="row g-3 mb-4">
@@ -179,7 +179,15 @@ $pageTitle = 'Certificate Verification';
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="cert-info-label">Program Period</div>
-                                    <div class="cert-info-val"><?php echo date('d M Y', strtotime($certificate['start_date'])); ?> - <?php echo date('d M Y', strtotime($certificate['end_date'])); ?></div>
+                                    <div class="cert-info-val">
+                                        <?php 
+                                        echo date('d M Y', strtotime($certificate['start_date'])) . ' - ' . date('d M Y', strtotime($certificate['end_date'])); 
+                                        $cleanDur = trim($certificate['duration_text'] ?? '');
+                                        if (!empty($cleanDur) && strcasecmp($cleanDur, 'Six months') !== 0) {
+                                            echo ' <span class="text-muted small">(' . htmlspecialchars($cleanDur) . ')</span>';
+                                        }
+                                        ?>
+                                    </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="cert-info-label">Issuing Authority</div>

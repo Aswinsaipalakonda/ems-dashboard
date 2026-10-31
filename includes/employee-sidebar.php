@@ -76,6 +76,12 @@ $employeeCheckinRequired = fetchOne(
                 <span>My Documents</span>
             </a>
         </li>
+        <li>
+            <a href="<?php echo url('employee/exit-feedback'); ?>" class="<?php echo $currentPage === 'exit-feedback.php' ? 'active' : ''; ?>">
+                <i class="bi bi-chat-square-heart me-2" style="font-size: 17px;"></i>
+                <span>Exit Feedback</span>
+            </a>
+        </li>
         
         <li>
             <a href="<?php echo url('employee/notifications'); ?>" class="<?php echo $currentPage === 'notifications.php' ? 'active' : ''; ?>">

@@ -134,7 +134,20 @@ require_once __DIR__ . '/../includes/employee-sidebar.php';
                                             <h5 class="font-weight-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">
                                                 <?php echo htmlspecialchars($cert['program_name']); ?>
                                             </h5>
-                                            <p class="text-muted small mb-2">Duration: <?php echo htmlspecialchars($cert['duration_text']); ?></p>
+                                            <?php
+                                            $dur = trim($cert['duration_text'] ?? '');
+                                            if (empty($dur) || strcasecmp($dur, 'Six months') === 0) {
+                                                try {
+                                                    $d1 = new DateTime($cert['start_date']);
+                                                    $d2 = new DateTime($cert['end_date']);
+                                                    $diff = $d1->diff($d2);
+                                                    $m = $diff->m + ($diff->y * 12);
+                                                    if ($diff->d >= 20) $m++;
+                                                    $dur = $m >= 1 ? ($m . ($m === 1 ? ' Month' : ' Months')) : ($diff->days . ' Days');
+                                                } catch (Exception $e) { $dur = ''; }
+                                            }
+                                            ?>
+                                            <p class="text-muted small mb-2">Period: <?php echo date('d M Y', strtotime($cert['start_date'])); ?> - <?php echo date('d M Y', strtotime($cert['end_date'])); ?><?php if ($dur): ?> (<?php echo htmlspecialchars($dur); ?>)<?php endif; ?></p>
                                             <p class="text-muted small mb-3">Issued: <?php echo date('d M Y', strtotime($cert['issue_date'])); ?></p>
                                         </div>
 
